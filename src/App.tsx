@@ -1,14 +1,14 @@
-import { useCallback, useState } from 'react'
-import './App.css'
-import { Game } from './game/game'
-import { ExhaustiveError } from './game/util';
+import { useCallback, useState } from "react";
+import { ExhaustiveError } from "./game/util";
+import "./App.css";
+import { Scenario } from "./game/scenario";
 
 function App() {
-  const [game] = useState(() => new Game());
-  const [logText, setLogText] = useState("");
+  const [scenario] = useState(() => new Scenario());
+  const [logText, setLogText] = useState("迎春すごろく2026");
 
   const mainButtonHandler = useCallback(() => {
-    const turn = game.genTurn();
+    const turn = scenario.generateTurn();
     let logTmp = "";
 
     // とりあえずターンごとに進むようにしてみよう
@@ -24,29 +24,30 @@ function App() {
           logTmp += `「${log.text}」`;
           break;
         case "dicerollBefore":
-          break;  // noop
+          break; // noop
         case "dicerollAfter":
           logTmp += `\n(${log.kind} -> ${log.result})\n`;
           break;
         default:
-          throw new ExhaustiveError(log)
+          throw new ExhaustiveError(log);
       }
       iresult = turn.next();
     }
     setLogText(logTmp);
-  }, [game])
+  }, [scenario]);
 
   return (
     <>
       <main>
-        <p>迎春すごろく2026</p>
         <pre>{logText}</pre>
       </main>
       <footer>
-        <button type="button" onClick={mainButtonHandler}>次へ</button>
+        <button type="button" onClick={mainButtonHandler}>
+          次へ
+        </button>
       </footer>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,8 +1,8 @@
 import { dice } from "./util";
 
 export type Log =
-  | { type: "description"; text: string }
-  | { type: "quote"; text: string }
+  | { type: "description"; text: string } // 地の文
+  | { type: "quote"; text: string } // 台詞
   | { type: "dicerollBefore"; kind: string }
   | { type: "dicerollAfter"; kind: string; result: number };
 
