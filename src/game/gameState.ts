@@ -26,7 +26,7 @@ export const Player = {
 };
 
 export type GameState = {
-  nextPlayerIndex: number;
+  currentPlayerIndex: number;
   players: Player[];
 };
 
@@ -39,7 +39,7 @@ export const GameState = {
     }
 
     return {
-      nextPlayerIndex: 0,
+      currentPlayerIndex: 0,
       players,
     };
   },

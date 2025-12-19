@@ -1,4 +1,4 @@
-import { dice } from "./util";
+import { dice } from "../util";
 
 export type Log =
   | { type: "description"; text: string } // 地の文

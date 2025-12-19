@@ -12,3 +12,19 @@ export class ExhaustiveError extends Error {
     super(message);
   }
 }
+
+export class Observer {
+  private listeners: (() => void)[] = [];
+
+  subscribe(listener: () => void): () => void {
+    this.listeners.push(listener);
+    // Unsubscribe
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
+  }
+
+  notify() {
+    this.listeners.forEach((listener) => listener());
+  }
+}

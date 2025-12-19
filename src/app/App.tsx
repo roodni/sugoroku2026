@@ -1,9 +1,12 @@
 import { useCallback, useState } from "react";
-import { ExhaustiveError } from "./game/util";
+import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
-import { Scenario } from "./game/scenario";
+import { Scenario } from "../game/scenario";
+import { GameMap } from "./GameMap";
 
 function App() {
+  const [mapRenderObserver] = useState(() => new Observer());
+
   const [scenario] = useState(() => new Scenario());
   const [logText, setLogText] = useState("迎春すごろく2026");
 
@@ -15,6 +18,7 @@ function App() {
     // TODO: 自分だけダイス待ちする
     let iresult = turn.next();
     while (!iresult.done) {
+      mapRenderObserver.notify();
       const log = iresult.value;
       switch (log.type) {
         case "description":
@@ -34,11 +38,15 @@ function App() {
       iresult = turn.next();
     }
     setLogText(logTmp);
-  }, [scenario]);
+  }, [scenario, mapRenderObserver]);
 
   return (
     <>
       <main>
+        <GameMap
+          gameState={scenario.gameState}
+          renderObserver={mapRenderObserver}
+        ></GameMap>
         <pre>{logText}</pre>
       </main>
       <footer>
