@@ -26,9 +26,9 @@ function App() {
         case "quote":
           logTmp += `「${log.text}」`;
           break;
-        case "dicerollBefore":
+        case "diceRollBefore":
           break; // noop
-        case "dicerollAfter":
+        case "diceRollAfter":
           logTmp += `\n(${log.kind} -> ${log.result})\n`;
           break;
         default:
