@@ -27,6 +27,7 @@ export const Player = {
 
 export type GameState = {
   currentPlayerIndex: number;
+  cameraStart: number; // 地図で省略せず表示するマスの開始位置
   players: Player[];
 };
 
@@ -40,6 +41,7 @@ export const GameState = {
 
     return {
       currentPlayerIndex: 0,
+      cameraStart: 0,
       players,
     };
   },

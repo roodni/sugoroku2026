@@ -18,7 +18,6 @@ function App() {
     // TODO: 自分だけダイス待ちする
     let iresult = turn.next();
     while (!iresult.done) {
-      mapRenderObserver.notify();
       const log = iresult.value;
       switch (log.type) {
         case "description":
@@ -36,6 +35,7 @@ function App() {
           throw new ExhaustiveError(log);
       }
       iresult = turn.next();
+      mapRenderObserver.notify();
     }
     setLogText(logTmp);
   }, [scenario, mapRenderObserver]);
@@ -43,17 +43,16 @@ function App() {
   return (
     <>
       <main>
+        <button type="button" onClick={mainButtonHandler}>
+          次へ
+        </button>
         <GameMap
           gameState={scenario.gameState}
           renderObserver={mapRenderObserver}
         ></GameMap>
         <pre>{logText}</pre>
       </main>
-      <footer>
-        <button type="button" onClick={mainButtonHandler}>
-          次へ
-        </button>
-      </footer>
+      <footer></footer>
     </>
   );
 }

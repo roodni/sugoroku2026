@@ -14,6 +14,8 @@ export class Scenario {
     const player = g.players[g.currentPlayerIndex];
     player.turn += 1;
 
+    g.cameraStart = player.pos;
+
     yield Log.description(
       `${player.name}のターン（マス: ${player.pos}, 経過: ${player.turn}ターン）\n`
     );

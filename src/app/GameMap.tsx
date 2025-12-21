@@ -15,8 +15,14 @@ function renderMapText(gameState: GameState): string {
         return true;
       }
     }
-    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    if (currentPlayer.pos < pos && pos <= currentPlayer.pos + 6) {
+
+    const max = gameState.cameraStart + 6;
+    let min = gameState.cameraStart;
+    if (max > Config.goalPosition) {
+      // 折り返す可能性があれば、最大折り返し地点まで表示する
+      min = Math.min(min, Config.goalPosition - (max - Config.goalPosition));
+    }
+    if (min <= pos && pos <= max) {
       return true;
     }
     return false;
@@ -43,6 +49,8 @@ function renderMapText(gameState: GameState): string {
       line += " スタート";
     } else if (pos === Config.goalPosition) {
       line += " ゴール";
+    } else if (pos % 10 === 0) {
+      line += " 病院";
     }
 
     const players = gameState.players.filter((p) => p.pos === pos);
