@@ -11,7 +11,7 @@ function renderMapText(gameState: GameState): string {
       return true;
     }
     for (const player of gameState.players) {
-      if (player.pos === pos) {
+      if (player.position === pos) {
         return true;
       }
     }
@@ -53,7 +53,7 @@ function renderMapText(gameState: GameState): string {
       line += " 病院";
     }
 
-    const players = gameState.players.filter((p) => p.pos === pos);
+    const players = gameState.players.filter((p) => p.position === pos);
     if (players.length > 0) {
       line += " <- ";
       line += players.map((p) => `(${p.name})`).join(" ");

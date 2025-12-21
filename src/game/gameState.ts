@@ -7,7 +7,7 @@ export type Player = {
   name: string;
   isBot: boolean;
   turn: number;
-  pos: number;
+  position: number;
   goaled: boolean;
   personality: Personality;
 };
@@ -18,7 +18,7 @@ export const Player = {
       name,
       isBot,
       turn: 0,
-      pos: 0,
+      position: 0,
       goaled: false,
       personality: "gentle",
     };
