@@ -17,22 +17,39 @@ function App() {
     // とりあえずターンごとに進むようにしてみよう
     // TODO: 自分だけダイス待ちする
     let iresult = turn.next();
+    let isLogReturned = true;
     while (!iresult.done) {
       const log = iresult.value;
       switch (log.type) {
         case "description":
-          logTmp += `${log.text}\n`;
+          if (isLogReturned) {
+            logTmp += "　";
+          }
+          logTmp += `${log.text}`;
+          isLogReturned = false;
           break;
         case "quote":
+          if (!isLogReturned) {
+            logTmp += `\n`;
+          }
           logTmp += `「${log.text}」\n`;
+          isLogReturned = true;
           break;
         case "system":
-          logTmp += `${log.text}\n`;
+          if (!isLogReturned) {
+            logTmp += `\n`;
+          }
+          logTmp += "" + `${log.text}\n`;
+          isLogReturned = true;
           break;
         case "diceRollBefore":
           break; // noop
         case "newSection":
+          if (!isLogReturned) {
+            logTmp += `\n`;
+          }
           logTmp += `\n`;
+          isLogReturned = true;
           break;
         default:
           throw new ExhaustiveError(log);
