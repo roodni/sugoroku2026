@@ -20,7 +20,7 @@ export class Scenario {
       `${player.name}のターン（マス: ${player.position}, 経過: ${player.turn}ターン）\n`
     );
     yield Log.quote("テストです");
-    const dice = yield* Log.generateDiceroll(1, 6);
+    const dice = yield* Log.generateDiceRoll(1, 6, player.isBot);
 
     yield Log.description(`${player.name}は${dice}マス進んだ。`);
     let nextPos = player.position + dice;

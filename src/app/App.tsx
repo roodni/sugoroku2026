@@ -35,8 +35,8 @@ function App() {
           throw new ExhaustiveError(log);
       }
       iresult = turn.next();
-      mapRenderObserver.notify();
     }
+    mapRenderObserver.notify();
     setLogText(logTmp);
   }, [scenario, mapRenderObserver]);
 
