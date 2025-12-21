@@ -26,7 +26,7 @@ class PersonalityAttr implements PlayerAttr {
       case "gentle":
         return "温厚";
       case "violent":
-        return "乱暴";
+        return "凶暴";
       case "phobic":
         return "綺麗好き";
       case "smart":

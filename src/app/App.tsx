@@ -31,6 +31,9 @@ function App() {
           break;
         case "diceRollBefore":
           break; // noop
+        case "newSection":
+          logTmp += `\n`;
+          break;
         default:
           throw new ExhaustiveError(log);
       }

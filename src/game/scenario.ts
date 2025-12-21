@@ -21,12 +21,14 @@ export class Scenario {
 
     g.cameraStart = player.position;
 
+    yield Log.system(`${player.name}のターン。`);
     const playerAttrsText = stringifyPlayerAttrs(player, [
       PlayerAttr.position,
       PlayerAttr.personality,
       PlayerAttr.turn,
     ]);
-    yield Log.system(`${player.name}のターン (${playerAttrsText})`);
+    yield Log.system(`(${player.name}) ${playerAttrsText}`);
+    yield Log.newSection();
     const dice = yield* LogUtil.generateDiceRoll(1, 6, player.isBot);
 
     yield Log.description(`${player.name}は${dice}マス進んだ。`);
