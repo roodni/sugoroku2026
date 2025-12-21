@@ -21,16 +21,16 @@ function App() {
       const log = iresult.value;
       switch (log.type) {
         case "description":
-          logTmp += `${log.text}`;
+          logTmp += `${log.text}\n`;
           break;
         case "quote":
-          logTmp += `「${log.text}」`;
+          logTmp += `「${log.text}」\n`;
+          break;
+        case "system":
+          logTmp += `${log.text}\n`;
           break;
         case "diceRollBefore":
           break; // noop
-        case "diceRollAfter":
-          logTmp += `\n(${log.kind} -> ${log.result})\n`;
-          break;
         default:
           throw new ExhaustiveError(log);
       }

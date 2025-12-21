@@ -5,8 +5,8 @@ export type Emotion = "positive" | "neutral" | "negative";
 export type Log =
   | { type: "description"; text: string; emotion: Emotion } // 地の文
   | { type: "quote"; text: string; emotion: Emotion } // 台詞
-  | { type: "diceRollBefore"; kind: string; isBot: boolean }
-  | { type: "diceRollAfter"; kind: string; result: number };
+  | { type: "system"; text: string; emotion: Emotion } // フレーバーではないテキスト
+  | { type: "diceRollBefore"; expression: string; isBot: boolean };
 
 export const Log = {
   description(text: string, emotion: Emotion = "neutral"): Log {
@@ -15,11 +15,11 @@ export const Log = {
   quote(text: string, emotion: Emotion = "neutral"): Log {
     return { type: "quote", text, emotion };
   },
-  diceRollBefore(kind: string, isBot: boolean): Log {
-    return { type: "diceRollBefore", kind, isBot };
+  system(text: string, emotion: Emotion = "neutral"): Log {
+    return { type: "system", text, emotion };
   },
-  diceRollAfter(kind: string, result: number): Log {
-    return { type: "diceRollAfter", kind, result };
+  diceRollBefore(expression: string, isBot: boolean): Log {
+    return { type: "diceRollBefore", expression, isBot };
   },
 
   *generateDiceRoll(
@@ -27,11 +27,13 @@ export const Log = {
     sides: number,
     isBot: boolean
   ): Generator<Log, number> {
-    const kind = `${times}d${sides}`;
-    yield Log.diceRollBefore(kind, isBot);
-    // ダイス振るボタンを押す前に結果がわかるのが嫌なのでbefore/afterに分けている。意味はない
+    const expression = `${times}d${sides}`;
+    yield Log.diceRollBefore(expression, isBot);
+    // ダイス振るボタンを押す前に結果がわかるのが気分的に嫌なのでbefore/afterに分けている。
+    // 意味はない。
     const result = dice(times, sides);
-    yield Log.diceRollAfter(kind, result);
+    yield Log.system(`(${expression}) => ${result}`);
+    // yield Log.
     return result;
   },
 };

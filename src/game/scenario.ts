@@ -1,5 +1,6 @@
 import { Config } from "./config";
 import { GameState } from "./gameState";
+import { logPlayerAttrs, PlayerAttr } from "./indicator";
 import { Log } from "./log";
 
 export class Scenario {
@@ -16,10 +17,14 @@ export class Scenario {
 
     g.cameraStart = player.position;
 
-    yield Log.description(
-      `${player.name}のターン（マス: ${player.position}, 経過: ${player.turn}ターン）\n`
+    yield Log.system(
+      logPlayerAttrs(player, [
+        PlayerAttr.position,
+        PlayerAttr.personality,
+        PlayerAttr.turn,
+      ])
     );
-    yield Log.quote("テストです");
+    yield Log.system(`${player.name}のターン。`);
     const dice = yield* Log.generateDiceRoll(1, 6, player.isBot);
 
     yield Log.description(`${player.name}は${dice}マス進んだ。`);
