@@ -1,6 +1,6 @@
 import type { Player } from "./gameState";
 
-// プレイヤーの各属性を文字列化する
+// プレイヤーの属性を文字列化するための仕組み
 export interface PlayerAttr {
   label: string;
   valueString: (p: Player) => string;
@@ -45,7 +45,11 @@ export const PlayerAttr = {
 };
 
 // プレイヤーの属性をほぼ全てログ出力用に文字列化する
-export function logPlayerAttrs(player: Player, attrs: PlayerAttr[]): string {
+const attrSeparator = " / ";
+export function stringifyPlayerAttrs(
+  player: Player,
+  attrs: PlayerAttr[]
+): string {
   const attrsText = attrs
     .flatMap((attr) => {
       if (attr.isDefaultValue?.(player)) {
@@ -53,6 +57,42 @@ export function logPlayerAttrs(player: Player, attrs: PlayerAttr[]): string {
       }
       return `${attr.label}: ${attr.valueString(player)}`;
     })
-    .join(" / ");
-  return `(${player.name}) ${attrsText}`;
+    .join(attrSeparator);
+  return attrsText;
+}
+
+// プレイヤーの属性を変更して、その変更をログとして出力するための仕組み
+export interface PlayerAttrChanger {
+  attr: PlayerAttr;
+  change: (p: Player) => void;
+}
+
+class PositionChanger implements PlayerAttrChanger {
+  attr = PlayerAttr.position;
+  nextPosition: number;
+  constructor(nextPosition: number) {
+    this.nextPosition = nextPosition;
+  }
+  change(p: Player) {
+    p.position = this.nextPosition;
+  }
+}
+
+export const PlayerAttrChanger = {
+  position: (nextPosition: number) => new PositionChanger(nextPosition),
+};
+
+// プレイヤーの属性を変更した後で、その変更内容を文字列化して返す
+export function stringifyPlayerAttrsChange(
+  player: Player,
+  changers: PlayerAttrChanger[]
+): string {
+  const attrTexts = [];
+  for (const changer of changers) {
+    const before = changer.attr.valueString(player);
+    changer.change(player);
+    const after = changer.attr.valueString(player);
+    attrTexts.push(`${changer.attr.label}: ${before} -> ${after}`);
+  }
+  return attrTexts.join(attrSeparator);
 }

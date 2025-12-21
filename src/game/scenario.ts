@@ -1,7 +1,11 @@
 import { Config } from "./config";
 import { GameState } from "./gameState";
-import { logPlayerAttrs, PlayerAttr } from "./indicator";
-import { Log } from "./log";
+import {
+  PlayerAttr,
+  PlayerAttrChanger,
+  stringifyPlayerAttrs,
+} from "./indicator";
+import { Log, LogUtil } from "./log";
 
 export class Scenario {
   gameState: GameState;
@@ -17,15 +21,13 @@ export class Scenario {
 
     g.cameraStart = player.position;
 
-    yield Log.system(
-      logPlayerAttrs(player, [
-        PlayerAttr.position,
-        PlayerAttr.personality,
-        PlayerAttr.turn,
-      ])
-    );
-    yield Log.system(`${player.name}のターン。`);
-    const dice = yield* Log.generateDiceRoll(1, 6, player.isBot);
+    const playerAttrsText = stringifyPlayerAttrs(player, [
+      PlayerAttr.position,
+      PlayerAttr.personality,
+      PlayerAttr.turn,
+    ]);
+    yield Log.system(`${player.name}のターン (${playerAttrsText})`);
+    const dice = yield* LogUtil.generateDiceRoll(1, 6, player.isBot);
 
     yield Log.description(`${player.name}は${dice}マス進んだ。`);
     let nextPos = player.position + dice;
@@ -35,9 +37,10 @@ export class Scenario {
     }
 
     // TODO: ユーザーの状態変化には専用のログを使う
-    player.position = nextPos;
-    yield Log.description(
-      `${player.name}は${player.position}マス目に到達した。`
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.position(nextPos),
+      "positive"
     );
 
     // 次のプレイヤーへ

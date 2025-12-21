@@ -1,4 +1,6 @@
 import { dice } from "../util";
+import type { Player } from "./gameState";
+import { PlayerAttrChanger, stringifyPlayerAttrsChange } from "./indicator";
 
 export type Emotion = "positive" | "neutral" | "negative";
 
@@ -21,7 +23,9 @@ export const Log = {
   diceRollBefore(expression: string, isBot: boolean): Log {
     return { type: "diceRollBefore", expression, isBot };
   },
+};
 
+export const LogUtil = {
   *generateDiceRoll(
     times: number,
     sides: number,
@@ -32,8 +36,25 @@ export const Log = {
     // ダイス振るボタンを押す前に結果がわかるのが気分的に嫌なのでbefore/afterに分けている。
     // 意味はない。
     const result = dice(times, sides);
-    yield Log.system(`(${expression}) => ${result}`);
-    // yield Log.
+    yield Log.system(`[${expression}] ${result}`);
     return result;
+  },
+
+  *generatePlayerAttrsChange(
+    player: Player,
+    attrs: PlayerAttrChanger[],
+    emotion: Emotion
+  ): Generator<Log> {
+    yield Log.system(
+      `(${player.name}) ${stringifyPlayerAttrsChange(player, attrs)}`,
+      emotion
+    );
+  },
+  *generatePlayerAttrChange(
+    player: Player,
+    attr: PlayerAttrChanger,
+    emotion: Emotion
+  ): Generator<Log> {
+    yield* this.generatePlayerAttrsChange(player, [attr], emotion);
   },
 };
