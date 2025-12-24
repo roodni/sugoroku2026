@@ -66,20 +66,19 @@ function renderMapText(gameState: GameState): string {
 
 // すごろくの地図を描画するコンポーネント
 export const GameMap: React.FC<{
-  gameState: GameState;
-  renderObserver: Observer;
-}> = ({ renderObserver, gameState }) => {
-  const [text, setText] = useState(() => renderMapText(gameState));
+  renderObserver: Observer<GameState>;
+}> = ({ renderObserver }) => {
+  const [text, setText] = useState("game map");
 
   useEffect(() => {
-    const unsubscribe = renderObserver.subscribe(() => {
+    const unsubscribe = renderObserver.subscribe((gameState) => {
       console.log("マップ再描画");
       setText(renderMapText(gameState));
     });
     return () => {
       unsubscribe();
     };
-  }, [renderObserver, gameState]);
+  }, [renderObserver]);
 
   return <pre className="game-map">{text}</pre>;
 };

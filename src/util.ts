@@ -13,10 +13,10 @@ export class ExhaustiveError extends Error {
   }
 }
 
-export class Observer {
-  private listeners: (() => void)[] = [];
+export class Observer<T> {
+  private listeners: ((arg: T) => void)[] = [];
 
-  subscribe(listener: () => void): () => void {
+  subscribe(listener: (arg: T) => void): () => void {
     this.listeners.push(listener);
     // Unsubscribe
     return () => {
@@ -24,7 +24,7 @@ export class Observer {
     };
   }
 
-  notify() {
-    this.listeners.forEach((listener) => listener());
+  notify(arg: T): void {
+    this.listeners.forEach((listener) => listener(arg));
   }
 }

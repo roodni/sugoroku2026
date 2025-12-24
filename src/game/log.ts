@@ -7,9 +7,10 @@ export type Emotion = "positive" | "neutral" | "negative";
 export type Log =
   | { type: "description"; text: string; emotion: Emotion } // 地の文
   | { type: "quote"; text: string; emotion: Emotion } // 台詞
-  | { type: "system"; text: string; emotion: Emotion } // フレーバーではないテキスト
+  | { type: "system"; text: string; emotion: Emotion }
+  | { type: "newSection" }
   | { type: "diceRollBefore"; expression: string; isBot: boolean }
-  | { type: "newSection" };
+  | { type: "turnEnd" };
 
 export const Log = {
   description(text: string, emotion: Emotion = "neutral"): Log {
@@ -26,6 +27,9 @@ export const Log = {
   },
   newSection(): Log {
     return { type: "newSection" };
+  },
+  turnEnd(): Log {
+    return { type: "turnEnd" };
   },
 };
 

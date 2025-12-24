@@ -1,78 +1,92 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import type { GameState } from "../game/gameState";
+import type { Log } from "../game/log";
+import { Scenario } from "../game/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
-import { Scenario } from "../game/scenario";
 import { GameMap } from "./GameMap";
+import { TurnLogs, type LogWithIndex } from "./TurnLogs";
+
+type WaitType = "button" | "timer";
+const WAIT = 50;
 
 function App() {
-  const [mapRenderObserver] = useState(() => new Observer());
-
+  // ゲームの状態
   const [scenario] = useState(() => new Scenario());
-  const [logText, setLogText] = useState("迎春すごろく2026");
 
-  const mainButtonHandler = useCallback(() => {
-    const turn = scenario.generateTurn();
-    let logTmp = "";
+  // 描画系の状態
+  const [mapRenderObserver] = useState(() => new Observer<GameState>());
+  const [waitType, setWaitType] = useState<WaitType>("button");
+  const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
 
-    // とりあえずターンごとに進むようにしてみよう
-    // TODO: 自分だけダイス待ちする
-    let iresult = turn.next();
-    let isLogReturned = true;
-    while (!iresult.done) {
-      const log = iresult.value;
+  // ゲーム進行
+  const allLogs = useRef<Log[]>([]);
+  const stepGame = useCallback(() => {
+    // 非常に危なっかしい。コンポーネント内で定義した関数で再帰するのは問題を起こすことが目に見えている。
+    const recFn = () => {
+      const log = scenario.next();
+      if (log === undefined) {
+        return;
+      }
+
+      const index = allLogs.current.length;
+      const lastLog = allLogs.current.at(-1);
+      allLogs.current.push(log);
+
+      if (lastLog?.type === "turnEnd") {
+        setTurnLogs([[index, log]]);
+      } else {
+        setTurnLogs((prev) => [...prev, [index, log]]);
+      }
+      mapRenderObserver.notify(scenario.gameState);
+
+      // 待機の仕方を決める
+      let waitType: WaitType;
       switch (log.type) {
         case "description":
-          if (isLogReturned) {
-            logTmp += "　";
-          }
-          logTmp += `${log.text}`;
-          isLogReturned = false;
-          break;
         case "quote":
-          if (!isLogReturned) {
-            logTmp += `\n`;
-          }
-          logTmp += `「${log.text}」\n`;
-          isLogReturned = true;
-          break;
         case "system":
-          if (!isLogReturned) {
-            logTmp += `\n`;
-          }
-          logTmp += "" + `${log.text}\n`;
-          isLogReturned = true;
+        case "newSection":
+          waitType = "timer";
           break;
         case "diceRollBefore":
-          break; // noop
-        case "newSection":
-          if (!isLogReturned) {
-            logTmp += `\n`;
-          }
-          logTmp += `\n`;
-          isLogReturned = true;
+          waitType = log.isBot ? "timer" : "button";
+          break;
+        case "turnEnd":
+          waitType = "button";
           break;
         default:
           throw new ExhaustiveError(log);
       }
-      iresult = turn.next();
-    }
-    mapRenderObserver.notify();
-    setLogText(logTmp);
+      setWaitType(waitType);
+      if (waitType === "timer") {
+        setTimeout(recFn, WAIT);
+      }
+    };
+    recFn();
   }, [scenario, mapRenderObserver]);
+
+  const mainButtonHandler = useCallback(() => {
+    if (waitType === "button") {
+      stepGame();
+    }
+  }, [waitType, stepGame]);
 
   return (
     <>
-      <main>
-        <button type="button" onClick={mainButtonHandler}>
+      <footer>
+        <button
+          type="button"
+          onClick={mainButtonHandler}
+          disabled={waitType !== "button"}
+        >
           次へ
         </button>
-        <GameMap
-          gameState={scenario.gameState}
-          renderObserver={mapRenderObserver}
-        ></GameMap>
-        <pre>{logText}</pre>
+      </footer>
+      <main>
+        <GameMap renderObserver={mapRenderObserver}></GameMap>
+        <TurnLogs logs={turnLogs} />
       </main>
-      <footer></footer>
     </>
   );
 }
