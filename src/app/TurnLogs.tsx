@@ -13,6 +13,11 @@ export const TurnLogs: React.FC<{
   let isReturned = true; // 最後に改行されたかどうか
   for (const [index, log] of logs) {
     let text = "";
+    const newLine = () => {
+      if (!isReturned) {
+        text += "\n";
+      }
+    };
     switch (log.type) {
       case "description":
         if (isReturned) {
@@ -22,33 +27,31 @@ export const TurnLogs: React.FC<{
         isReturned = false;
         break;
       case "quote":
-        if (!isReturned) {
-          text += "\n";
-        }
+        newLine();
         text += `「${log.text}」\n`;
         isReturned = true;
         break;
       case "system":
-        if (!isReturned) {
-          text += "\n";
-        }
+        newLine();
         text += `${log.text}\n`;
         isReturned = true;
         break;
       case "newSection":
-        if (!isReturned) {
-          text += "\n";
-        }
+        newLine();
         text += "\n";
         isReturned = true;
         break;
       case "diceRollBefore":
+        newLine();
+        text += `[${log.expression}]`;
+        break;
+      case "diceRollAfter":
+        text += ` ${log.result}\n`;
+        isReturned = true;
         break;
       case "turnEnd":
-        if (!isReturned) {
-          text += "\n";
-        }
-        text += "--- ターンエンド ---";
+        newLine();
+        text += "--- ターン終了 ---";
         isReturned = false;
         break;
       default:

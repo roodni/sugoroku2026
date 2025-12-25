@@ -10,6 +10,7 @@ export type Log =
   | { type: "system"; text: string; emotion: Emotion }
   | { type: "newSection" }
   | { type: "diceRollBefore"; expression: string; isBot: boolean }
+  | { type: "diceRollAfter"; expression: string; result: number }
   | { type: "turnEnd" };
 
 export const Log = {
@@ -24,6 +25,9 @@ export const Log = {
   },
   diceRollBefore(expression: string, isBot: boolean): Log {
     return { type: "diceRollBefore", expression, isBot };
+  },
+  diceRollAfter(expression: string, result: number): Log {
+    return { type: "diceRollAfter", expression, result };
   },
   newSection(): Log {
     return { type: "newSection" };
@@ -44,7 +48,7 @@ export const LogUtil = {
     // ダイス振るボタンを押す前に結果がわかるのが気分的に嫌なのでbefore/afterに分けている。
     // 意味はない。
     const result = dice(times, sides);
-    yield Log.system(`[${expression}] ${result}`);
+    yield Log.diceRollAfter(expression, result);
     return result;
   },
 

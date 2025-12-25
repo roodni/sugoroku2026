@@ -8,7 +8,7 @@ import { GameMap } from "./GameMap";
 import { TurnLogs, type LogWithIndex } from "./TurnLogs";
 
 type WaitType = "button" | "timer";
-const WAIT = 50;
+const WAIT = 100;
 
 function App() {
   // ゲームの状態
@@ -21,9 +21,8 @@ function App() {
 
   // ゲーム進行
   const allLogs = useRef<Log[]>([]);
-  const stepGame = useCallback(() => {
-    // 非常に危なっかしい。コンポーネント内で定義した関数で再帰するのは問題を起こすことが目に見えている。
-    const recFn = () => {
+  const stepGame = useCallback(async () => {
+    while (true) {
       const log = scenario.next();
       if (log === undefined) {
         return;
@@ -41,13 +40,16 @@ function App() {
       mapRenderObserver.notify(scenario.gameState);
 
       // 待機の仕方を決める
-      let waitType: WaitType;
+      let waitType: WaitType | "immediate";
       switch (log.type) {
         case "description":
         case "quote":
         case "system":
-        case "newSection":
+        case "diceRollAfter":
           waitType = "timer";
+          break;
+        case "newSection":
+          waitType = "immediate";
           break;
         case "diceRollBefore":
           waitType = log.isBot ? "timer" : "button";
@@ -58,12 +60,17 @@ function App() {
         default:
           throw new ExhaustiveError(log);
       }
-      setWaitType(waitType);
-      if (waitType === "timer") {
-        setTimeout(recFn, WAIT);
+
+      if (waitType === "immediate") {
+        continue;
+      } else if (waitType === "timer") {
+        setWaitType(waitType);
+        await new Promise((resolve) => setTimeout(resolve, WAIT));
+      } else if (waitType === "button") {
+        setWaitType(waitType);
+        break;
       }
-    };
-    recFn();
+    }
   }, [scenario, mapRenderObserver]);
 
   const mainButtonHandler = useCallback(() => {
