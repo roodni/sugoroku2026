@@ -1,3 +1,37 @@
 .game-map {
-  border: 2px solid black
+  border: 2px solid gray;
+  padding: 4px;
+  margin: 0;
+}
+
+.app {
+  max-width: 1024px;
+  height: 100vh;
+
+  margin: 0 auto;
+  padding: 8px;
+
+  background-color: lightgray;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex-grow: 1;
+  overflow: auto;
+}
+.footer {
+  /* background-color: orange; */
+
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.main-button {
+  flex-grow: 1;
+  height: 40px;
 }

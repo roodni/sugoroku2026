@@ -1,11 +1,28 @@
+* {
+  box-sizing: border-box;
+}
+
 :root {
   /* font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; */
-  font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, "Source Code Pro", source-code-pro, monospace;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, "Source Code Pro",
+    source-code-pro, monospace;
+  font-size: 14px;
 
-  background-color: lightgray;
+  background-color: silver;
 
-  /* color: rgba(255, 255, 255, 0.87);
-  background-color: #242424; */
+  /* color: rgba(255, 255, 255, 0.87); */
+  /* background-color: #242424; */
+}
+
+body {
+  margin: 0;
+}
+
+pre {
+  font-family: inherit;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
 }

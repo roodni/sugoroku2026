@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameState } from "../game/gameState";
 import type { Log } from "../game/log";
 import { Scenario } from "../game/scenario";
@@ -18,6 +18,8 @@ function App() {
   const [mapRenderObserver] = useState(() => new Observer<GameState>());
   const [waitType, setWaitType] = useState<WaitType>("button");
   const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
+
+  const mainButtonRef = useRef<HTMLButtonElement>(null);
 
   // ゲーム進行
   const allLogs = useRef<Log[]>([]);
@@ -73,6 +75,12 @@ function App() {
     }
   }, [scenario, mapRenderObserver]);
 
+  useEffect(() => {
+    if (waitType === "button") {
+      mainButtonRef.current?.focus();
+    }
+  }, [waitType]);
+
   const mainButtonHandler = useCallback(() => {
     if (waitType === "button") {
       stepGame();
@@ -80,21 +88,27 @@ function App() {
   }, [waitType, stepGame]);
 
   return (
-    <>
-      <footer>
-        <button
-          type="button"
-          onClick={mainButtonHandler}
-          disabled={waitType !== "button"}
-        >
-          次へ
-        </button>
-      </footer>
-      <main>
+    <div className="app">
+      <main className="main">
         <GameMap renderObserver={mapRenderObserver}></GameMap>
         <TurnLogs logs={turnLogs} />
       </main>
-    </>
+      <footer className="footer">
+        <button
+          ref={mainButtonRef}
+          type="button"
+          onClick={mainButtonHandler}
+          disabled={waitType !== "button"}
+          className="main-button"
+        >
+          次へ
+        </button>
+        <label>
+          <input type="checkbox"></input>
+          自動
+        </label>
+      </footer>
+    </div>
   );
 }
 

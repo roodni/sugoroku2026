@@ -54,9 +54,12 @@ function renderMapText(gameState: GameState): string {
     }
 
     const players = gameState.players.filter((p) => p.position === pos);
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     if (players.length > 0) {
       line += " <- ";
-      line += players.map((p) => `(${p.name})`).join(" ");
+      line += players
+        .map((p) => (p === currentPlayer ? `[${p.name}]` : p.name))
+        .join(" ");
     }
     lines.push(line);
   }
