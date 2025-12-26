@@ -48,9 +48,9 @@ function* generateTurn(g: GameState): Generator<Log> {
     PlayerAttr.turn,
   ]);
   yield Log.system(`(${player.name}) ${playerAttrsText}`);
-  yield Log.newSection();
 
   // ダイス移動
+  yield Log.newSection();
   const dice = yield* LogUtil.generateDiceRoll(1, 6, player.isBot);
   yield Log.description(`${player.name}は${dice}マス進んだ。`);
   let nextPos = player.position + dice;
@@ -63,7 +63,6 @@ function* generateTurn(g: GameState): Generator<Log> {
     PlayerAttrChanger.position(nextPos),
     "positive"
   );
-  yield Log.newSection();
 
   // 相席イベント
   yield* generateSharingPositionEvent(g, player);
@@ -86,6 +85,7 @@ function* generateSharingPositionEvent(
     return;
   }
 
+  yield Log.newSection();
   const otherNames = others.map((p) => p.name).join("と");
   yield Log.description(`マスには${otherNames}がいた。`);
   for (const other of others) {
@@ -107,5 +107,4 @@ function* generateSharingPositionEvent(
     }
     yield Log.description("心が温かくなった。");
   }
-  yield Log.newSection();
 }

@@ -43,16 +43,19 @@ export const TurnLogs: React.FC<{
         break;
       case "diceRollBefore":
         newLine();
-        text += `[${log.expression}]`;
+        text += `[サイコロ] ${log.expression} => `;
+        if (index === logs.at(-1)?.[0] && !log.isBot) {
+          text += "(サイコロを振ってください)";
+        }
         break;
       case "diceRollAfter":
-        text += ` ${log.result}\n`;
+        text += `${log.result}\n`;
         isReturned = true;
         break;
       case "turnEnd":
         newLine();
-        text += "--- ターン終了 ---";
-        isReturned = false;
+        text += "\n--- ターン終了 ---\n";
+        isReturned = true;
         break;
       default:
         throw new ExhaustiveError(log);
@@ -63,5 +66,5 @@ export const TurnLogs: React.FC<{
     }
     elements.push(<span key={index}>{text}</span>);
   }
-  return <pre>{elements}</pre>;
+  return <pre className="turn-logs">{elements}</pre>;
 };

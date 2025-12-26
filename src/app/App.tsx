@@ -76,6 +76,7 @@ function App() {
   }, [scenario, mapRenderObserver]);
 
   useEffect(() => {
+    // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
     if (waitType === "button") {
       mainButtonRef.current?.focus();
     }
@@ -86,6 +87,22 @@ function App() {
       stepGame();
     }
   }, [waitType, stepGame]);
+
+  const lastLog = turnLogs.at(-1)?.[1];
+
+  const mainButtonLabel = (() => {
+    if (waitType !== "button") {
+      return "進行中……";
+    }
+    switch (lastLog?.type) {
+      case "diceRollBefore":
+        return `サイコロを振る (${lastLog.expression})`;
+      case "turnEnd":
+        return "次へ";
+      default:
+        return "次へ";
+    }
+  })();
 
   return (
     <div className="app">
@@ -101,11 +118,11 @@ function App() {
           disabled={waitType !== "button"}
           className="main-button"
         >
-          次へ
+          {mainButtonLabel}
         </button>
         <label>
           <input type="checkbox"></input>
-          自動
+          自動進行
         </label>
       </footer>
     </div>
