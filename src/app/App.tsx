@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameState } from "../game/gameState";
 import type { Log } from "../game/log";
-import { Scenario } from "../game/scenario";
+import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { GameMap } from "./GameMap";

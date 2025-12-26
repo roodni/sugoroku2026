@@ -1,11 +1,12 @@
-import { Config } from "./config";
-import { GameState, Player } from "./gameState";
+import { ExhaustiveError } from "../../util";
+import { Config } from "../config";
+import { GameState, Player } from "../gameState";
 import {
   PlayerAttr,
   PlayerAttrChanger,
   stringifyPlayerAttrs,
-} from "./indicator";
-import { Log, LogUtil } from "./log";
+} from "../indicator";
+import { Log, LogUtil } from "../log";
 
 export class Scenario {
   // 描画に使うのでpublic。申し訳程度にReadonlyにしている
@@ -42,6 +43,7 @@ function* generateTurn(g: GameState): Generator<Log> {
 
   // ターン開始
   yield Log.description(`${player.name}のターン。`);
+  yield* generateHello(g);
   const playerAttrsText = stringifyPlayerAttrs(player, [
     PlayerAttr.position,
     PlayerAttr.personality,
@@ -73,6 +75,61 @@ function* generateTurn(g: GameState): Generator<Log> {
   g.currentPlayerIndex = (g.currentPlayerIndex + 1) % g.players.length;
 }
 
+// ターン開始時の独り言
+function* generateHello(g: GameState): Generator<Log> {
+  const player = g.players[g.currentPlayerIndex];
+  const index = g.currentPlayerIndex + player.position;
+
+  const quotes = (() => {
+    switch (player.personality) {
+      case "gentle":
+        return [
+          "さあ頑張ろう",
+          player.position < Config.goalPosition / 2
+            ? "ゴールまで遠いなあ"
+            : "ゴールが近づいてきた",
+          "6の目を出したい",
+          "今日はどうしようかな",
+          "みんな元気かな",
+          "平和が一番だね",
+        ];
+      case "violent":
+        return [
+          "ブッ飛ばしてやるぜ！",
+          "今日も暴れてやるか！",
+          "誰でもいいから殴りてえ",
+          "ククク……俺のターンだな……",
+          "終わらせてやるぜ、このゲームをよォー！",
+          "ヒャッハー！",
+        ];
+      case "phobic":
+        return [
+          "あ、あの……頑張ります",
+          "うう、進まないと",
+          "なんで私がこんなことを……",
+          "帰りたいです",
+          "サイコロも消毒しなきゃ",
+          "誰にも会いませんように……！",
+        ];
+      case "smart":
+        return [
+          "フッ、今日も知略を巡らせよう",
+          "無駄な動きはしない",
+          "6の目が出る確率……66.6%",
+          "スマートにゴールしてみせるさ",
+          "データに基づいて最適に行動するのさ",
+          `あと${Math.ceil(
+            (Config.goalPosition - player.position) / 3.5
+          )}ターンくらいだな`,
+        ];
+      default:
+        throw new ExhaustiveError(player.personality);
+    }
+  })();
+
+  yield Log.quote(quotes[index % quotes.length]);
+}
+
 // 相席イベント
 function* generateSharingPositionEvent(
   g: GameState,
@@ -102,7 +159,7 @@ function* generateSharingPositionEvent(
         yield Log.quote(`こ、こんにちは……`);
         break;
       case "smart":
-        yield Log.quote(`フッ……のどかな日だね`);
+        yield Log.quote(`奇遇だね`);
         break;
     }
     yield Log.description("心が温かくなった。");
