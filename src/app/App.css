@@ -37,6 +37,11 @@
 }
 
 
-.paragraph {
+.turn-logs {
   margin: 16px 0;
+  white-space: pre-wrap;
+}
+
+.log-waiting {
+  opacity: 0.5;
 }

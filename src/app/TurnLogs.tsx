@@ -12,59 +12,78 @@ export const TurnLogs: React.FC<{
   const elements: JSX.Element[] = [];
   let isReturned = true; // 最後に改行されたかどうか
   for (const [index, log] of logs) {
-    let text = "";
-    const newLine = () => {
-      if (!isReturned) {
-        text += "\n";
-      }
-    };
+    let logElement: JSX.Element | undefined = undefined;
+    const newLine = () => !isReturned && "\n";
     switch (log.type) {
       case "description":
-        if (isReturned) {
-          text += "　";
-        }
-        text += log.text;
+        logElement = (
+          <>
+            {isReturned && "　"}
+            {log.text}
+          </>
+        );
         isReturned = false;
         break;
       case "quote":
-        newLine();
-        text += `「${log.text}」\n`;
+        logElement = (
+          <span>
+            {newLine()}「{log.text}」{"\n"}
+          </span>
+        );
         isReturned = true;
         break;
       case "system":
-        newLine();
-        text += `${log.text}\n`;
+        logElement = (
+          <>
+            {newLine()}
+            {log.text}
+            {"\n"}
+          </>
+        );
         isReturned = true;
         break;
       case "newSection":
-        newLine();
-        text += "\n";
+        logElement = (
+          <>
+            {newLine()}
+            {"\n"}
+          </>
+        );
         isReturned = true;
         break;
       case "diceRollBefore":
-        newLine();
-        text += `[サイコロ] ${log.expression} => `;
-        if (index === logs.at(-1)?.[0] && !log.isBot) {
-          text += "(サイコロを振ってください)";
-        }
+        logElement = (
+          <>
+            {newLine()}
+            {`[サイコロ] ${log.expression} => `}
+            {index === logs.at(-1)?.[0] && !log.isBot && (
+              <span className="log-waiting">(待機中)</span>
+            )}
+          </>
+        );
+        isReturned = false;
         break;
       case "diceRollAfter":
-        text += `${log.result}\n`;
+        logElement = <>{`${log.result}\n`}</>;
         isReturned = true;
         break;
       case "turnEnd":
-        newLine();
-        text += "\n--- ターン終了 ---\n";
+        logElement = (
+          <>
+            {newLine()}
+            {"\n--- ターン終了 ---\n"}
+          </>
+        );
         isReturned = true;
         break;
       default:
         throw new ExhaustiveError(log);
     }
 
-    if (text === "") {
+    if (logElement === undefined) {
       continue;
     }
-    elements.push(<span key={index}>{text}</span>);
+    elements.push(<span key={index}>{logElement}</span>);
   }
-  return <pre className="turn-logs">{elements}</pre>;
+  return <div className="turn-logs">{elements}</div>;
 };
