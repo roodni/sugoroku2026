@@ -1,22 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { GameState } from "../game/gameState";
-import type { Log } from "../game/log";
+import { Log } from "../game/log";
 import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { GameMap } from "./GameMap";
 import { TurnLogs, type LogWithIndex } from "./TurnLogs";
 
-type WaitType = "button" | "timer";
 const WAIT = 100;
 
+type PlayingState = "beforeStart" | "playing" | "goaled";
+
 function App() {
-  // ゲームの状態
+  const [playingState, setPlayingState] = useState<PlayingState>("beforeStart");
   const [scenario] = useState(() => new Scenario());
 
-  // 描画系の状態
-  const [mapRenderObserver] = useState(() => new Observer<GameState>());
-  const [waitType, setWaitType] = useState<WaitType>("button");
+  const [mapRenderObserver] = useState(() => new Observer<void>());
+  const [isWaitingButton, setIsWaitingButton] = useState(true);
   const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
 
   const mainButtonRef = useRef<HTMLButtonElement>(null);
@@ -39,10 +38,10 @@ function App() {
       } else {
         setTurnLogs((prev) => [...prev, [index, log]]);
       }
-      mapRenderObserver.notify(scenario.gameState);
+      mapRenderObserver.notify();
 
       // 待機の仕方を決める
-      let waitType: WaitType | "immediate";
+      let waitType: "immediate" | "timer" | "button";
       switch (log.type) {
         case "description":
         case "quote":
@@ -66,10 +65,9 @@ function App() {
       if (waitType === "immediate") {
         continue;
       } else if (waitType === "timer") {
-        setWaitType(waitType);
         await new Promise((resolve) => setTimeout(resolve, WAIT));
       } else if (waitType === "button") {
-        setWaitType(waitType);
+        setIsWaitingButton(true);
         break;
       }
     }
@@ -77,45 +75,74 @@ function App() {
 
   useEffect(() => {
     // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
-    if (waitType === "button") {
+    if (isWaitingButton) {
       mainButtonRef.current?.focus();
     }
-  }, [waitType]);
+  }, [isWaitingButton]);
 
   const mainButtonHandler = useCallback(() => {
-    if (waitType === "button") {
+    if (playingState === "beforeStart") {
+      setIsWaitingButton(false);
+      setPlayingState("playing");
+      stepGame();
+    } else if (playingState === "playing") {
+      setIsWaitingButton(false);
       stepGame();
     }
-  }, [waitType, stepGame]);
+  }, [stepGame, playingState]);
 
   const lastLog = turnLogs.at(-1)?.[1];
-
   const mainButtonLabel = (() => {
-    if (waitType !== "button") {
-      return "進行中……";
-    }
-    switch (lastLog?.type) {
-      case "diceRollBefore":
-        return `サイコロを振る (${lastLog.expression})`;
-      case "turnEnd":
-        return "次へ";
-      default:
-        return "次へ";
+    if (playingState === "beforeStart") {
+      return "ゲームを始める";
+    } else if (playingState === "playing") {
+      if (!isWaitingButton) {
+        return "進行中……";
+      }
+      switch (lastLog?.type) {
+        case "diceRollBefore":
+          return `サイコロを振る (${lastLog.expression})`;
+        case "turnEnd":
+          return "次のターンへ";
+        default:
+          return "次へ";
+      }
     }
   })();
+
+  const getGameState = useCallback(() => scenario.gameState, [scenario]);
 
   return (
     <div className="app">
       <main className="main">
-        <GameMap renderObserver={mapRenderObserver}></GameMap>
-        <TurnLogs logs={turnLogs} />
+        {playingState === "beforeStart" && (
+          <div>
+            <span className="log-system-neutral"># 迎春すごろく2026</span>
+            <br />
+            <br />
+            <span className="log-description-neutral">
+              {"　"}
+              あなたの目的は、1位でゴールに辿り着くことです。画面下のボタンを押すとゲームが始まります。
+            </span>
+            {/* <br />
+            <br />
+            <span className="log-system-neutral">
+              [設定] CPの数: <input type="number" value={2} max={10}></input>
+            </span> */}
+          </div>
+        )}
+        <GameMap
+          getGameState={getGameState}
+          renderObserver={mapRenderObserver}
+        ></GameMap>
+        {playingState === "playing" && <TurnLogs logs={turnLogs} />}
       </main>
       <footer className="footer">
         <button
           ref={mainButtonRef}
           type="button"
           onClick={mainButtonHandler}
-          disabled={waitType !== "button"}
+          disabled={!isWaitingButton}
           className="main-button"
         >
           {mainButtonLabel}
@@ -124,6 +151,10 @@ function App() {
           <input type="checkbox"></input>
           自動進行
         </label>
+        {/* <label>
+          <input type="checkbox"></input>
+          読み上げ
+        </label> */}
       </footer>
     </div>
   );

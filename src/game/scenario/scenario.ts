@@ -83,7 +83,7 @@ function* generateHello(g: GameState): Generator<Log> {
     switch (player.personality) {
       case "gentle":
         return [
-          "さあ頑張ろう",
+          "がんばるぞ",
           player.position < Config.goalPosition / 2
             ? "ゴールまで遠いなあ"
             : "ゴールが近づいてきた",

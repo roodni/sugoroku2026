@@ -14,6 +14,10 @@
 .main {
   flex-grow: 1;
   overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 .footer {
   /* background-color: orange; */
@@ -25,16 +29,18 @@
   justify-content: center;
 }
 
+/* スタート前のやつ */
+
 /* 地図 */
 .game-map {
-  border: 2px solid #ddd;
+  border: 2px solid #ccc;
+  color: #ccc;
   padding: 4px;
   margin: 0;
 }
 
 /* ログ */
 .turn-logs {
-  margin: 16px 0;
   white-space: pre-wrap;
 }
 
