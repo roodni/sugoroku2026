@@ -27,8 +27,9 @@ export const Player = {
 
 export type GameState = {
   currentPlayerIndex: number;
-  cameraStart: number; // 地図で省略せず表示するマスの開始位置
   players: Player[];
+  cameraStart: number; // 地図で省略せず表示するマスの開始位置
+  gameOverMessage: string | null; // null でなくなったときゲーム終了と判定される
 };
 
 export const GameState = {
@@ -41,8 +42,9 @@ export const GameState = {
 
     return {
       currentPlayerIndex: 0,
-      cameraStart: 0,
       players,
+      cameraStart: 0,
+      gameOverMessage: null,
     };
   },
 };

@@ -16,7 +16,7 @@ export class Scenario {
   constructor() {
     this.gameState = GameState.initial();
     this.generator = (function* (g: GameState) {
-      while (true) {
+      while (g.gameOverMessage === null) {
         yield* generateTurn(g);
       }
     })(this.gameState);
@@ -34,24 +34,29 @@ export class Scenario {
   }
 }
 
+const playerAttrs = [
+  PlayerAttr.position,
+  PlayerAttr.personality,
+  PlayerAttr.turn,
+];
+
 // 1ターンを経過させる。
 // ターンごとのセーブ&ロード（デバッグ用）を可能にするため、
 // 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
 function* generateTurn(g: GameState): Generator<Log> {
   const player = g.players[g.currentPlayerIndex];
-  player.turn += 1;
+  if (player.goaled) {
+    g.currentPlayerIndex = (g.currentPlayerIndex + 1) % g.players.length;
+    return;
+  }
 
+  player.turn += 1;
   g.cameraStart = player.position;
 
   // ターン開始
   yield Log.description(`${player.name}のターン。`);
   yield* generateHello(g);
-  const playerAttrsText = stringifyPlayerAttrs(player, [
-    PlayerAttr.position,
-    PlayerAttr.personality,
-    PlayerAttr.turn,
-  ]);
-  yield Log.system(`(${player.name}) ${playerAttrsText}`);
+  yield* LogUtil.generatePlayerAttrs(player, playerAttrs);
 
   // ダイス移動
   yield Log.newSection();
@@ -70,6 +75,40 @@ function* generateTurn(g: GameState): Generator<Log> {
 
   // 相席イベント
   yield* generateSharingPositionEvent(g, player);
+
+  // ゴールチェック
+  const justGoaledPlayers = g.players.filter(
+    (p) => p.position === Config.goalPosition && !p.goaled
+  );
+  if (justGoaledPlayers.length > 0) {
+    let gameOverMessage = "";
+
+    yield Log.newSection();
+    yield Log.description("おめでとう！", "positive");
+
+    const alreadyGoaled = g.players.filter((p) => p.goaled).length;
+    const rank = alreadyGoaled + 1;
+    const justGoaledNames = justGoaledPlayers.map((p) => p.name).join("と");
+    const goaledDescription = `${justGoaledNames}は${rank}位でゴールした。`;
+    yield Log.description(goaledDescription, "positive");
+    gameOverMessage += goaledDescription;
+
+    for (const p of justGoaledPlayers) {
+      const dialog = goaledDialog(p, rank);
+      yield Log.quote(dialog);
+      gameOverMessage += `「${dialog}」`;
+      p.goaled = true;
+    }
+
+    const you = g.players[0];
+    if (justGoaledPlayers.includes(you)) {
+      const attrs = playerAttrs.filter((attr) => attr !== PlayerAttr.position);
+      yield* LogUtil.generatePlayerAttrs(you, attrs);
+      gameOverMessage += `\n(あなた) ${stringifyPlayerAttrs(you, attrs)}`;
+      g.gameOverMessage = gameOverMessage;
+      return; // ゲーム終了
+    }
+  }
 
   yield Log.turnEnd();
 
@@ -163,5 +202,19 @@ function* generateSharingPositionEvent(
         break;
     }
     yield Log.description("心が温かくなった。");
+  }
+}
+
+function goaledDialog(player: Player, rank: number): string {
+  const isFirst = rank === 1;
+  switch (player.personality) {
+    case "gentle":
+      return isFirst ? `やったね` : `頑張った`;
+    case "violent":
+      return isFirst ? `俺の勝ちだァー！` : `チッ……遅れを取ったぜ`;
+    case "phobic":
+      return isFirst ? `なんとかゴールできました` : `うう……外は怖いです`;
+    case "smart":
+      return isFirst ? `フッ、当然の結果さ` : `まだまだ、至らないね`;
   }
 }

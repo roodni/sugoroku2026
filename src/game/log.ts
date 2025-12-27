@@ -1,6 +1,11 @@
 import { dice } from "../util";
 import type { Player } from "./gameState";
-import { PlayerAttrChanger, stringifyPlayerAttrsChange } from "./indicator";
+import {
+  PlayerAttr,
+  PlayerAttrChanger,
+  stringifyPlayerAttrs,
+  stringifyPlayerAttrsChange,
+} from "./indicator";
 
 export type Emotion = "positive" | "neutral" | "negative";
 
@@ -50,6 +55,11 @@ export const LogUtil = {
     const result = dice(times, sides);
     yield Log.diceRollAfter(expression, result);
     return result;
+  },
+
+  *generatePlayerAttrs(player: Player, attrs: PlayerAttr[]): Generator<Log> {
+    const text = stringifyPlayerAttrs(player, attrs);
+    yield Log.system(`(${player.name}) ${text}`);
   },
 
   *generatePlayerAttrsChange(

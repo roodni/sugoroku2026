@@ -16,16 +16,7 @@ body {
   margin: 0;
 }
 
-pre {
-  font-family: inherit;
-}
-
-button {
-  font-family: inherit;
-  font-size: inherit;
-}
-
-input {
+pre, button, input, textarea{
   font-family: inherit;
   font-size: inherit;
 }

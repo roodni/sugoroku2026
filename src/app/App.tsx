@@ -4,8 +4,9 @@ import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { GameMap } from "./GameMap";
 import { TurnLogs, type LogWithIndex } from "./TurnLogs";
+import { Goaled } from "./Goaled";
 
-const WAIT = 100;
+const WAIT = 80;
 
 type PlayingState = "beforeStart" | "playing" | "goaled";
 
@@ -14,6 +15,7 @@ function App() {
   const [scenario] = useState(() => new Scenario());
 
   const [mapRenderObserver] = useState(() => new Observer<void>());
+
   const [isWaitingButton, setIsWaitingButton] = useState(true);
   const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
 
@@ -27,6 +29,7 @@ function App() {
 
       const log = scenario.next();
       if (log === undefined) {
+        setPlayingState("goaled");
         return;
       }
 
@@ -91,7 +94,7 @@ function App() {
   const lastLog = turnLogs.at(-1)?.[1];
   const mainButtonLabel = (() => {
     if (playingState === "beforeStart") {
-      return "ゲームを始める";
+      return "始める";
     } else if (playingState === "playing") {
       if (!isWaitingButton) {
         return "進行中……";
@@ -104,6 +107,8 @@ function App() {
         default:
           return "次へ";
       }
+    } else if (playingState === "goaled") {
+      return "ゲームオーバー";
     }
   })();
 
@@ -114,11 +119,11 @@ function App() {
       <main className="main">
         {playingState === "beforeStart" && (
           <div className="turn-logs">
-            <span className="log-system-neutral"># 迎春すごろく2026</span>
+            <span className="log-system-neutral">迎春すごろく2026</span>
             {"\n\n"}
             <span className="log-description-neutral">
               {"　"}
-              あなたの目的は、1位でゴールに辿り着くことです。画面下のボタンを押すとゲームが始まります。
+              あなたの目的は1位でゴールに辿り着くことです。画面下のボタンを押すとゲームが始まります。
             </span>
             {/* {"\n\n"}
             <span className="log-system-neutral">
@@ -130,7 +135,8 @@ function App() {
           getGameState={getGameState}
           renderObserver={mapRenderObserver}
         ></GameMap>
-        {playingState === "playing" && <TurnLogs logs={turnLogs} />}
+        <TurnLogs logs={turnLogs} />
+        {playingState === "goaled" && <Goaled getGameState={getGameState} />}
       </main>
       <footer className="footer">
         <button
