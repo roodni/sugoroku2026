@@ -17,16 +17,16 @@ export const TurnLogs: React.FC<{
     switch (log.type) {
       case "description":
         logElement = (
-          <>
+          <span className={`log-description-${log.emotion}`}>
             {isReturned && "　"}
             {log.text}
-          </>
+          </span>
         );
         isReturned = false;
         break;
       case "quote":
         logElement = (
-          <span>
+          <span className="log-quote">
             {newLine()}「{log.text}」{"\n"}
           </span>
         );
@@ -34,11 +34,11 @@ export const TurnLogs: React.FC<{
         break;
       case "system":
         logElement = (
-          <>
+          <span className={`log-system-${log.emotion}`}>
             {newLine()}
             {log.text}
             {"\n"}
-          </>
+          </span>
         );
         isReturned = true;
         break;
@@ -53,26 +53,28 @@ export const TurnLogs: React.FC<{
         break;
       case "diceRollBefore":
         logElement = (
-          <>
+          <span className="log-system-dice">
             {newLine()}
             {`[サイコロ] ${log.expression} => `}
             {index === logs.at(-1)?.[0] && !log.isBot && (
-              <span className="log-waiting">(待機中)</span>
+              <span className="log-waiting">(ボタンを押してください)</span>
             )}
-          </>
+          </span>
         );
         isReturned = false;
         break;
       case "diceRollAfter":
-        logElement = <>{`${log.result}\n`}</>;
+        logElement = (
+          <span className="log-system-dice">{`${log.result}\n`}</span>
+        );
         isReturned = true;
         break;
       case "turnEnd":
         logElement = (
-          <>
+          <span className="log-waiting">
             {newLine()}
             {"\n--- ターン終了 ---\n"}
-          </>
+          </span>
         );
         isReturned = true;
         break;

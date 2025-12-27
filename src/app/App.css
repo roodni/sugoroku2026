@@ -1,17 +1,11 @@
-.game-map {
-  border: 2px solid gray;
-  padding: 4px;
-  margin: 0;
-}
-
 .app {
   max-width: 1024px;
-  height: 100vh;
-
   margin: 0 auto;
   padding: 8px;
+  height: 100vh;
 
-  background-color: lightgray;
+  background-color: #333;
+  color: #eee;
 
   display: flex;
   flex-direction: column;
@@ -31,17 +25,40 @@
   justify-content: center;
 }
 
-.main-button {
-  flex-grow: 1;
-  height: 40px;
+/* 地図 */
+.game-map {
+  border: 2px solid #ddd;
+  padding: 4px;
+  margin: 0;
 }
 
-
+/* ログ */
 .turn-logs {
   margin: 16px 0;
   white-space: pre-wrap;
 }
 
+.log-system-neutral, .log-system-dice {
+  color: #eea;
+}
+.log-system-positive, .log-description-positive {
+  color: #aea;
+}
+.log-system-negative, .log-description-negative {
+  color: #eaa;
+}
+
+.log-quote {
+  color: #ddf;
+}
+
 .log-waiting {
-  opacity: 0.5;
+  color: #eee;
+  opacity: 0.7;
+}
+
+/* ボタンとか */
+.main-button {
+  flex-grow: 1;
+  height: 40px;
 }

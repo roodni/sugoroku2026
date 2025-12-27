@@ -1,4 +1,3 @@
-import { ExhaustiveError } from "../../util";
 import { Config } from "../config";
 import { GameState, Player } from "../gameState";
 import {
@@ -54,16 +53,16 @@ function* generateTurn(g: GameState): Generator<Log> {
   // ダイス移動
   yield Log.newSection();
   const dice = yield* LogUtil.generateDiceRoll(1, 6, player.isBot);
-  yield Log.description(`${player.name}は${dice}マス進んだ。`);
+  yield Log.description(`${player.name}は${dice}マス進んだ。`, "positive");
   let nextPos = player.position + dice;
   if (nextPos > Config.goalPosition) {
     nextPos = Config.goalPosition - (nextPos - Config.goalPosition);
-    yield Log.description(`ゴールで折り返した。`);
+    yield Log.description(`ゴールで折り返した。`, "negative");
   }
   yield* LogUtil.generatePlayerAttrChange(
     player,
     PlayerAttrChanger.position(nextPos),
-    "positive"
+    nextPos > player.position ? "positive" : "negative"
   );
 
   // 相席イベント
@@ -107,7 +106,7 @@ function* generateHello(g: GameState): Generator<Log> {
           "あ、あの……頑張ります",
           "うう、進まないと",
           "なんで私がこんなことを……",
-          "帰りたいです",
+          "帰りたい",
           "サイコロも消毒しなきゃ",
           "誰にも会いませんように……！",
         ];
@@ -120,10 +119,8 @@ function* generateHello(g: GameState): Generator<Log> {
           "データに基づいて最適に行動するのさ",
           `あと${Math.ceil(
             (Config.goalPosition - player.position) / 3.5
-          )}ターンくらいだな`,
+          )}ターンくらいかな`,
         ];
-      default:
-        throw new ExhaustiveError(player.personality);
     }
   })();
 
