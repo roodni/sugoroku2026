@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Log } from "../game/log";
 import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
@@ -21,22 +20,20 @@ function App() {
   const mainButtonRef = useRef<HTMLButtonElement>(null);
 
   // ゲーム進行
-  const allLogs = useRef<Log[]>([]);
   const stepGame = useCallback(async () => {
     while (true) {
+      const logIndex = scenario.history.length;
+      const lastLog = scenario.history.at(-1);
+
       const log = scenario.next();
       if (log === undefined) {
         return;
       }
 
-      const index = allLogs.current.length;
-      const lastLog = allLogs.current.at(-1);
-      allLogs.current.push(log);
-
       if (lastLog?.type === "turnEnd") {
-        setTurnLogs([[index, log]]);
+        setTurnLogs([[logIndex, log]]);
       } else {
-        setTurnLogs((prev) => [...prev, [index, log]]);
+        setTurnLogs((prev) => [...prev, [logIndex, log]]);
       }
       mapRenderObserver.notify();
 
@@ -116,16 +113,14 @@ function App() {
     <div className="app">
       <main className="main">
         {playingState === "beforeStart" && (
-          <div>
+          <div className="turn-logs">
             <span className="log-system-neutral"># 迎春すごろく2026</span>
-            <br />
-            <br />
+            {"\n\n"}
             <span className="log-description-neutral">
               {"　"}
               あなたの目的は、1位でゴールに辿り着くことです。画面下のボタンを押すとゲームが始まります。
             </span>
-            {/* <br />
-            <br />
+            {/* {"\n\n"}
             <span className="log-system-neutral">
               [設定] CPの数: <input type="number" value={2} max={10}></input>
             </span> */}

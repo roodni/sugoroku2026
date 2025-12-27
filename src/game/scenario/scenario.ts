@@ -11,6 +11,7 @@ export class Scenario {
   // 描画に使うのでpublic。申し訳程度にReadonlyにしている
   readonly gameState: Readonly<GameState>;
   private generator: Generator<Log>;
+  history: Log[];
 
   constructor() {
     this.gameState = GameState.initial();
@@ -19,6 +20,7 @@ export class Scenario {
         yield* generateTurn(g);
       }
     })(this.gameState);
+    this.history = [];
   }
 
   next(): Log | undefined {
@@ -26,6 +28,7 @@ export class Scenario {
     if (result.done) {
       return undefined;
     } else {
+      this.history.push(result.value);
       return result.value;
     }
   }
