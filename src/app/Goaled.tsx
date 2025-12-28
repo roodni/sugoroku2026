@@ -14,7 +14,8 @@ function tweetUrl(text: string, url: string, hashtags: string[]) {
 
 export const Goaled: React.FC<{
   getGameState: () => GameState;
-}> = ({ getGameState }) => {
+  restartGame: () => void;
+}> = ({ getGameState, restartGame }) => {
   const gameState = getGameState();
   const text = gameState.gameOverMessage + "\n";
 
@@ -27,16 +28,14 @@ export const Goaled: React.FC<{
 
   return (
     <div className="goaled">
-      <textarea className="goaled-textarea" readOnly>
-        {allText}
-      </textarea>
+      <textarea className="goaled-textarea" readOnly value={allText} />
       <div className="goaled-buttons">
         <div>
           <a href={tweetUrl(text, url, [HASHTAG])} target="_blank">
             𝕏 (タブが開きます)
           </a>
         </div>
-        <button>はじめから</button>
+        <button onClick={restartGame}>はじめから</button>
       </div>
     </div>
   );

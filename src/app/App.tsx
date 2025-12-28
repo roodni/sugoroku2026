@@ -8,15 +8,23 @@ import { Goaled } from "./Goaled";
 
 const WAIT = 80;
 
-type PlayingState = "beforeStart" | "playing" | "goaled";
+type PlayingState = Readonly<
+  | { type: "beforeStart" }
+  | { type: "playing"; isWaitingButton: boolean }
+  | { type: "goaled" }
+>;
 
 function App() {
-  const [playingState, setPlayingState] = useState<PlayingState>("beforeStart");
-  const [scenario] = useState(() => new Scenario());
+  const [playingState, setPlayingState] = useState<PlayingState>({
+    type: "beforeStart",
+  });
+  const isWaitingButton =
+    playingState.type === "beforeStart" ||
+    (playingState.type === "playing" && playingState.isWaitingButton);
+
+  const [scenario, setScenario] = useState(() => new Scenario());
 
   const [mapRenderObserver] = useState(() => new Observer<void>());
-
-  const [isWaitingButton, setIsWaitingButton] = useState(true);
   const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
 
   const mainButtonRef = useRef<HTMLButtonElement>(null);
@@ -29,7 +37,7 @@ function App() {
 
       const log = scenario.next();
       if (log === undefined) {
-        setPlayingState("goaled");
+        setPlayingState({ type: "goaled" });
         return;
       }
 
@@ -67,7 +75,7 @@ function App() {
       } else if (waitType === "timer") {
         await new Promise((resolve) => setTimeout(resolve, WAIT));
       } else if (waitType === "button") {
-        setIsWaitingButton(true);
+        setPlayingState({ type: "playing", isWaitingButton: true });
         break;
       }
     }
@@ -81,22 +89,27 @@ function App() {
   }, [isWaitingButton]);
 
   const mainButtonHandler = useCallback(() => {
-    if (playingState === "beforeStart") {
-      setIsWaitingButton(false);
-      setPlayingState("playing");
+    if (playingState.type === "beforeStart") {
+      setPlayingState({ type: "playing", isWaitingButton: false });
       stepGame();
-    } else if (playingState === "playing") {
-      setIsWaitingButton(false);
+    } else if (playingState.type === "playing") {
+      setPlayingState({ type: "playing", isWaitingButton: false });
       stepGame();
     }
   }, [stepGame, playingState]);
 
+  const restartGame = useCallback(() => {
+    setPlayingState({ type: "beforeStart" });
+    setScenario(new Scenario());
+    setTurnLogs([]);
+  }, []);
+
   const lastLog = turnLogs.at(-1)?.[1];
   const mainButtonLabel = (() => {
-    if (playingState === "beforeStart") {
-      return "ゲームを始める";
-    } else if (playingState === "playing") {
-      if (!isWaitingButton) {
+    if (playingState.type === "beforeStart") {
+      return "始める";
+    } else if (playingState.type === "playing") {
+      if (!playingState.isWaitingButton) {
         return "進行中……";
       }
       switch (lastLog?.type) {
@@ -107,8 +120,8 @@ function App() {
         default:
           return "次へ";
       }
-    } else if (playingState === "goaled") {
-      return "ゲームオーバー";
+    } else if (playingState.type === "goaled") {
+      return "終わり";
     }
   })();
 
@@ -118,7 +131,7 @@ function App() {
     <div className="app">
       <main className="main">
         <div className="main-scroll">
-          {playingState === "beforeStart" && (
+          {playingState.type === "beforeStart" && (
             <div className="turn-logs">
               <span className="log-system-neutral">迎春すごろく2026</span>
               {"\n\n"}
@@ -137,7 +150,9 @@ function App() {
             renderObserver={mapRenderObserver}
           ></GameMap>
           <TurnLogs logs={turnLogs} />
-          {playingState === "goaled" && <Goaled getGameState={getGameState} />}
+          {playingState.type === "goaled" && (
+            <Goaled getGameState={getGameState} restartGame={restartGame} />
+          )}
         </div>
       </main>
       <footer className="footer">
