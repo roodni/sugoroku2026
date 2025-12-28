@@ -24,7 +24,7 @@ export const TurnLogs: React.FC<{
         );
         isReturned = false;
         break;
-      case "quote":
+      case "dialog":
         logElement = (
           <span className="log-quote">
             {newLine()}「{log.text}」{"\n"}

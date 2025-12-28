@@ -95,7 +95,7 @@ function* generateTurn(g: GameState): Generator<Log> {
 
     for (const p of justGoaledPlayers) {
       const dialog = goaledDialog(p, rank);
-      yield Log.quote(dialog);
+      yield Log.dialog(dialog);
       gameOverMessage += `「${dialog}」`;
       p.goaled = true;
     }
@@ -166,7 +166,7 @@ function* generateHello(g: GameState): Generator<Log> {
     }
   })();
 
-  yield Log.quote(quotes[index % quotes.length]);
+  yield Log.dialog(quotes[index % quotes.length]);
 }
 
 // 相席イベント
@@ -186,19 +186,19 @@ function* generateSharingPositionEvent(
   yield Log.description(`マスには${otherNames}がいた。`);
   for (const other of others) {
     yield Log.description(`${currentPlayer.name}は${other.name}に挨拶した。`);
-    yield Log.quote(`こんにちは！`);
+    yield Log.dialog(`こんにちは！`);
     switch (other.personality) {
       case "gentle":
-        yield Log.quote(`やあ`);
+        yield Log.dialog(`やあ`);
         break;
       case "violent":
-        yield Log.quote(`おう`);
+        yield Log.dialog(`おう`);
         break;
       case "phobic":
-        yield Log.quote(`こ、こんにちは……`);
+        yield Log.dialog(`こ、こんにちは……`);
         break;
       case "smart":
-        yield Log.quote(`奇遇だね`);
+        yield Log.dialog(`奇遇だね`);
         break;
     }
     yield Log.description("心が温かくなった。");

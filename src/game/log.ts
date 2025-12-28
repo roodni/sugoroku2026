@@ -11,7 +11,7 @@ export type Emotion = "positive" | "neutral" | "negative";
 
 export type Log =
   | { type: "description"; text: string; emotion: Emotion } // 地の文
-  | { type: "quote"; text: string } // 台詞
+  | { type: "dialog"; text: string } // 台詞
   | { type: "system"; text: string; emotion: Emotion }
   | { type: "newSection" }
   | { type: "diceRollBefore"; expression: string; isBot: boolean }
@@ -22,8 +22,8 @@ export const Log = {
   description(text: string, emotion: Emotion = "neutral"): Log {
     return { type: "description", text, emotion };
   },
-  quote(text: string): Log {
-    return { type: "quote", text };
+  dialog(text: string): Log {
+    return { type: "dialog", text };
   },
   system(text: string, emotion: Emotion = "neutral"): Log {
     return { type: "system", text, emotion };

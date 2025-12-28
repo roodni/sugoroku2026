@@ -52,7 +52,7 @@ function App() {
       let waitType: "immediate" | "timer" | "button";
       switch (log.type) {
         case "description":
-        case "quote":
+        case "dialog":
         case "system":
         case "diceRollAfter":
           waitType = "timer";
