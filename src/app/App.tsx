@@ -94,7 +94,7 @@ function App() {
   const lastLog = turnLogs.at(-1)?.[1];
   const mainButtonLabel = (() => {
     if (playingState === "beforeStart") {
-      return "始める";
+      return "ゲームを始める";
     } else if (playingState === "playing") {
       if (!isWaitingButton) {
         return "進行中……";
@@ -117,26 +117,28 @@ function App() {
   return (
     <div className="app">
       <main className="main">
-        {playingState === "beforeStart" && (
-          <div className="turn-logs">
-            <span className="log-system-neutral">迎春すごろく2026</span>
-            {"\n\n"}
-            <span className="log-description-neutral">
-              {"　"}
-              あなたの目的は1位でゴールに辿り着くことです。画面下のボタンを押すとゲームが始まります。
-            </span>
-            {/* {"\n\n"}
-            <span className="log-system-neutral">
-              [設定] CPの数: <input type="number" value={2} max={10}></input>
-            </span> */}
-          </div>
-        )}
-        <GameMap
-          getGameState={getGameState}
-          renderObserver={mapRenderObserver}
-        ></GameMap>
-        <TurnLogs logs={turnLogs} />
-        {playingState === "goaled" && <Goaled getGameState={getGameState} />}
+        <div className="main-scroll">
+          {playingState === "beforeStart" && (
+            <div className="turn-logs">
+              <span className="log-system-neutral">迎春すごろく2026</span>
+              {"\n\n"}
+              <span className="log-description-neutral">
+                {"　"}
+                あなたの目的は1位でゴールに辿り着くことです。画面下のボタンを押すとゲームが始まります。
+              </span>
+              {/* {"\n\n"}
+              <span className="log-system-neutral">
+                [設定] CPの数: <input type="number" value={2} max={10}></input>
+              </span> */}
+            </div>
+          )}
+          <GameMap
+            getGameState={getGameState}
+            renderObserver={mapRenderObserver}
+          ></GameMap>
+          <TurnLogs logs={turnLogs} />
+          {playingState === "goaled" && <Goaled getGameState={getGameState} />}
+        </div>
       </main>
       <footer className="footer">
         <button

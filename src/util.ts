@@ -1,6 +1,6 @@
 // (times)d(sides)
 export function dice(times: number, sides: number): number {
-  // return 6;
+  return 100;
 
   let total = 0;
   for (let i = 0; i < times; i++) {

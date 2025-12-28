@@ -30,11 +30,14 @@ export const Goaled: React.FC<{
       <textarea className="goaled-textarea" readOnly>
         {allText}
       </textarea>
-      <a href={tweetUrl(text, url, [HASHTAG])} target="_blank">
-        ツイートする
-      </a>
-      <button>ログを見る</button>
-      <button>はじめから</button>
+      <div className="goaled-buttons">
+        <div>
+          <a href={tweetUrl(text, url, [HASHTAG])} target="_blank">
+            𝕏 (タブが開きます)
+          </a>
+        </div>
+        <button>はじめから</button>
+      </div>
     </div>
   );
 };
