@@ -40,6 +40,10 @@
   margin: 0;
 }
 
+.map-line-current {
+  color: #eea;
+}
+
 /* ログ */
 .turn-logs {
   white-space: pre-wrap;

@@ -22,7 +22,10 @@ function App() {
     playingState.type === "beforeStart" ||
     (playingState.type === "playing" && playingState.isWaitingButton);
 
-  const [scenario, setScenario] = useState(() => new Scenario());
+  const scenarioRef = useRef<Scenario>(undefined);
+  if (scenarioRef.current === undefined) {
+    scenarioRef.current = new Scenario();
+  }
 
   const [mapRenderObserver] = useState(() => new Observer<void>());
   const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
@@ -31,6 +34,7 @@ function App() {
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
+    const scenario = scenarioRef.current!;
     while (true) {
       const logIndex = scenario.history.length;
       const lastLog = scenario.history.at(-1);
@@ -79,7 +83,7 @@ function App() {
         break;
       }
     }
-  }, [scenario, mapRenderObserver]);
+  }, [mapRenderObserver]);
 
   useEffect(() => {
     // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
@@ -99,10 +103,11 @@ function App() {
   }, [stepGame, playingState]);
 
   const restartGame = useCallback(() => {
+    scenarioRef.current = new Scenario();
+    mapRenderObserver.notify();
     setPlayingState({ type: "beforeStart" });
-    setScenario(new Scenario());
     setTurnLogs([]);
-  }, []);
+  }, [mapRenderObserver]);
 
   const lastLog = turnLogs.at(-1)?.[1];
   const mainButtonLabel = (() => {
@@ -125,7 +130,7 @@ function App() {
     }
   })();
 
-  const getGameState = useCallback(() => scenario.gameState, [scenario]);
+  const getGameState = useCallback(() => scenarioRef.current!.gameState, []);
 
   return (
     <div className="app">

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState, type JSX } from "react";
 import type { GameState } from "../game/gameState";
 import type { Observer } from "../util";
 import { Config } from "../game/config";
 
-function renderMapText(gameState: GameState): string {
+function drawMapElements(gameState: GameState): JSX.Element[] {
   // まず描画対象のマスを決める
   const spaces: number[] = [];
   const isSpaceIncluded = (pos: number): boolean => {
@@ -36,35 +36,43 @@ function renderMapText(gameState: GameState): string {
   spaces.reverse();
 
   // 各マスを描画する
-  const lines: string[] = [];
+  const lines: JSX.Element[] = [];
   let lastPos: number | undefined = undefined;
   for (const pos of spaces) {
     if (lastPos !== undefined && Math.abs(pos - lastPos) > 1) {
-      lines.push("︙");
+      lines.push(<Fragment key={`ellipsis-${pos}`}>{"︙\n"}</Fragment>);
     }
     lastPos = pos;
 
-    let line = `${pos}`;
+    let text = `${pos}`;
     if (pos === 0) {
-      line += " スタート";
+      text += " スタート";
     } else if (pos === Config.goalPosition) {
-      line += " ゴール";
+      text += " ゴール";
     } else if (pos % 10 === 0) {
-      line += " 病院";
+      text += " 病院";
     }
 
     const players = gameState.players.filter((p) => p.position === pos);
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     if (players.length > 0) {
-      line += " <- ";
-      line += players
+      text += " <- ";
+      text += players
         .map((p) => (p === currentPlayer ? `[${p.name}]` : p.name))
         .join(" ");
     }
-    lines.push(line);
+    lines.push(
+      <span
+        key={pos}
+        className={currentPlayer.position === pos ? "map-line-current" : ""}
+      >
+        {text}
+        {"\n"}
+      </span>
+    );
   }
 
-  return lines.join("\n");
+  return lines;
 }
 
 // すごろくの地図を描画するコンポーネント
@@ -72,21 +80,21 @@ export const GameMap: React.FC<{
   getGameState: () => GameState;
   renderObserver: Observer<void>;
 }> = ({ getGameState, renderObserver }) => {
-  const [text, setText] = useState(() => renderMapText(getGameState()));
+  const [lines, setLines] = useState(() => drawMapElements(getGameState()));
 
   // イベント購読
   useEffect(() => {
     const unsubscribe = renderObserver.subscribe(() => {
       console.log("マップ再描画");
-      setText(renderMapText(getGameState()));
+      setLines(drawMapElements(getGameState()));
     });
     return () => {
       unsubscribe();
     };
   }, [renderObserver, getGameState]);
 
-  if (text === "") {
+  if (lines.length === 0) {
     return undefined;
   }
-  return <pre className="game-map">{text}</pre>;
+  return <pre className="game-map">{lines}</pre>;
 };
