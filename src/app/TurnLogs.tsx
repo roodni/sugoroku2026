@@ -6,11 +6,24 @@ import { ExhaustiveError } from "../util";
 
 export type LogWithIndex = [number, Log];
 
+function isSpaceNeededBeforeNext(sentence: string): boolean {
+  switch (sentence.at(-1)) {
+    case "!":
+    case "?":
+    case "！":
+    case "？":
+      return true;
+    default:
+      return false;
+  }
+}
+
 export const TurnLogs: React.FC<{
   logs: LogWithIndex[];
 }> = ({ logs }) => {
   const elements: JSX.Element[] = [];
   let isReturned = true; // 最後に改行されたかどうか
+  let lastLog: Log | undefined = undefined;
   for (const [index, log] of logs) {
     let logElement: JSX.Element | undefined = undefined;
     const newLine = () => !isReturned && "\n";
@@ -19,6 +32,9 @@ export const TurnLogs: React.FC<{
         logElement = (
           <span className={`log-description-${log.emotion}`}>
             {isReturned && "　"}
+            {lastLog?.type === "description" &&
+              isSpaceNeededBeforeNext(lastLog.text) &&
+              "　"}
             {log.text}
           </span>
         );
@@ -81,11 +97,11 @@ export const TurnLogs: React.FC<{
       default:
         throw new ExhaustiveError(log);
     }
-
     if (logElement === undefined) {
       continue;
     }
     elements.push(<span key={index}>{logElement}</span>);
+    lastLog = log;
   }
   return <div className="turn-logs">{elements}</div>;
 };
