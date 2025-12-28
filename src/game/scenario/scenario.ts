@@ -137,7 +137,7 @@ function* generateHello(g: GameState): Generator<Log> {
       case "violent":
         return [
           "ブッ飛ばしてやるぜ！",
-          "今日も暴れてやるか！",
+          "誰も俺を止められねえ！",
           "誰でもいいから殴りてえ",
           "ククク……俺のターンだな……",
           "終わらせてやるぜ、このゲームをよォー！",
@@ -209,7 +209,7 @@ function goaledDialog(player: Player, rank: number): string {
   const isFirst = rank === 1;
   switch (player.personality) {
     case "gentle":
-      return isFirst ? `やったね` : `頑張った`;
+      return isFirst ? `やったね` : `がんばった`;
     case "violent":
       return isFirst ? `俺の勝ちだァー！` : `チッ……遅れを取ったぜ`;
     case "phobic":
