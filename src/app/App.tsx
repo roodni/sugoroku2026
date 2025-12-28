@@ -6,7 +6,7 @@ import { GameMap } from "./GameMap";
 import { TurnLogs, type LogWithIndex } from "./TurnLogs";
 import { Goaled } from "./Goaled";
 
-const WAIT = 80;
+const WAIT = 50;
 
 type PlayingState = Readonly<
   | { type: "beforeStart" }
@@ -15,6 +15,11 @@ type PlayingState = Readonly<
 >;
 
 function App() {
+  const scenarioRef = useRef<Scenario>(undefined);
+  if (scenarioRef.current === undefined) {
+    scenarioRef.current = new Scenario();
+  }
+
   const [playingState, setPlayingState] = useState<PlayingState>({
     type: "beforeStart",
   });
@@ -22,13 +27,14 @@ function App() {
     playingState.type === "beforeStart" ||
     (playingState.type === "playing" && playingState.isWaitingButton);
 
-  const scenarioRef = useRef<Scenario>(undefined);
-  if (scenarioRef.current === undefined) {
-    scenarioRef.current = new Scenario();
-  }
-
   const [mapRenderObserver] = useState(() => new Observer<void>());
   const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
+
+  const [isAuto, setIsAuto] = useState(false);
+  const isAutoRef = useRef(isAuto);
+  useEffect(() => {
+    isAutoRef.current = isAuto; // 非同期関数から最新値を取得するため
+  }, [isAuto]);
 
   const mainButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -74,6 +80,11 @@ function App() {
           throw new ExhaustiveError(log);
       }
 
+      if (isAutoRef.current && waitType === "button") {
+        waitType = "timer";
+      }
+
+      // 待機方法に応じて待機する
       if (waitType === "immediate") {
         continue;
       } else if (waitType === "timer") {
@@ -83,7 +94,7 @@ function App() {
         break;
       }
     }
-  }, [mapRenderObserver]);
+  }, [mapRenderObserver]); // 注意: 非同期関数なので古い状態しか参照できない
 
   useEffect(() => {
     // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
@@ -171,7 +182,11 @@ function App() {
           {mainButtonLabel}
         </button>
         <label>
-          <input type="checkbox"></input>
+          <input
+            type="checkbox"
+            checked={isAuto}
+            onChange={(e) => setIsAuto(e.target.checked)}
+          ></input>
           自動進行
         </label>
         {/* <label>

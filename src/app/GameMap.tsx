@@ -85,7 +85,7 @@ export const GameMap: React.FC<{
   // イベント購読
   useEffect(() => {
     const unsubscribe = renderObserver.subscribe(() => {
-      console.log("マップ再描画");
+      // console.log("マップ再描画");
       setLines(drawMapElements(getGameState()));
     });
     return () => {
