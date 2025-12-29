@@ -1,10 +1,8 @@
 // ログを描画するコンポーネント
 
-import type { JSX } from "react";
+import { useMemo, type JSX } from "react";
 import type { Log } from "../game/log";
 import { ExhaustiveError } from "../util";
-
-export type LogWithIndex = [number, Log];
 
 function isSpaceNeededBeforeNext(sentence: string): boolean {
   switch (sentence.at(-1)) {
@@ -18,13 +16,12 @@ function isSpaceNeededBeforeNext(sentence: string): boolean {
   }
 }
 
-export const TurnLogs: React.FC<{
-  logs: LogWithIndex[];
-}> = ({ logs }) => {
+function logsToElements(logs: Log[]): JSX.Element[] {
   const elements: JSX.Element[] = [];
   let isReturned = true; // 最後に改行されたかどうか
   let lastLog: Log | undefined = undefined;
-  for (const [index, log] of logs) {
+  for (let i = 0; i < logs.length; i++) {
+    const log = logs[i];
     let logElement: JSX.Element | undefined = undefined;
     const newLine = () => !isReturned && "\n";
     switch (log.type) {
@@ -72,7 +69,7 @@ export const TurnLogs: React.FC<{
           <span className="log-system-dice">
             {newLine()}
             {`[サイコロ] ${log.expression} => `}
-            {index === logs.at(-1)?.[0] && !log.isBot && (
+            {i === logs.length - 1 && !log.isBot && (
               <span className="log-waiting">(ボタンを押してください)</span>
             )}
           </span>
@@ -100,8 +97,20 @@ export const TurnLogs: React.FC<{
     if (logElement === undefined) {
       continue;
     }
-    elements.push(<span key={index}>{logElement}</span>);
+    // TODO: ここをFragmentにする
+    elements.push(<span key={i}>{logElement}</span>);
     lastLog = log;
   }
-  return <div className="turn-logs">{elements}</div>;
+
+  return elements;
+}
+
+// TODO: 名前を変えよう
+export const TurnLogs: React.FC<{
+  logs: Log[];
+  offset: number;
+}> = ({ logs, offset }) => {
+  const elements = useMemo(() => logsToElements(logs), [logs]);
+  const slice = elements.slice(offset);
+  return <div className="turn-logs">{slice}</div>;
 };

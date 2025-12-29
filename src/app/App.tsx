@@ -3,8 +3,9 @@ import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { GameMap } from "./GameMap";
-import { TurnLogs, type LogWithIndex } from "./TurnLogs";
+import { TurnLogs } from "./TurnLogs";
 import { Goaled } from "./Goaled";
+import type { Log } from "../game/log";
 
 const WAIT = 50;
 
@@ -28,7 +29,11 @@ function App() {
     (playingState.type === "playing" && playingState.isWaitingButton);
 
   const [mapRenderObserver] = useState(() => new Observer<void>());
-  const [turnLogs, setTurnLogs] = useState<LogWithIndex[]>([]);
+
+  const [allLogs, setAllLogs] = useState<Log[]>([]);
+  const [logOffset, setLogOffset] = useState(0);
+  const [isAllLogsShown, setIsAllLogsShown] = useState(false);
+  const logOffsetActual = isAllLogsShown ? 0 : logOffset;
 
   const [isAuto, setIsAuto] = useState(false);
   const isAutoRef = useRef(isAuto);
@@ -37,13 +42,14 @@ function App() {
   }, [isAuto]);
 
   const mainButtonRef = useRef<HTMLButtonElement>(null);
+  const scrollElementRef = useRef<HTMLDivElement>(null);
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
     const scenario = scenarioRef.current!;
     while (true) {
-      const logIndex = scenario.history.length;
       const lastLog = scenario.history.at(-1);
+      const logIndex = scenario.history.length;
 
       const log = scenario.next();
       if (log === undefined) {
@@ -51,11 +57,11 @@ function App() {
         return;
       }
 
+      setAllLogs((prev) => [...prev, log]);
       if (lastLog?.type === "turnEnd") {
-        setTurnLogs([[logIndex, log]]);
-      } else {
-        setTurnLogs((prev) => [...prev, [logIndex, log]]);
+        setLogOffset(logIndex);
       }
+
       mapRenderObserver.notify();
 
       // 待機の仕方を決める
@@ -103,6 +109,15 @@ function App() {
     }
   }, [isWaitingButton]);
 
+  // useEffect(() => {
+  //   // ログの自動スクロール
+  //   // これ描画更新とどっちが先だ？ Effectの方が遅れるのではという直観があるがライフサイクルを見ないとわからん
+  //   // 末尾までスクロールってどうやるんだろう
+  //   const element = scrollElementRef.current!;
+  //   element.scrollTop = element.scrollHeight;
+  //   console.log("scroll", element.scrollTop, element.scrollHeight);
+  // }, [allLogs, logOffsetActual]);
+
   const mainButtonHandler = useCallback(() => {
     if (playingState.type === "beforeStart") {
       setPlayingState({ type: "playing", isWaitingButton: false });
@@ -117,10 +132,11 @@ function App() {
     scenarioRef.current = new Scenario();
     mapRenderObserver.notify();
     setPlayingState({ type: "beforeStart" });
-    setTurnLogs([]);
+    setAllLogs([]);
+    setLogOffset(0);
   }, [mapRenderObserver]);
 
-  const lastLog = turnLogs.at(-1)?.[1];
+  const lastLog = allLogs.at(-1);
   const mainButtonLabel = (() => {
     if (playingState.type === "beforeStart") {
       return "始める";
@@ -146,7 +162,7 @@ function App() {
   return (
     <div className="app">
       <main className="main">
-        <div className="main-scroll">
+        <div className="main-scroll" ref={scrollElementRef}>
           {playingState.type === "beforeStart" && (
             <div className="turn-logs">
               <span className="log-system-neutral">迎春すごろく2026</span>
@@ -165,7 +181,7 @@ function App() {
             getGameState={getGameState}
             renderObserver={mapRenderObserver}
           ></GameMap>
-          <TurnLogs logs={turnLogs} />
+          <TurnLogs logs={allLogs} offset={logOffsetActual} />
           {playingState.type === "goaled" && (
             <Goaled getGameState={getGameState} restartGame={restartGame} />
           )}
@@ -188,6 +204,14 @@ function App() {
             onChange={(e) => setIsAuto(e.target.checked)}
           ></input>
           自動進行
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={isAllLogsShown}
+            onChange={(e) => setIsAllLogsShown(e.target.checked)}
+          ></input>
+          全ログ表示
         </label>
         {/* <label>
           <input type="checkbox"></input>
