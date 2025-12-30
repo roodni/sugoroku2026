@@ -34,11 +34,7 @@ export class Scenario {
   }
 }
 
-const playerAttrs = [
-  PlayerAttr.position,
-  PlayerAttr.personality,
-  PlayerAttr.turn,
-];
+const playerAttrs = [PlayerAttr.position, PlayerAttr.personality];
 
 // 1ターンを経過させる。
 // ターンごとのセーブ&ロード（デバッグ用）を可能にするため、
@@ -54,7 +50,7 @@ function* generateTurn(g: GameState): Generator<Log> {
   g.cameraStart = player.position;
 
   // ターン開始
-  yield Log.description(`${player.name}のターン。`);
+  yield Log.description(`${player.name}のターン${player.turn}。`);
   yield* generateHello(g);
   yield* LogUtil.generatePlayerAttrs(player, playerAttrs);
 
@@ -81,8 +77,6 @@ function* generateTurn(g: GameState): Generator<Log> {
     (p) => p.position === Config.goalPosition && !p.goaled
   );
   if (justGoaledPlayers.length > 0) {
-    let gameOverMessage = "";
-
     yield Log.newSection();
     yield Log.description("おめでとう！", "positive");
 
@@ -91,25 +85,29 @@ function* generateTurn(g: GameState): Generator<Log> {
     const justGoaledNames = justGoaledPlayers.map((p) => p.name).join("と");
     const goaledDescription = `${justGoaledNames}は${rank}位でゴールした。`;
     yield Log.description(goaledDescription, "positive");
-    gameOverMessage += goaledDescription;
 
     for (const p of justGoaledPlayers) {
       const dialog = goaledDialog(p, rank);
       yield Log.dialog(dialog);
-      gameOverMessage += `「${dialog}」`;
       p.goaled = true;
     }
 
     const you = g.players[0];
     if (justGoaledPlayers.includes(you)) {
-      const attrs = playerAttrs.filter((attr) => attr !== PlayerAttr.position);
-      yield* LogUtil.generatePlayerAttrs(you, attrs);
-      gameOverMessage += `\n(あなた) ${stringifyPlayerAttrs(you, attrs)}`;
-      g.gameOverMessage = gameOverMessage;
+      const attrs = [PlayerAttr.turn, ...playerAttrs.slice(1)];
+      const dialog = goaledDialog(you, rank);
+      g.gameOverMessage = `${
+        you.name
+      }は${rank}位でゴールした (${stringifyPlayerAttrs(
+        you,
+        attrs
+      )})。「${dialog}」`;
       return; // ゲーム終了
     }
   }
 
+  // ここは空行を挟まなくていい
+  yield Log.description("ターンが終了した。");
   yield Log.turnEnd();
 
   // 次のプレイヤーへ

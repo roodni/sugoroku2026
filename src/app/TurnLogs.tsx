@@ -86,7 +86,10 @@ function logsToElements(logs: Log[]): JSX.Element[] {
         logElement = (
           <span className="log-waiting">
             {newLine()}
-            {"\n--- ターン終了 ---\n"}
+            {"\n"}
+            {i === logs.length - 1 && (
+              <span className="log-waiting">(ボタンを押してください)</span>
+            )}
           </span>
         );
         isReturned = true;
