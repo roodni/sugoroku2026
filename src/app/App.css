@@ -1,12 +1,14 @@
 .app {
   max-width: 1024px;
   margin: 0 auto;
-  height: 100vh;
+  height: 100dvh;
 
   color: #eee;
 
   display: flex;
   flex-direction: column;
+
+  --gap: 6px;
 }
 
 .main {
@@ -15,7 +17,7 @@
   overflow: auto;
 }
 .footer {
-  padding: 8px;
+  padding: var(--gap);
   background-color: #555;
 
   align-items: center;
@@ -23,11 +25,11 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: var(--gap);
 }
 
 .main-scrollee {
-  padding: 8px;
+  padding: var(--gap);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -76,7 +78,7 @@
 .goaled {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--gap);
 
   & > textarea {
     width: 100%;
@@ -92,7 +94,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: var(--gap);
 
   & > * {
     flex-grow: 1;
