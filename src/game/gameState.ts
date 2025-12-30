@@ -1,3 +1,4 @@
+import { Weapon } from "./battle";
 import { Config } from "./config";
 
 export type Personality = "gentle" | "violent" | "phobic" | "smart";
@@ -10,6 +11,8 @@ export type Player = {
   position: number;
   goaled: boolean;
   personality: Personality;
+  hp: number;
+  weapon: Weapon;
 };
 
 export const Player = {
@@ -21,6 +24,8 @@ export const Player = {
       position: 0,
       goaled: false,
       personality: "gentle",
+      hp: Config.initialHp,
+      weapon: Weapon.hand,
     };
   },
 };

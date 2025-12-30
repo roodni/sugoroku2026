@@ -1,3 +1,4 @@
+import { Config } from "./config";
 import type { Personality, Player } from "./gameState";
 
 // プレイヤーの属性を文字列化するための仕組み
@@ -33,6 +34,11 @@ export class PlayerAttr {
       }
     },
     (p: Player) => p.personality === "gentle"
+  );
+  static hp = new this(
+    "HP",
+    (p: Player) => `${p.hp}`,
+    (p: Player) => p.hp === Config.initialHp
   );
 }
 
@@ -78,6 +84,7 @@ export const PlayerAttrChanger = {
     new GeneralChanger(PlayerAttr.position, "position", next),
   personality: (next: Personality) =>
     new GeneralChanger(PlayerAttr.personality, "personality", next),
+  hp: (next: number) => new GeneralChanger(PlayerAttr.hp, "hp", next),
 };
 
 // プレイヤーの属性を変更した後で、その変更内容を文字列化して返す

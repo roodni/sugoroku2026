@@ -70,7 +70,7 @@ const hauntedHouseSpace: Space = {
       yield Log.description(`${player.name}は幽霊を殴り倒して通り抜けた。`);
     } else if (player.personality === "smart") {
       yield Log.dialog("フッ……");
-      yield Log.description(`${player.name}はスマートにUターンして退出した。`);
+      yield Log.description(`${player.name}はスマートに回れ右して退出した。`);
     } else {
       yield Log.dialog(`ギャアアアアアアアアアアアア！`);
       yield Log.description(
@@ -96,7 +96,7 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
     isHospital: true,
   },
 
-  4: liveSpace,
-  6: librarySpace,
-  8: hauntedHouseSpace,
+  3: liveSpace,
+  5: librarySpace,
+  6: hauntedHouseSpace,
 };

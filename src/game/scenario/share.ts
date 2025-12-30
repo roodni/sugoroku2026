@@ -1,3 +1,4 @@
+import { Battle, PlayerBattler } from "../battle";
 import type { GameState, Player } from "../gameState";
 import { Log } from "../log";
 
@@ -17,22 +18,25 @@ export function* generateSharingPositionEvent(
   const otherNames = others.map((p) => p.name).join("と");
   yield Log.description(`マスには${otherNames}がいた。`);
   for (const other of others) {
-    yield Log.description(`${currentPlayer.name}は${other.name}に挨拶した。`);
-    yield Log.dialog(`こんにちは！`);
-    switch (other.personality) {
-      case "gentle":
-        yield Log.dialog(`やあ`);
-        break;
-      case "violent":
-        yield Log.dialog(`おう`);
-        break;
-      case "phobic":
-        yield Log.dialog(`こ、こんにちは……`);
-        break;
-      case "smart":
-        yield Log.dialog(`おや奇遇だね`);
-        break;
-    }
-    yield Log.description("心が温かくなった。");
+    const playerBattler = new PlayerBattler(currentPlayer);
+    const otherBattler = new PlayerBattler(other);
+    yield* Battle.generateAttack(playerBattler, otherBattler);
+    // yield Log.description(`${currentPlayer.name}は${other.name}に挨拶した。`);
+    // yield Log.dialog(`こんにちは！`);
+    // switch (other.personality) {
+    //   case "gentle":
+    //     yield Log.dialog(`やあ`);
+    //     break;
+    //   case "violent":
+    //     yield Log.dialog(`おう`);
+    //     break;
+    //   case "phobic":
+    //     yield Log.dialog(`こ、こんにちは……`);
+    //     break;
+    //   case "smart":
+    //     yield Log.dialog(`おや奇遇だね`);
+    //     break;
+    // }
+    // yield Log.description("心が温かくなった。");
   }
 }

@@ -34,7 +34,11 @@ export class Scenario {
   }
 }
 
-const playerAttrs = [PlayerAttr.personality, PlayerAttr.position];
+const playerAttrs = [
+  PlayerAttr.personality,
+  PlayerAttr.position,
+  PlayerAttr.hp,
+];
 
 function* generateGame(g: GameState): Generator<Log> {
   while (g.gameOverMessage === null) {
