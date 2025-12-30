@@ -100,7 +100,6 @@ function logsToElements(logs: Log[]): JSX.Element[] {
     if (logElement === undefined) {
       continue;
     }
-    // TODO: ここをFragmentにする
     elements.push(<Fragment key={i}>{logElement}</Fragment>);
     lastLog = log;
   }
@@ -108,8 +107,7 @@ function logsToElements(logs: Log[]): JSX.Element[] {
   return elements;
 }
 
-// TODO: 名前を変えよう
-export const TurnLogs: React.FC<{
+export const Logs: React.FC<{
   logs: Log[];
   offset: number;
 }> = ({ logs, offset }) => {

@@ -3,7 +3,7 @@ import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { GameMap } from "./GameMap";
-import { TurnLogs } from "./TurnLogs";
+import { Logs } from "./Logs";
 import { Goaled } from "./Goaled";
 import type { Log } from "../game/log";
 
@@ -178,7 +178,7 @@ function App() {
             getGameState={getGameState}
             renderObserver={mapRenderObserver}
           ></GameMap>
-          <TurnLogs logs={allLogs} offset={logOffsetActual} />
+          <Logs logs={allLogs} offset={logOffsetActual} />
           {playingState.type === "goaled" && (
             <Goaled getGameState={getGameState} restartGame={restartGame} />
           )}
