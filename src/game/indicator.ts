@@ -1,48 +1,40 @@
-import type { Player } from "./gameState";
+import type { Personality, Player } from "./gameState";
 
 // プレイヤーの属性を文字列化するための仕組み
-export interface PlayerAttr {
+export class PlayerAttr {
   label: string;
   valueString: (p: Player) => string;
   isDefaultValue?: (p: Player) => boolean;
-}
 
-class PositionAttr implements PlayerAttr {
-  label = "現在地";
-  valueString(p: Player): string {
-    return `${p.position}`;
+  constructor(
+    label: string,
+    valueString: (p: Player) => string,
+    isDefaultValue?: (p: Player) => boolean
+  ) {
+    this.label = label;
+    this.valueString = valueString;
+    this.isDefaultValue = isDefaultValue;
   }
-}
-class TurnAttr implements PlayerAttr {
-  label = "ターン";
-  valueString(p: Player): string {
-    return `${p.turn}`;
-  }
-}
-class PersonalityAttr implements PlayerAttr {
-  label = "性格";
-  valueString(p: Player): string {
-    switch (p.personality) {
-      case "gentle":
-        return "温厚";
-      case "violent":
-        return "凶暴";
-      case "phobic":
-        return "綺麗好き";
-      case "smart":
-        return "スマート";
-    }
-  }
-  isDefaultValue(p: Player) {
-    return p.personality === "gentle";
-  }
-}
 
-export const PlayerAttr = {
-  position: new PositionAttr(),
-  turn: new TurnAttr(),
-  personality: new PersonalityAttr(),
-};
+  static position = new this("現在地", (p: Player) => `${p.position}`);
+  static turn = new this("ターン", (p: Player) => `${p.turn}`);
+  static personality = new this(
+    "性格",
+    (p: Player) => {
+      switch (p.personality) {
+        case "gentle":
+          return "温厚";
+        case "violent":
+          return "凶暴";
+        case "phobic":
+          return "綺麗好き";
+        case "smart":
+          return "スマート";
+      }
+    },
+    (p: Player) => p.personality === "gentle"
+  );
+}
 
 // プレイヤーの属性をほぼ全てログ出力用に文字列化する
 const attrSeparator = " / ";
@@ -67,19 +59,25 @@ export interface PlayerAttrChanger {
   change: (p: Player) => void;
 }
 
-class PositionChanger implements PlayerAttrChanger {
-  attr = PlayerAttr.position;
-  nextPosition: number;
-  constructor(nextPosition: number) {
-    this.nextPosition = nextPosition;
+class GeneralChanger<K extends keyof Player> implements PlayerAttrChanger {
+  attr: PlayerAttr;
+  key: K;
+  value: Player[K];
+  constructor(attr: PlayerAttr, key: K, value: Player[K]) {
+    this.attr = attr;
+    this.key = key;
+    this.value = value;
   }
   change(p: Player) {
-    p.position = this.nextPosition;
+    p[this.key] = this.value;
   }
 }
 
 export const PlayerAttrChanger = {
-  position: (nextPosition: number) => new PositionChanger(nextPosition),
+  position: (next: number) =>
+    new GeneralChanger(PlayerAttr.position, "position", next),
+  personality: (next: Personality) =>
+    new GeneralChanger(PlayerAttr.personality, "personality", next),
 };
 
 // プレイヤーの属性を変更した後で、その変更内容を文字列化して返す
