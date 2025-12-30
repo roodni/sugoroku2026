@@ -15,11 +15,7 @@ export class Scenario {
 
   constructor() {
     this.gameState = GameState.initial();
-    this.generator = (function* (g: GameState) {
-      while (g.gameOverMessage === null) {
-        yield* generateTurn(g);
-      }
-    })(this.gameState);
+    this.generator = generateGame(this.gameState);
     this.history = [];
   }
 
@@ -36,13 +32,19 @@ export class Scenario {
 
 const playerAttrs = [PlayerAttr.position, PlayerAttr.personality];
 
+function* generateGame(g: GameState): Generator<Log> {
+  while (g.gameOverMessage === null) {
+    yield* generateTurn(g);
+    g.currentPlayerIndex = (g.currentPlayerIndex + 1) % g.players.length;
+  }
+}
+
 // 1ターンを経過させる。
 // ターンごとのセーブ&ロード（デバッグ用）を可能にするため、
 // 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
 function* generateTurn(g: GameState): Generator<Log> {
   const player = g.players[g.currentPlayerIndex];
   if (player.goaled) {
-    g.currentPlayerIndex = (g.currentPlayerIndex + 1) % g.players.length;
     return;
   }
 
@@ -109,9 +111,6 @@ function* generateTurn(g: GameState): Generator<Log> {
   // ここは空行を挟まなくていい
   yield Log.description("ターンが終了した。");
   yield Log.turnEnd();
-
-  // 次のプレイヤーへ
-  g.currentPlayerIndex = (g.currentPlayerIndex + 1) % g.players.length;
 }
 
 // ターン開始時の独り言

@@ -1,4 +1,4 @@
 export const Config = {
-  goalPosition: 100,
+  goalPosition: 10,
   computerPlayerNumber: 2,
 } as const;
