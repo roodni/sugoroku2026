@@ -143,7 +143,7 @@ function App() {
       }
       switch (lastLog?.type) {
         case "diceRollBefore":
-          return `サイコロを振る (${lastLog.expression})`;
+          return `${lastLog.expression}`;
         case "turnEnd":
           return "次のターンへ";
         default:

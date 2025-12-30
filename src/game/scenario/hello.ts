@@ -26,7 +26,7 @@ export function* generateHello(g: GameState): Generator<Log> {
           "誰も俺を止められねえ！",
           "誰でもいいから殴りてえ",
           "ククク……俺のターンだな……",
-          "終わらせてやるぜ、このゲームをよォー！",
+          "終わらせてやるぜ、このゲームをよォ！",
           "ヒャッハー！",
         ];
       case "phobic":

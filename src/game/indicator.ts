@@ -27,7 +27,7 @@ export class PlayerAttr {
         case "violent":
           return "凶暴";
         case "phobic":
-          return "綺麗好き";
+          return "恐怖症";
         case "smart":
           return "スマート";
       }

@@ -9,6 +9,7 @@ import { Log, LogUtil } from "../log";
 import { goaledDialog } from "./goal";
 import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./share";
+import { SPACE_MAP } from "./space";
 
 export class Scenario {
   // 描画に使うのでpublic。申し訳程度にReadonlyにしている
@@ -33,7 +34,7 @@ export class Scenario {
   }
 }
 
-const playerAttrs = [PlayerAttr.position, PlayerAttr.personality];
+const playerAttrs = [PlayerAttr.personality, PlayerAttr.position];
 
 function* generateGame(g: GameState): Generator<Log> {
   while (g.gameOverMessage === null) {
@@ -56,8 +57,8 @@ function* generateTurn(g: GameState): Generator<Log> {
 
   // ターン開始
   yield Log.description(`${player.name}のターン${player.turn}。`);
-  yield* generateHello(g);
   yield* LogUtil.generatePlayerAttrs(player, playerAttrs);
+  yield* generateHello(g);
 
   // ダイス移動
   yield Log.newSection();
@@ -76,6 +77,13 @@ function* generateTurn(g: GameState): Generator<Log> {
 
   // 相席イベント
   yield* generateSharingPositionEvent(g, player);
+
+  // マスイベント
+  const space = SPACE_MAP[player.position];
+  if (space?.generate) {
+    yield Log.newSection();
+    yield* space.generate(g);
+  }
 
   // ゴールチェック
   const justGoaledPlayers = g.players.filter(

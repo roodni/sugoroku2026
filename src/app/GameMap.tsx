@@ -2,10 +2,11 @@ import { Fragment, useEffect, useState, type JSX } from "react";
 import type { GameState } from "../game/gameState";
 import type { Observer } from "../util";
 import { Config } from "../game/config";
+import { SPACE_MAP } from "../game/scenario/space";
 
 function drawMapElements(gameState: GameState): JSX.Element[] {
   // まず描画対象のマスを決める
-  const spaces: number[] = [];
+  const positions: number[] = [];
   const isSpaceIncluded = (pos: number): boolean => {
     if (pos === 0 || pos === Config.goalPosition) {
       return true;
@@ -30,27 +31,24 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
 
   for (let i = 0; i <= Config.goalPosition; i++) {
     if (isSpaceIncluded(i)) {
-      spaces.push(i);
+      positions.push(i);
     }
   }
-  spaces.reverse();
+  positions.reverse();
 
   // 各マスを描画する
   const lines: JSX.Element[] = [];
   let lastPos: number | undefined = undefined;
-  for (const pos of spaces) {
+  for (const pos of positions) {
     if (lastPos !== undefined && Math.abs(pos - lastPos) > 1) {
       lines.push(<Fragment key={`ellipsis-${pos}`}>{"︙\n"}</Fragment>);
     }
     lastPos = pos;
 
     let text = `${pos}`;
-    if (pos === 0) {
-      text += " スタート";
-    } else if (pos === Config.goalPosition) {
-      text += " ゴール";
-    } else if (pos % 10 === 0) {
-      text += " 病院";
+    const space = SPACE_MAP[pos];
+    if (space) {
+      text += ` ${space.name}`;
     }
 
     const players = gameState.players.filter((p) => p.position === pos);

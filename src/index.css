@@ -7,7 +7,7 @@
   font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, "Source Code Pro",
     source-code-pro, monospace;
   font-size: 16px;
-  line-height: 1.2;
+  line-height: 1.4;
 
   background-color: #666;
 }
@@ -16,7 +16,10 @@ body {
   margin: 0;
 }
 
-pre, button, input, textarea{
+pre,
+button,
+input,
+textarea {
   font-family: inherit;
   font-size: inherit;
 }

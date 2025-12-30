@@ -30,7 +30,7 @@ export function* generateSharingPositionEvent(
         yield Log.dialog(`こ、こんにちは……`);
         break;
       case "smart":
-        yield Log.dialog(`奇遇だね`);
+        yield Log.dialog(`おや奇遇だね`);
         break;
     }
     yield Log.description("心が温かくなった。");

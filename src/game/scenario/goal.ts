@@ -6,7 +6,7 @@ export function goaledDialog(player: Player, rank: number): string {
     case "gentle":
       return isFirst ? `やったね` : `がんばった`;
     case "violent":
-      return isFirst ? `俺の勝ちだァー！` : `チッ……遅れを取ったぜ`;
+      return isFirst ? `俺の勝ちだァ！` : `遅れを取ったぜ`;
     case "phobic":
       return isFirst ? `なんとかゴールできました` : `うう……外は怖いです`;
     case "smart":
