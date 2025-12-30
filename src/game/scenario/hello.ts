@@ -45,9 +45,9 @@ export function* generateHello(g: GameState): Generator<Log> {
           "6の目が出る確率……66.6%",
           "スマートにゴールしてみせるさ",
           "データに基づいて最適に行動するのさ",
-          `あと${Math.ceil(
-            (Config.goalPosition - player.position) / 3.5
-          )}ターンくらいかな`,
+          `僕の計算によれば、あと${Math.ceil(
+            (Config.goalPosition - player.position) / 6
+          )}ターンだね`,
         ];
     }
   })();
