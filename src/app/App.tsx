@@ -194,7 +194,15 @@ function App() {
         >
           {mainButtonLabel}
         </button>
-        <label>
+        <label
+          className={
+            isAuto &&
+            playingState.type === "playing" &&
+            !playingState.isWaitingButton
+              ? "auto-stepping"
+              : ""
+          }
+        >
           <input
             type="checkbox"
             checked={isAuto}

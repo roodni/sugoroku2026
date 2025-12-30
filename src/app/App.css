@@ -112,3 +112,16 @@
   flex-grow: 1;
   height: 40px;
 }
+
+@keyframes notice {
+  from {
+    color: orange;
+  }
+  to {
+    color: inherit;
+  }
+}
+
+.auto-stepping {
+  animation: 1s ease-in infinite notice;
+}
