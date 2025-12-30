@@ -42,7 +42,7 @@ function App() {
   }, [isAuto]);
 
   const mainButtonRef = useRef<HTMLButtonElement>(null);
-  const scrollElementRef = useRef<HTMLDivElement>(null);
+  const scrollerElementRef = useRef<HTMLElement>(null);
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
@@ -61,8 +61,6 @@ function App() {
       if (lastLog?.type === "turnEnd") {
         setLogOffset(logIndex);
       }
-
-      mapRenderObserver.notify();
 
       // 待機の仕方を決める
       let waitType: "immediate" | "timer" | "button";
@@ -95,6 +93,7 @@ function App() {
         continue;
       } else if (waitType === "timer") {
         await new Promise((resolve) => setTimeout(resolve, WAIT));
+        mapRenderObserver.notify();
       } else if (waitType === "button") {
         setPlayingState({ type: "playing", isWaitingButton: true });
         break;
@@ -109,14 +108,12 @@ function App() {
     }
   }, [isWaitingButton]);
 
-  // useEffect(() => {
-  //   // ログの自動スクロール
-  //   // これ描画更新とどっちが先だ？ Effectの方が遅れるのではという直観があるがライフサイクルを見ないとわからん
-  //   // 末尾までスクロールってどうやるんだろう
-  //   const element = scrollElementRef.current!;
-  //   element.scrollTop = element.scrollHeight;
-  //   console.log("scroll", element.scrollTop, element.scrollHeight);
-  // }, [allLogs, logOffsetActual]);
+  useEffect(() => {
+    // ログの自動スクロール
+    const element = scrollerElementRef.current!;
+    element.scroll({ top: element.scrollHeight, behavior: "instant" });
+    // console.log("scroll", element.scrollTop, element.scrollHeight);
+  }, [allLogs, logOffsetActual, playingState]);
 
   const mainButtonHandler = useCallback(() => {
     if (playingState.type === "beforeStart") {
@@ -161,8 +158,8 @@ function App() {
 
   return (
     <div className="app">
-      <main className="main">
-        <div className="main-scroll" ref={scrollElementRef}>
+      <main className="main" ref={scrollerElementRef}>
+        <div className="main-scrollee">
           {playingState.type === "beforeStart" && (
             <div className="turn-logs">
               <span className="log-system-neutral">迎春すごろく2026</span>

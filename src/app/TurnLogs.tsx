@@ -1,6 +1,6 @@
 // ログを描画するコンポーネント
 
-import { useMemo, type JSX } from "react";
+import { Fragment, useMemo, type JSX } from "react";
 import type { Log } from "../game/log";
 import { ExhaustiveError } from "../util";
 
@@ -101,7 +101,7 @@ function logsToElements(logs: Log[]): JSX.Element[] {
       continue;
     }
     // TODO: ここをFragmentにする
-    elements.push(<span key={i}>{logElement}</span>);
+    elements.push(<Fragment key={i}>{logElement}</Fragment>);
     lastLog = log;
   }
 
