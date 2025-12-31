@@ -1,4 +1,4 @@
-import { Player } from "./gameState";
+import { GameState, Player } from "./gameState";
 import { PlayerAttr } from "./indicator";
 import { Log, LogUtil } from "./log";
 
@@ -58,6 +58,7 @@ export class PlayerBattler implements Battler {
 
 // 武器の処理
 type WeaponAttackGenerator = (
+  g: GameState,
   attacker: Attacker,
   blocker: Blocker
 ) => Generator<Log, { power: number }>;
@@ -74,9 +75,9 @@ export class Weapon {
 
   static hand = new this({
     name: "素手",
-    *generateAttack(attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}を殴った。`);
-      const power = yield* LogUtil.generateDiceRoll(1, 6, attacker.isBot);
+      const power = yield* LogUtil.generateDiceRoll(g, 1, 6, attacker.isBot);
       return { power };
     },
   });
@@ -111,8 +112,16 @@ export const Battle = {
     );
   },
 
-  *generateAttack(attacker: Attacker, blocker: Blocker): Generator<Log> {
-    const { power } = yield* attacker.weapon.generateAttack(attacker, blocker);
+  *generateAttack(
+    g: GameState,
+    attacker: Attacker,
+    blocker: Blocker
+  ): Generator<Log> {
+    const { power } = yield* attacker.weapon.generateAttack(
+      g,
+      attacker,
+      blocker
+    );
     const attackVoice = attacker.attackVoice(0);
     if (attackVoice) {
       yield Log.dialog(attackVoice);

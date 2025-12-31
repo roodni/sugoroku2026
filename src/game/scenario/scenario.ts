@@ -1,5 +1,5 @@
 import { Config } from "../config";
-import { GameState, type GameStateJson } from "../gameState";
+import { GameState } from "../gameState";
 import {
   PlayerAttr,
   PlayerAttrChanger,
@@ -25,12 +25,14 @@ export class Scenario {
 
   // デバッグ用
   // ターンの切れ目でのみ安全にロードできる。
-  load(json: GameStateJson) {
-    const newState = GameState.load(json);
+  load(json: string) {
+    const obj = JSON.parse(json);
+    const newState = GameState.load(obj);
     Object.assign(this.gameState, newState); // in-place更新により、一応ターン途中でロードできる
   }
-  save(): GameStateJson {
-    return GameState.save(this.gameState);
+  save(): string {
+    const obj = GameState.save(this.gameState);
+    return JSON.stringify(obj, undefined, 2);
   }
 
   private *generate(): Generator<Log> {
@@ -85,7 +87,7 @@ function* generateTurn(g: GameState): Generator<Log> {
 
   // ダイス移動
   yield Log.newSection();
-  const dice = yield* LogUtil.generateDiceRoll(1, 6, player.isBot);
+  const dice = yield* LogUtil.generateDiceRoll(g, 1, 6, player.isBot);
   yield Log.description(`${player.name}は${dice}マス進んだ。`, "positive");
   let nextPos = player.position + dice;
   if (nextPos > Config.goalPosition) {

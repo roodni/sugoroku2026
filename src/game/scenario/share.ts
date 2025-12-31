@@ -91,7 +91,7 @@ function* generateSharingPositionGentle(
 }
 
 function* generateSharingPositionViolent(
-  _g: GameState,
+  g: GameState,
   player: Player,
   others: Player[]
 ) {
@@ -99,7 +99,7 @@ function* generateSharingPositionViolent(
     yield Log.dialog("邪魔だー！");
     const playerBattler = new PlayerBattler(player);
     const otherBattler = new PlayerBattler(other);
-    yield* Battle.generateAttack(playerBattler, otherBattler);
+    yield* Battle.generateAttack(g, playerBattler, otherBattler);
 
     // TODO: 搬送
   }

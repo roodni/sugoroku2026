@@ -66,6 +66,7 @@ export type GameState = {
   players: Player[];
   cameraStart: number; // 地図で省略せず表示するマスの開始位置
   gameOverMessage: string | null; // null でなくなったときゲーム終了と判定される
+  futureDice: number[]; // デバッグ用
 };
 
 export type GameStateJson = {
@@ -73,6 +74,7 @@ export type GameStateJson = {
   players: PlayerJson[];
   cameraStart: number;
   gameOverMessage: string | null;
+  futureDice: number[];
 };
 
 export const GameState = {
@@ -88,11 +90,13 @@ export const GameState = {
       players,
       cameraStart: 0,
       gameOverMessage: null,
+      futureDice: [],
     };
   },
 
   save(g: GameState): GameStateJson {
     return {
+      futureDice: g.futureDice,
       currentPlayerIndex: g.currentPlayerIndex,
       players: g.players.map((p) => Player.save(p)),
       cameraStart: g.cameraStart,
@@ -101,6 +105,7 @@ export const GameState = {
   },
   load(json: GameStateJson): GameState {
     return {
+      futureDice: json.futureDice,
       currentPlayerIndex: json.currentPlayerIndex,
       players: json.players.map((p) => Player.load(p)),
       cameraStart: json.cameraStart,

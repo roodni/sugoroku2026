@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
@@ -44,11 +44,25 @@ function App() {
   // デバッグ機能
   const [isDebug, setIsDebug] = useState(false);
   const [stateJson, setStateJson] = useState("");
+  const [stateJsonOriginal, setStateJsonOriginal] = useState(""); // テキストエリアと現在の状態が合っているか判定する
   const updateDebugJson = useCallback(() => {
-    const state = scenarioRef.current!.save();
-    const json = JSON.stringify(state, null, 2);
+    // テキストエリアを更新する
+    const json = scenarioRef.current!.save();
     setStateJson(json);
+    setStateJsonOriginal(json);
   }, []);
+  const loadDebugJson = useCallback(() => {
+    // テキストエリアの内容をロードする
+    try {
+      scenarioRef.current!.load(stateJson);
+    } catch (e) {
+      console.error("ロード失敗", e);
+      alert(e);
+      return;
+    }
+    updateDebugJson();
+    mapRenderObserver.notify();
+  }, [stateJson, mapRenderObserver, updateDebugJson]);
   useEffect(() => {
     // Alt + @ を押すとデバッグモード
     const handler = (e: KeyboardEvent) => {
@@ -63,16 +77,13 @@ function App() {
       window.removeEventListener("keydown", handler);
     };
   }, [updateDebugJson]);
-  const loadDebugJson = useCallback(() => {
-    try {
-      const obj = JSON.parse(stateJson);
-      scenarioRef.current!.load(obj);
-    } catch (e) {
-      console.error("ロード失敗", e);
-      alert(e);
+  const debugTextareaKeyboardHandler: React.KeyboardEventHandler<
+    HTMLTextAreaElement
+  > = (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      loadDebugJson();
     }
-    mapRenderObserver.notify();
-  }, [stateJson, mapRenderObserver]);
+  };
 
   const mainButtonRef = useRef<HTMLButtonElement>(null);
   const scrollerElementRef = useRef<HTMLElement>(null);
@@ -228,7 +239,10 @@ function App() {
           <div className="debug">
             デバッグ盤
             <button onClick={() => setIsDebug(false)}>閉じてね</button>
-            <button onClick={loadDebugJson}>
+            <button
+              onClick={loadDebugJson}
+              disabled={stateJson === stateJsonOriginal}
+            >
               ロード
               {lastLog?.type !== "turnEnd" && "(危険)"}
             </button>
@@ -238,6 +252,7 @@ function App() {
               onChange={(e) => setStateJson(e.target.value)}
               spellCheck={false}
               ref={debugTextareaRef}
+              onKeyDown={debugTextareaKeyboardHandler}
             ></textarea>
           </div>
         )}

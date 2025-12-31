@@ -1,5 +1,5 @@
 import { dice } from "../util";
-import type { Player } from "./gameState";
+import type { GameState, Player } from "./gameState";
 import {
   PlayerAttr,
   PlayerAttrChanger,
@@ -44,15 +44,19 @@ export const Log = {
 
 export const LogUtil = {
   *generateDiceRoll(
+    g: GameState,
     times: number,
     sides: number,
     isBot: boolean
   ): Generator<Log, number> {
     const expression = `${times}d${sides}`;
     yield Log.diceRollBefore(expression, isBot);
-    // ダイス振るボタンを押す前に結果がわかるのが気分的に嫌なのでbefore/afterに分けている。
-    // 意味はない。
-    const result = dice(times, sides);
+    let result;
+    if (g.futureDice.length > 0) {
+      result = g.futureDice.shift()!;
+    } else {
+      result = dice(times, sides);
+    }
     yield Log.diceRollAfter(expression, result);
     return result;
   },
