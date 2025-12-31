@@ -8,7 +8,7 @@ import {
 import { Log, LogUtil } from "../log";
 import { goaledDialog } from "./goal";
 import { generateHello } from "./hello";
-import { generateSharingPositionEvent } from "./share";
+import { generateSharingPositionEvent } from "./sharing";
 import { SPACE_MAP } from "./space";
 
 export class Scenario {

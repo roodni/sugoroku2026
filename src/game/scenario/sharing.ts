@@ -9,7 +9,7 @@ export function* generateSharingPositionEvent(
   g: GameState,
   currentPlayer: Player
 ): Generator<Log> {
-  let others = g.players.filter(
+  const others = g.players.filter(
     (p) => p !== currentPlayer && p.position === currentPlayer.position
   );
   if (others.length === 0) {
@@ -19,12 +19,6 @@ export function* generateSharingPositionEvent(
   yield Log.newSection();
   const otherNames = others.map((p) => p.name).join("と");
   yield Log.description(`マスには${otherNames}がいた。`);
-
-  for (const phobic of others.filter((p) => p.personality === "phobic")) {
-    yield* generatePhobicEscape(phobic, currentPlayer);
-  }
-  others = others.filter((p) => p.position === currentPlayer.position); // 逃げた人を除外
-
   switch (currentPlayer.personality) {
     case "gentle":
       yield* generateSharingPositionGentle(g, currentPlayer, others);
@@ -41,22 +35,28 @@ export function* generateSharingPositionEvent(
   }
 }
 
-function* generatePhobicEscape(phobic: Player, coming: Player) {
-  yield Log.dialog("近い！");
+// 来た人から逃げる
+function* generatePhobicEscape(
+  phobic: Player,
+  coming: Player
+): Generator<Log, { escaped: boolean }> {
   if (phobic.position !== Config.goalPosition) {
     yield Log.description(
       `${phobic.name}は${coming.name}を嫌がって1マス進んだ。`,
       "negative"
     );
+    yield Log.dialog("近い！");
     yield* LogUtil.generatePlayerAttrChange(
       phobic,
       PlayerAttrChanger.position(phobic.position + 1),
       "positive"
     );
+    return { escaped: true };
   } else {
     yield Log.description(
       `${phobic.name}は${coming.name}を避けようとしたが、これ以上進めなかった。`
     );
+    return { escaped: false };
   }
 }
 
@@ -80,6 +80,7 @@ function* generateSharingPositionGentle(
         yield hot;
         break;
       case "phobic":
+        // 逃げない
         yield Log.dialog(`こ、こんにちは……`);
         break;
       case "smart":
@@ -96,6 +97,13 @@ function* generateSharingPositionViolent(
   others: Player[]
 ) {
   for (const other of others) {
+    if (other.personality === "phobic") {
+      const { escaped } = yield* generatePhobicEscape(other, player);
+      if (escaped) {
+        continue;
+      }
+    }
+    // 同席したやつを殴る
     yield Log.dialog("邪魔だー！");
     const playerBattler = new PlayerBattler(player);
     const otherBattler = new PlayerBattler(other);
@@ -106,6 +114,7 @@ function* generateSharingPositionViolent(
       { skipAttackVoice: true }
     );
     if (!attack1.knockedOut && other.personality === "violent") {
+      // 反撃
       yield Log.dialog("何しやがる！");
       const attack2 = yield* Battle.generateAttack(
         g,
@@ -153,6 +162,12 @@ function* generateSharingPositionSmart(
   others: Player[]
 ) {
   for (const other of others) {
+    if (other.personality === "phobic") {
+      const { escaped } = yield* generatePhobicEscape(other, player);
+      if (escaped) {
+        continue;
+      }
+    }
     yield Log.description(`${player.name}は${other.name}に笑いかけた。`);
     yield Log.dialog(`フッ……`);
     switch (other.personality) {
