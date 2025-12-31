@@ -64,9 +64,9 @@ function App() {
     mapRenderObserver.notify();
   }, [stateJson, mapRenderObserver, updateDebugJson]);
   useEffect(() => {
-    // Alt + @ を押すとデバッグモード
+    // @ を押すとデバッグモード
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "@" && e.altKey) {
+      if (e.key === "@") {
         updateDebugJson();
         setIsDebug((v) => !v);
         setTimeout(() => debugTextareaRef.current?.focus());

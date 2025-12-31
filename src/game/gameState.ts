@@ -1,7 +1,23 @@
+import { ExhaustiveError } from "../util";
 import { Weapon } from "./battle";
 import { Config } from "./config";
 
 export type Personality = "gentle" | "violent" | "phobic" | "smart";
+
+const Personality = {
+  // JSONでtypoするので
+  validate(p: Personality): void {
+    switch (p) {
+      case "gentle":
+      case "violent":
+      case "phobic":
+      case "smart":
+        return;
+      default:
+        throw new ExhaustiveError(p);
+    }
+  },
+};
 
 // 駒
 export type Player = {
@@ -57,6 +73,7 @@ export const Player = {
     if (!weapon) {
       throw new Error(`weapon: ${json.weapon}`);
     }
+    Personality.validate(json.personality);
     return { ...json, weapon };
   },
 };

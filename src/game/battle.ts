@@ -1,13 +1,15 @@
+import { Config } from "./config";
 import { GameState, Player } from "./gameState";
-import { PlayerAttr } from "./indicator";
+import { PlayerAttr, PlayerAttrChanger } from "./indicator";
 import { Log, LogUtil } from "./log";
+import { SPACE_MAP } from "./scenario/space";
 
 // 攻撃するもの
 export interface Attacker {
   name: string;
   isBot: boolean;
   weapon: Weapon;
-  attackVoice(battleTurn: number): string | undefined;
+  generateAttackVoice(g: GameState): Generator<Log>;
 }
 
 // 攻撃を受けるもの
@@ -15,46 +17,15 @@ export interface Blocker {
   name: string;
   getHp(): number;
   setHp(hp: number): void;
-  damageVoice(beforeHp: number, damage: number): string | undefined;
   smart?: boolean;
+  generateDamageVoice(
+    g: GameState,
+    details: { damage: number }
+  ): Generator<Log>;
+  generateKnockedOut(g: GameState): Generator<Log>;
 }
 
 export type Battler = Blocker & Attacker;
-
-export class PlayerBattler implements Battler {
-  p: Player;
-  constructor(p: Player) {
-    this.p = p;
-  }
-
-  // blocker
-  get name() {
-    return this.p.name;
-  }
-  getHp() {
-    return this.p.hp;
-  }
-  setHp(hp: number): void {
-    this.p.hp = hp;
-  }
-  damageVoice() {
-    return "ぐはっ";
-  }
-
-  // attacker
-  get smart() {
-    return this.p.personality === "smart";
-  }
-  get isBot() {
-    return this.p.isBot;
-  }
-  get weapon() {
-    return this.p.weapon;
-  }
-  attackVoice(): string | undefined {
-    return "くらえー！";
-  }
-}
 
 // 武器の処理
 type WeaponAttackGenerator = (
@@ -85,8 +56,13 @@ export class Weapon {
   static list: Weapon[] = [this.hand];
 }
 
+type HitResult = { knockedOut: boolean };
 export const Battle = {
-  *generateHit(power: number, blocker: Blocker): Generator<Log> {
+  *generateHit(
+    g: GameState,
+    power: number,
+    blocker: Blocker
+  ): Generator<Log, HitResult> {
     let damage = power;
     if (blocker.smart) {
       yield Log.description(
@@ -102,30 +78,127 @@ export const Battle = {
       `${blocker.name}は${damage}ダメージを受けた。`,
       "negative"
     );
-    const damageVoice = blocker.damageVoice(beforeHp, afterHp);
-    if (damageVoice) {
-      yield Log.dialog(damageVoice);
-    }
+    yield* blocker.generateDamageVoice(g, { damage });
     yield Log.system(
       `(${blocker.name}) ${PlayerAttr.hp.label}: ${beforeHp} -> ${afterHp}`,
       "negative"
     );
+    if (afterHp <= 0) {
+      yield* blocker.generateKnockedOut(g);
+      return { knockedOut: true };
+    }
+    return { knockedOut: false };
   },
 
   *generateAttack(
     g: GameState,
     attacker: Attacker,
-    blocker: Blocker
-  ): Generator<Log> {
+    blocker: Blocker,
+    options: { skipAttackVoice?: boolean } = {}
+  ): Generator<Log, HitResult> {
+    if (!options?.skipAttackVoice) {
+      yield* attacker.generateAttackVoice(g);
+    }
     const { power } = yield* attacker.weapon.generateAttack(
       g,
       attacker,
       blocker
     );
-    const attackVoice = attacker.attackVoice(0);
-    if (attackVoice) {
-      yield Log.dialog(attackVoice);
-    }
-    yield* this.generateHit(power, blocker);
+    return yield* this.generateHit(g, power, blocker);
   },
+
+  // *generateDefaultKnockedOut(
+  //   g: GameState,
+  //   blocker: Blocker
+  // ): Generator<Log> {
+  //   yield Log.description(`${blocker.name}は気絶した。`, "negative");
+  //   yield Log.description(`${blocker.name}は最寄りの病院に運ばれた。`, "negative");
+  // }
 };
+
+// Player
+export class PlayerBattler implements Battler {
+  p: Player;
+  constructor(p: Player) {
+    this.p = p;
+  }
+
+  // blocker
+  get name() {
+    return this.p.name;
+  }
+  getHp() {
+    return this.p.hp;
+  }
+  setHp(hp: number): void {
+    this.p.hp = hp;
+  }
+  *generateDamageVoice(): Generator<Log> {
+    switch (this.p.personality) {
+      case "gentle":
+        yield Log.dialog("痛っ");
+        break;
+      case "violent":
+        yield Log.dialog("ギャー！");
+        break;
+      case "phobic":
+        yield Log.dialog("嫌あああ！");
+        break;
+      case "smart":
+        yield Log.dialog("ぐはっ");
+        break;
+    }
+  }
+
+  *generateKnockedOut(): Generator<Log> {
+    yield Log.description(`${this.name}は気絶した。`, "negative");
+    yield Log.description(`${this.name}は最寄りの病院に運ばれた。`, "negative");
+
+    // 病院を探す
+    let hospitalPosition = 0;
+    for (let pos = this.p.position; pos >= 0; pos--) {
+      if (SPACE_MAP[pos]?.isHospital) {
+        hospitalPosition = pos;
+        break;
+      }
+    }
+
+    const attrs = [
+      PlayerAttrChanger.position(hospitalPosition),
+      PlayerAttrChanger.hp(Config.initialHp),
+    ];
+    yield* LogUtil.generatePlayerAttrsChange(this.p, attrs, "negative");
+  }
+
+  // attacker
+  get smart() {
+    return this.p.personality === "smart";
+  }
+  get isBot() {
+    return this.p.isBot;
+  }
+  get weapon() {
+    return this.p.weapon;
+  }
+  *generateAttackVoice(): Generator<Log> {
+    switch (this.p.personality) {
+      case "gentle":
+        // 温厚なやつが攻撃することはないかも
+        yield Log.dialog("くらえー！");
+        break;
+      case "violent":
+        yield Log.dialog("オラー！");
+        break;
+      case "phobic":
+        // 手が出るタイプ
+        yield Log.dialog("消えて！");
+        break;
+      case "smart":
+        yield Log.dialog("僕の力を見せてあげよう");
+        // ・圧倒的な力を見るがいい
+        // ・僕に勝てると思っているのかな？
+        // ・少しは楽しませてもらおうか
+        break;
+    }
+  }
+}

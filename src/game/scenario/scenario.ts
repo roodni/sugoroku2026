@@ -132,7 +132,10 @@ function* generateTurn(g: GameState): Generator<Log> {
 
     const you = g.players[0];
     if (justGoaledPlayers.includes(you)) {
-      const attrs = [PlayerAttr.turn, ...playerAttrs.slice(1)];
+      const attrs = [
+        PlayerAttr.turn,
+        ...playerAttrs.filter((a) => a !== PlayerAttr.position),
+      ];
       const dialog = goaledDialog(you, rank);
       g.gameOverMessage = `${
         you.name

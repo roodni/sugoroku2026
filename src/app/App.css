@@ -120,7 +120,7 @@
 
   & > textarea {
     width: 100%;
-    height: 40vh;
+    height: 30vh;
     resize: vertical;
     font-size: 13px;
     line-height: 1;

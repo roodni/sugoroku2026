@@ -99,13 +99,29 @@ function* generateSharingPositionViolent(
     yield Log.dialog("邪魔だー！");
     const playerBattler = new PlayerBattler(player);
     const otherBattler = new PlayerBattler(other);
-    yield* Battle.generateAttack(g, playerBattler, otherBattler);
-
-    // TODO: 搬送
+    const attack1 = yield* Battle.generateAttack(
+      g,
+      playerBattler,
+      otherBattler,
+      { skipAttackVoice: true }
+    );
+    if (!attack1.knockedOut && other.personality === "violent") {
+      yield Log.dialog("何しやがる！");
+      const attack2 = yield* Battle.generateAttack(
+        g,
+        otherBattler,
+        playerBattler,
+        { skipAttackVoice: true }
+      );
+      if (attack2.knockedOut) {
+        // 反撃で倒されたら後続の人を殴れない
+        break;
+      }
+    }
   }
 }
 
-function* generateSharingPositionPhobic(_g: GameState, player: Player) {
+function* generateSharingPositionPhobic(g: GameState, player: Player) {
   yield Log.dialog("ひっ");
   if (player.position !== Config.goalPosition) {
     yield Log.description(
@@ -127,9 +143,7 @@ function* generateSharingPositionPhobic(_g: GameState, player: Player) {
       "negative"
     );
     const battler = new PlayerBattler(player);
-    yield* Battle.generateHit(10, battler);
-
-    // TODO: 搬送
+    yield* Battle.generateHit(g, 10, battler);
   }
 }
 
