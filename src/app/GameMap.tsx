@@ -52,17 +52,17 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
     }
 
     const players = gameState.players.filter((p) => p.position === pos);
-    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    const cameraPlayer = gameState.players[gameState.cameraPlayerIndex];
     if (players.length > 0) {
       text += " <- ";
       text += players
-        .map((p) => (p === currentPlayer ? `[${p.name}]` : p.name))
+        .map((p) => (p === cameraPlayer ? `[${p.name}]` : p.name))
         .join(" ");
     }
     lines.push(
       <span
         key={pos}
-        className={currentPlayer.position === pos ? "map-line-current" : ""}
+        className={cameraPlayer.position === pos ? "map-line-current" : ""}
       >
         {text}
         {"\n"}

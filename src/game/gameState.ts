@@ -57,15 +57,16 @@ export const Player = {
   },
 
   save(p: Player): PlayerJson {
+    // 順番を制御するため全部列挙
     return {
       name: p.name,
-      isBot: p.isBot,
-      turn: p.turn,
-      position: p.position,
-      goaled: p.goaled,
       personality: p.personality,
-      hp: p.hp,
+      position: p.position,
       weapon: p.weapon.name,
+      hp: p.hp,
+      goaled: p.goaled,
+      turn: p.turn,
+      isBot: p.isBot,
     };
   },
   load(json: PlayerJson): Player {
@@ -82,6 +83,7 @@ export type GameState = {
   currentPlayerIndex: number;
   players: Player[];
   cameraStart: number; // 地図で省略せず表示するマスの開始位置
+  cameraPlayerIndex: number; // 地図で注目している駒
   gameOverMessage: string | null; // null でなくなったときゲーム終了と判定される
   futureDice: number[]; // デバッグ用
 };
@@ -90,6 +92,7 @@ export type GameStateJson = {
   currentPlayerIndex: number;
   players: PlayerJson[];
   cameraStart: number;
+  cameraPlayerIndex: number;
   gameOverMessage: string | null;
   futureDice: number[];
 };
@@ -106,15 +109,18 @@ export const GameState = {
       currentPlayerIndex: 0,
       players,
       cameraStart: 0,
+      cameraPlayerIndex: 0,
       gameOverMessage: null,
       futureDice: [],
     };
   },
 
   save(g: GameState): GameStateJson {
+    // 順番を制御するため全部列挙
     return {
       futureDice: g.futureDice,
       currentPlayerIndex: g.currentPlayerIndex,
+      cameraPlayerIndex: g.cameraPlayerIndex,
       players: g.players.map((p) => Player.save(p)),
       cameraStart: g.cameraStart,
       gameOverMessage: g.gameOverMessage,
@@ -122,11 +128,8 @@ export const GameState = {
   },
   load(json: GameStateJson): GameState {
     return {
-      futureDice: json.futureDice,
-      currentPlayerIndex: json.currentPlayerIndex,
+      ...json,
       players: json.players.map((p) => Player.load(p)),
-      cameraStart: json.cameraStart,
-      gameOverMessage: json.gameOverMessage,
     };
   },
 };

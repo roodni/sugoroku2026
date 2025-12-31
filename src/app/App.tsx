@@ -30,44 +30,50 @@ function App() {
 
   const [mapRenderObserver] = useState(() => new Observer<void>());
 
+  // ログ系
   const [allLogs, setAllLogs] = useState<Log[]>([]);
   const [logOffset, setLogOffset] = useState(0);
   const [isAllLogsShown, setIsAllLogsShown] = useState(false);
   const logOffsetActual = isAllLogsShown ? 0 : logOffset;
+  const lastLog = allLogs.at(-1);
 
+  // 自動進行系
   const [isAuto, setIsAuto] = useState(false);
   const isAutoRef = useRef(isAuto);
   useEffect(() => {
     isAutoRef.current = isAuto; // 非同期関数から最新値を取得するため
   }, [isAuto]);
 
-  // デバッグ機能
+  // デバッグ系
   const [isDebug, setIsDebug] = useState(false);
-  const [stateJson, setStateJson] = useState("");
-  const [stateJsonOriginal, setStateJsonOriginal] = useState(""); // テキストエリアと現在の状態が合っているか判定する
-  const updateDebugJson = useCallback(() => {
-    // テキストエリアを更新する
+  const [debugJson, setDebugJson] = useState("");
+  const isLoadableNow = lastLog === undefined || lastLog.type === "turnEnd";
+
+  // テキストエリアに現在の状態を反映する
+  const updateDebugTextarea = useCallback(() => {
     const json = scenarioRef.current!.save();
-    setStateJson(json);
-    setStateJsonOriginal(json);
+    setDebugJson(json);
   }, []);
+  useEffect(() => {
+    updateDebugTextarea(); // 初期化。もっと他にやり方ないのか
+  }, [updateDebugTextarea]);
+
+  // テキストエリアの内容をロードする
   const loadDebugJson = useCallback(() => {
-    // テキストエリアの内容をロードする
     try {
-      scenarioRef.current!.load(stateJson);
+      scenarioRef.current!.load(debugJson);
     } catch (e) {
       console.error("ロード失敗", e);
       alert(e);
       return;
     }
-    updateDebugJson();
     mapRenderObserver.notify();
-  }, [stateJson, mapRenderObserver, updateDebugJson]);
+  }, [debugJson, mapRenderObserver]);
+
+  // @ を押すとデバッグ盤が開く
   useEffect(() => {
-    // @ を押すとデバッグモード
     const handler = (e: KeyboardEvent) => {
       if (e.key === "@") {
-        updateDebugJson();
         setIsDebug((v) => !v);
         setTimeout(() => debugTextareaRef.current?.focus());
       }
@@ -76,7 +82,9 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handler);
     };
-  }, [updateDebugJson]);
+  }, [updateDebugTextarea]);
+
+  // Ctrl + Enterでロード
   const debugTextareaKeyboardHandler: React.KeyboardEventHandler<
     HTMLTextAreaElement
   > = (e) => {
@@ -96,9 +104,9 @@ function App() {
     setAllLogs([]);
     setLogOffset(0);
 
-    updateDebugJson();
+    updateDebugTextarea();
     mapRenderObserver.notify();
-  }, [mapRenderObserver, updateDebugJson]);
+  }, [mapRenderObserver, updateDebugTextarea]);
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
@@ -116,6 +124,11 @@ function App() {
       setAllLogs((prev) => [...prev, log]);
       if (lastLog?.type === "turnEnd") {
         setLogOffset(logIndex);
+      }
+
+      if (log.type === "turnEnd") {
+        // ターンの切れ目でデバッグ盤に反映する
+        updateDebugTextarea();
       }
 
       // 待機の仕方を決める
@@ -148,16 +161,15 @@ function App() {
       if (waitType === "immediate") {
         continue;
       } else if (waitType === "timer") {
-        updateDebugJson();
-        await new Promise((resolve) => setTimeout(resolve, WAIT));
         mapRenderObserver.notify();
+        await new Promise((resolve) => setTimeout(resolve, WAIT));
       } else if (waitType === "button") {
-        updateDebugJson();
+        mapRenderObserver.notify();
         setPlayingState({ type: "playing", isWaitingButton: true });
         break;
       }
     }
-  }, [mapRenderObserver, updateDebugJson]); // 注意: 非同期関数なので古い状態しか参照できない
+  }, [mapRenderObserver, updateDebugTextarea]); // 注意: 非同期関数なので古い状態しか参照できない
 
   useEffect(() => {
     // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
@@ -171,7 +183,7 @@ function App() {
     const element = scrollerElementRef.current!;
     element.scroll({ top: element.scrollHeight, behavior: "instant" });
     // console.log("scroll", element.scrollTop, element.scrollHeight);
-  }, [allLogs, logOffsetActual, playingState, isDebug]);
+  }, [allLogs, logOffsetActual, playingState]);
 
   const mainButtonHandler = useCallback(() => {
     if (playingState.type === "beforeStart") {
@@ -183,7 +195,6 @@ function App() {
     }
   }, [stepGame, playingState]);
 
-  const lastLog = allLogs.at(-1);
   const mainButtonLabel = (() => {
     if (playingState.type === "beforeStart") {
       return "始める";
@@ -239,17 +250,13 @@ function App() {
           <div className="debug">
             デバッグ盤
             <button onClick={() => setIsDebug(false)}>閉じてね</button>
-            <button
-              onClick={loadDebugJson}
-              disabled={stateJson === stateJsonOriginal}
-            >
+            <button onClick={loadDebugJson} disabled={!isLoadableNow}>
               ロード
-              {lastLog?.type !== "turnEnd" && "(危険)"}
             </button>
             <textarea
               name="debug-textarea"
-              value={stateJson}
-              onChange={(e) => setStateJson(e.target.value)}
+              value={debugJson}
+              onChange={(e) => setDebugJson(e.target.value)}
               spellCheck={false}
               ref={debugTextareaRef}
               onKeyDown={debugTextareaKeyboardHandler}

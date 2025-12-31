@@ -11,24 +11,32 @@ import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./sharing";
 import { SPACE_MAP } from "./space";
 
+type TurnResult = {
+  skipped: boolean;
+};
+
 export class Scenario {
   // 描画に使うのでpublic
-  readonly gameState: GameState;
+  gameState: GameState;
 
   private generator: Generator<Log> | undefined;
   history: Log[];
+  loadable: boolean;
 
   constructor() {
     this.gameState = GameState.initial();
     this.history = [];
+    this.loadable = true;
   }
 
   // デバッグ用
-  // ターンの切れ目でのみ安全にロードできる。
   load(json: string) {
-    const obj = JSON.parse(json);
-    const newState = GameState.load(obj);
-    Object.assign(this.gameState, newState); // in-place更新により、一応ターン途中でロードできる
+    if (this.loadable) {
+      const obj = JSON.parse(json);
+      this.gameState = GameState.load(obj);
+    } else {
+      throw new Error("ターン途中ではロード禁止");
+    }
   }
   save(): string {
     const obj = GameState.save(this.gameState);
@@ -36,15 +44,23 @@ export class Scenario {
   }
 
   private *generate(): Generator<Log> {
+    this.loadable = false;
     while (true) {
-      yield* generateTurn(this.gameState);
-      if (this.gameState.gameOverMessage) {
+      const g = this.gameState;
+      const turnResult = yield* generateTurn(g);
+      if (g.gameOverMessage) {
         // ゲーム終了
         // メッセージはgameStateじゃなくて返値で返すべきかも
         return;
       }
-      this.gameState.currentPlayerIndex += 1;
-      this.gameState.currentPlayerIndex %= this.gameState.players.length;
+      g.currentPlayerIndex += 1;
+      g.currentPlayerIndex %= g.players.length;
+      if (!turnResult.skipped) {
+        this.loadable = true;
+        yield Log.turnEnd();
+        // <- このタイミングでgameStateがデバッグ機能により書き変わる可能性がある
+        this.loadable = false;
+      }
     }
   }
 
@@ -71,14 +87,15 @@ const playerAttrs = [
 // 1ターンを経過させる。
 // ターンの切れ目に安全にセーブ&ロード（デバッグ用）できるように、
 // 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
-function* generateTurn(g: GameState): Generator<Log> {
+function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   const player = g.players[g.currentPlayerIndex];
   if (player.goaled) {
-    return;
+    return { skipped: true };
   }
 
   player.turn += 1;
   g.cameraStart = player.position;
+  g.cameraPlayerIndex = g.currentPlayerIndex;
 
   // ターン開始
   yield Log.description(`${player.name}のターン${player.turn}。`);
@@ -143,11 +160,11 @@ function* generateTurn(g: GameState): Generator<Log> {
         you,
         attrs
       )})。「${dialog}」`;
-      return; // ゲーム終了
+      return { skipped: true }; // ゲーム終了
     }
   }
 
   // ここは空行を挟まなくていい
   yield Log.description("ターンが終了した。");
-  yield Log.turnEnd();
+  return { skipped: false };
 }
