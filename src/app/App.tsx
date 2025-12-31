@@ -46,29 +46,71 @@ function App() {
 
   // デバッグ系
   const [isDebug, setIsDebug] = useState(false);
-  const [debugJson, setDebugJson] = useState("");
+  const [debugJson, setDebugJson] = useState(""); // テキストエリアの内容
+  const [debugJsonHistory, setDebugJsonHistory] = useState<{
+    undo: string[];
+    current: string;
+    redo: string[];
+  }>({ undo: [], current: "", redo: [] }); // currentはゲームとほぼ同期させる
   const isLoadableNow = lastLog === undefined || lastLog.type === "turnEnd";
 
-  // テキストエリアに現在の状態を反映する
-  const updateDebugTextarea = useCallback(() => {
+  // デバッグ盤をゲーム初期化に合わせて初期化する
+  const initializeDebugJson = useCallback(() => {
     const json = scenarioRef.current!.save();
+    setDebugJsonHistory({ undo: [], current: json, redo: [] });
     setDebugJson(json);
   }, []);
   useEffect(() => {
-    updateDebugTextarea(); // 初期化。もっと他にやり方ないのか
-  }, [updateDebugTextarea]);
+    initializeDebugJson(); // 初期化。もっと他にやり方ないのか
+  }, [initializeDebugJson]);
 
-  // テキストエリアの内容をロードする
-  const loadDebugJson = useCallback(() => {
-    try {
-      scenarioRef.current!.load(debugJson);
-    } catch (e) {
-      console.error("ロード失敗", e);
-      alert(e);
+  // デバッグ盤の内容をゲームにロードする
+  const loadDebugJson = useCallback(
+    (json: string) => {
+      try {
+        scenarioRef.current!.load(json);
+      } catch (e) {
+        console.error("ロード失敗", e);
+        alert(e);
+        return;
+      }
+      setDebugJsonHistory(({ undo, redo }) => ({
+        undo,
+        current: json,
+        redo,
+      }));
+      mapRenderObserver.notify();
+    },
+    [mapRenderObserver]
+  );
+
+  // ゲームの状態をUndo / Redoする
+  const undoDebugJson = () => {
+    const { undo, current, redo } = debugJsonHistory;
+    if (undo.length === 0) {
       return;
     }
-    mapRenderObserver.notify();
-  }, [debugJson, mapRenderObserver]);
+    setDebugJsonHistory({
+      undo: undo.slice(1),
+      current: undo[0],
+      redo: [current, ...redo],
+    });
+    loadDebugJson(undo[0]);
+    setDebugJson(undo[0]);
+  };
+  const redoDebugJson = () => {
+    const { undo, current, redo } = debugJsonHistory;
+    if (redo.length === 0) {
+      return;
+    }
+    setDebugJsonHistory({
+      undo: [current, ...undo],
+      current: redo[0],
+      redo: redo.slice(1),
+    });
+    loadDebugJson(redo[0]);
+    setDebugJson(redo[0]);
+  };
 
   // @ を押すとデバッグ盤が開く
   useEffect(() => {
@@ -82,16 +124,17 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handler);
     };
-  }, [updateDebugTextarea]);
+  }, []);
 
   // Ctrl + Enterでロード
-  const debugTextareaKeyboardHandler: React.KeyboardEventHandler<
-    HTMLTextAreaElement
-  > = (e) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-      loadDebugJson();
-    }
-  };
+  const debugTextareaKeyboardHandler = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        loadDebugJson(debugJson);
+      }
+    },
+    [loadDebugJson, debugJson]
+  );
 
   const mainButtonRef = useRef<HTMLButtonElement>(null);
   const scrollerElementRef = useRef<HTMLElement>(null);
@@ -104,9 +147,9 @@ function App() {
     setAllLogs([]);
     setLogOffset(0);
 
-    updateDebugTextarea();
+    initializeDebugJson();
     mapRenderObserver.notify();
-  }, [mapRenderObserver, updateDebugTextarea]);
+  }, [mapRenderObserver, initializeDebugJson]);
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
@@ -128,7 +171,13 @@ function App() {
 
       if (log.type === "turnEnd") {
         // ターンの切れ目でデバッグ盤に反映する
-        updateDebugTextarea();
+        const next = scenario.save();
+        setDebugJsonHistory(({ undo, current }) => ({
+          undo: [current, ...undo],
+          current: next,
+          redo: [],
+        }));
+        setDebugJson(next);
       }
 
       // 待機の仕方を決める
@@ -169,7 +218,7 @@ function App() {
         break;
       }
     }
-  }, [mapRenderObserver, updateDebugTextarea]); // 注意: 非同期関数なので古い状態しか参照できない
+  }, [mapRenderObserver]); // 注意: 非同期関数なので古い状態しか参照できない
 
   useEffect(() => {
     // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
@@ -250,8 +299,26 @@ function App() {
           <div className="debug">
             デバッグ盤
             <button onClick={() => setIsDebug(false)}>閉じてね</button>
-            <button onClick={loadDebugJson} disabled={!isLoadableNow}>
+            <button
+              onClick={() => loadDebugJson(debugJson)}
+              disabled={
+                !isLoadableNow || debugJson === debugJsonHistory.current
+              }
+            >
               ロード
+              {!isLoadableNow && " (禁止)"}
+            </button>
+            <button
+              onClick={undoDebugJson}
+              disabled={!isLoadableNow || debugJsonHistory.undo.length === 0}
+            >
+              Undo
+            </button>
+            <button
+              onClick={redoDebugJson}
+              disabled={!isLoadableNow || debugJsonHistory.redo.length === 0}
+            >
+              Redo
             </button>
             <textarea
               name="debug-textarea"
