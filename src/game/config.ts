@@ -1,5 +1,5 @@
 export const Config = {
-  goalPosition: 100,
+  goalPosition: 50,
   computerPlayerNumber: 2,
   initialHp: 20,
 } as const;

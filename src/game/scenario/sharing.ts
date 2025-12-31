@@ -54,7 +54,8 @@ function* generatePhobicEscape(
     return { escaped: true };
   } else {
     yield Log.description(
-      `${phobic.name}は${coming.name}を避けようとしたが、これ以上進めなかった。`
+      `${phobic.name}は${coming.name}を避けようとしたが、これ以上進めなかった。`,
+      "negative"
     );
     return { escaped: false };
   }
@@ -66,28 +67,29 @@ function* generateSharingPositionGentle(
   others: Player[]
 ) {
   for (const other of others) {
+    if (other.personality === "phobic") {
+      const { escaped } = yield* generatePhobicEscape(other, player);
+      if (escaped) {
+        continue;
+      }
+    }
     yield Log.description(`${player.name}は${other.name}に挨拶した。`);
     yield Log.dialog(`こんにちは！`);
-
-    const hot = Log.description("心が温かくなった。");
     switch (other.personality) {
       case "gentle":
         yield Log.dialog(`やあ`);
-        yield hot;
         break;
       case "violent":
         yield Log.dialog(`おう`);
-        yield hot;
         break;
       case "phobic":
-        // 逃げない
         yield Log.dialog(`こ、こんにちは……`);
         break;
       case "smart":
         yield Log.dialog(`おや奇遇だね`);
-        yield hot;
         break;
     }
+    yield Log.description("心が温かくなった。");
   }
 }
 
@@ -146,7 +148,6 @@ function* generateSharingPositionPhobic(g: GameState, player: Player) {
     yield Log.description(
       `${player.name}は先客を避けようとしたが、これ以上進めなかった。`
     );
-    yield Log.dialog("ううっ……");
     yield Log.description(
       `精神的な苦痛が${player.name}の体を蝕んだ。`,
       "negative"
