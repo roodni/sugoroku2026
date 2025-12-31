@@ -109,6 +109,24 @@
   }
 }
 
+/* デバッグパネル */
+.debug {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--gap);
+
+  & > textarea {
+    width: 100%;
+    height: 40vh;
+    resize: vertical;
+    font-size: 13px;
+    line-height: 1;
+  }
+}
+
 /* フッターのUI */
 .main-button {
   flex-grow: 1;

@@ -1,5 +1,5 @@
 import { Config } from "../config";
-import { GameState } from "../gameState";
+import { GameState, type GameStateJson } from "../gameState";
 import {
   PlayerAttr,
   PlayerAttrChanger,
@@ -12,18 +12,44 @@ import { generateSharingPositionEvent } from "./share";
 import { SPACE_MAP } from "./space";
 
 export class Scenario {
-  // 描画に使うのでpublic。申し訳程度にReadonlyにしている
-  readonly gameState: Readonly<GameState>;
-  private generator: Generator<Log>;
+  // 描画に使うのでpublic
+  readonly gameState: GameState;
+
+  private generator: Generator<Log> | undefined;
   history: Log[];
 
   constructor() {
     this.gameState = GameState.initial();
-    this.generator = generateGame(this.gameState);
     this.history = [];
   }
 
+  // デバッグ用
+  // ターンの切れ目でのみ安全にロードできる。
+  load(json: GameStateJson) {
+    const newState = GameState.load(json);
+    Object.assign(this.gameState, newState); // in-place更新により、一応ターン途中でロードできる
+  }
+  save(): GameStateJson {
+    return GameState.save(this.gameState);
+  }
+
+  private *generate(): Generator<Log> {
+    while (true) {
+      yield* generateTurn(this.gameState);
+      if (this.gameState.gameOverMessage) {
+        // ゲーム終了
+        // メッセージはgameStateじゃなくて返値で返すべきかも
+        return;
+      }
+      this.gameState.currentPlayerIndex += 1;
+      this.gameState.currentPlayerIndex %= this.gameState.players.length;
+    }
+  }
+
   next(): Log | undefined {
+    if (!this.generator) {
+      this.generator = this.generate();
+    }
     const result = this.generator.next();
     if (result.done) {
       return undefined;
@@ -40,15 +66,8 @@ const playerAttrs = [
   PlayerAttr.hp,
 ];
 
-function* generateGame(g: GameState): Generator<Log> {
-  while (g.gameOverMessage === null) {
-    yield* generateTurn(g);
-    g.currentPlayerIndex = (g.currentPlayerIndex + 1) % g.players.length;
-  }
-}
-
 // 1ターンを経過させる。
-// ターンごとのセーブ&ロード（デバッグ用）を可能にするため、
+// ターンの切れ目に安全にセーブ&ロード（デバッグ用）できるように、
 // 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
 function* generateTurn(g: GameState): Generator<Log> {
   const player = g.players[g.currentPlayerIndex];

@@ -15,6 +15,17 @@ export type Player = {
   weapon: Weapon;
 };
 
+type PlayerJson = {
+  name: string;
+  isBot: boolean;
+  turn: number;
+  position: number;
+  goaled: boolean;
+  personality: Personality;
+  hp: number;
+  weapon: string;
+};
+
 export const Player = {
   initial(name: string, isBot: boolean): Player {
     return {
@@ -28,6 +39,26 @@ export const Player = {
       weapon: Weapon.hand,
     };
   },
+
+  save(p: Player): PlayerJson {
+    return {
+      name: p.name,
+      isBot: p.isBot,
+      turn: p.turn,
+      position: p.position,
+      goaled: p.goaled,
+      personality: p.personality,
+      hp: p.hp,
+      weapon: p.weapon.name,
+    };
+  },
+  load(json: PlayerJson): Player {
+    const weapon = Weapon.list.find((w) => w.name === json.weapon);
+    if (!weapon) {
+      throw new Error(`weapon: ${json.weapon}`);
+    }
+    return { ...json, weapon };
+  },
 };
 
 export type GameState = {
@@ -35,6 +66,13 @@ export type GameState = {
   players: Player[];
   cameraStart: number; // 地図で省略せず表示するマスの開始位置
   gameOverMessage: string | null; // null でなくなったときゲーム終了と判定される
+};
+
+export type GameStateJson = {
+  currentPlayerIndex: number;
+  players: PlayerJson[];
+  cameraStart: number;
+  gameOverMessage: string | null;
 };
 
 export const GameState = {
@@ -50,6 +88,23 @@ export const GameState = {
       players,
       cameraStart: 0,
       gameOverMessage: null,
+    };
+  },
+
+  save(g: GameState): GameStateJson {
+    return {
+      currentPlayerIndex: g.currentPlayerIndex,
+      players: g.players.map((p) => Player.save(p)),
+      cameraStart: g.cameraStart,
+      gameOverMessage: g.gameOverMessage,
+    };
+  },
+  load(json: GameStateJson): GameState {
+    return {
+      currentPlayerIndex: json.currentPlayerIndex,
+      players: json.players.map((p) => Player.load(p)),
+      cameraStart: json.cameraStart,
+      gameOverMessage: json.gameOverMessage,
     };
   },
 };

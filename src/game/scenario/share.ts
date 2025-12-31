@@ -46,7 +46,7 @@ function* generatePhobicEscape(phobic: Player, coming: Player) {
   if (phobic.position !== Config.goalPosition) {
     yield Log.description(
       `${phobic.name}は${coming.name}を嫌がって1マス進んだ。`,
-      "positive"
+      "negative"
     );
     yield* LogUtil.generatePlayerAttrChange(
       phobic,
@@ -96,6 +96,7 @@ function* generateSharingPositionViolent(
   others: Player[]
 ) {
   for (const other of others) {
+    yield Log.dialog("邪魔だー！");
     const playerBattler = new PlayerBattler(player);
     const otherBattler = new PlayerBattler(other);
     yield* Battle.generateAttack(playerBattler, otherBattler);
@@ -151,7 +152,7 @@ function* generateSharingPositionSmart(
         yield Log.dialog(`ひいっ……`);
         break;
       case "smart":
-        yield Log.dialog(`フフ……君も中々スマートだね`);
+        yield Log.dialog(`おや……君も中々スマートだね`);
         break;
     }
     yield Log.description("人望が高まった。");

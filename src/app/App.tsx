@@ -41,8 +41,53 @@ function App() {
     isAutoRef.current = isAuto; // 非同期関数から最新値を取得するため
   }, [isAuto]);
 
+  // デバッグ機能
+  const [isDebug, setIsDebug] = useState(false);
+  const [stateJson, setStateJson] = useState("");
+  const updateDebugJson = useCallback(() => {
+    const state = scenarioRef.current!.save();
+    const json = JSON.stringify(state, null, 2);
+    setStateJson(json);
+  }, []);
+  useEffect(() => {
+    // Alt + @ を押すとデバッグモード
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "@" && e.altKey) {
+        updateDebugJson();
+        setIsDebug((v) => !v);
+        setTimeout(() => debugTextareaRef.current?.focus());
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
+  }, [updateDebugJson]);
+  const loadDebugJson = useCallback(() => {
+    try {
+      const obj = JSON.parse(stateJson);
+      scenarioRef.current!.load(obj);
+    } catch (e) {
+      console.error("ロード失敗", e);
+      alert(e);
+    }
+    mapRenderObserver.notify();
+  }, [stateJson, mapRenderObserver]);
+
   const mainButtonRef = useRef<HTMLButtonElement>(null);
   const scrollerElementRef = useRef<HTMLElement>(null);
+  const debugTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // ゲーム初期化
+  const restartGame = useCallback(() => {
+    scenarioRef.current = new Scenario();
+    setPlayingState({ type: "beforeStart" });
+    setAllLogs([]);
+    setLogOffset(0);
+
+    updateDebugJson();
+    mapRenderObserver.notify();
+  }, [mapRenderObserver, updateDebugJson]);
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
@@ -92,14 +137,16 @@ function App() {
       if (waitType === "immediate") {
         continue;
       } else if (waitType === "timer") {
+        updateDebugJson();
         await new Promise((resolve) => setTimeout(resolve, WAIT));
         mapRenderObserver.notify();
       } else if (waitType === "button") {
+        updateDebugJson();
         setPlayingState({ type: "playing", isWaitingButton: true });
         break;
       }
     }
-  }, [mapRenderObserver]); // 注意: 非同期関数なので古い状態しか参照できない
+  }, [mapRenderObserver, updateDebugJson]); // 注意: 非同期関数なので古い状態しか参照できない
 
   useEffect(() => {
     // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
@@ -113,7 +160,7 @@ function App() {
     const element = scrollerElementRef.current!;
     element.scroll({ top: element.scrollHeight, behavior: "instant" });
     // console.log("scroll", element.scrollTop, element.scrollHeight);
-  }, [allLogs, logOffsetActual, playingState]);
+  }, [allLogs, logOffsetActual, playingState, isDebug]);
 
   const mainButtonHandler = useCallback(() => {
     if (playingState.type === "beforeStart") {
@@ -124,14 +171,6 @@ function App() {
       stepGame();
     }
   }, [stepGame, playingState]);
-
-  const restartGame = useCallback(() => {
-    scenarioRef.current = new Scenario();
-    mapRenderObserver.notify();
-    setPlayingState({ type: "beforeStart" });
-    setAllLogs([]);
-    setLogOffset(0);
-  }, [mapRenderObserver]);
 
   const lastLog = allLogs.at(-1);
   const mainButtonLabel = (() => {
@@ -185,6 +224,23 @@ function App() {
         </div>
       </main>
       <footer className="footer">
+        {isDebug && (
+          <div className="debug">
+            デバッグ盤
+            <button onClick={() => setIsDebug(false)}>閉じてね</button>
+            <button onClick={loadDebugJson}>
+              ロード
+              {lastLog?.type !== "turnEnd" && "(危険)"}
+            </button>
+            <textarea
+              name="debug-textarea"
+              value={stateJson}
+              onChange={(e) => setStateJson(e.target.value)}
+              spellCheck={false}
+              ref={debugTextareaRef}
+            ></textarea>
+          </div>
+        )}
         <button
           ref={mainButtonRef}
           type="button"
