@@ -1,3 +1,4 @@
+import { Weapon } from "./battle";
 import { Config } from "./config";
 import type { Personality, Player } from "./gameState";
 
@@ -39,6 +40,11 @@ export class PlayerAttr {
     "HP",
     (p: Player) => `${p.hp}`,
     (p: Player) => p.hp === Config.initialHp
+  );
+  static weapon = new this(
+    "装備",
+    (p: Player) => p.weapon.name,
+    (p: Player) => p.weapon === Weapon.hand
   );
 }
 
@@ -85,6 +91,8 @@ export const PlayerAttrChanger = {
   personality: (next: Personality) =>
     new GeneralChanger(PlayerAttr.personality, "personality", next),
   hp: (next: number) => new GeneralChanger(PlayerAttr.hp, "hp", next),
+  weapon: (next: Weapon) =>
+    new GeneralChanger(PlayerAttr.weapon, "weapon", next),
 };
 
 // プレイヤーの属性を変更した後で、その変更内容を文字列化して返す

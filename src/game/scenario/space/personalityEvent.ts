@@ -3,6 +3,8 @@ import { PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
 import type { Space } from "./space";
 
+// 性格変更系イベント
+
 export const liveSpace: Space = {
   name: "ライブ会場",
   *generate(g: GameState) {

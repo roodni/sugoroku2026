@@ -53,7 +53,18 @@ export class Weapon {
     },
   });
 
-  static list: Weapon[] = [this.hand];
+  static stick = new this({
+    name: "こん棒",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}をこん棒で打った。`
+      );
+      const power = yield* LogUtil.generateDiceRoll(g, 1, 10, attacker.isBot);
+      return { power };
+    },
+  });
+
+  static list: Weapon[] = [this.hand, this.stick];
 }
 
 type HitResult = { knockedOut: boolean };
@@ -219,5 +230,32 @@ export class PlayerBattler implements Battler {
         // ・少しは楽しませてもらおうか
         break;
     }
+  }
+
+  static *generateHitPlayer(
+    g: GameState,
+    power: number,
+    player: Player,
+    options: {
+      overrideDamageVoice?: string;
+      unblockable?: boolean; // スマートガード不能
+    }
+  ): Generator<Log, HitResult> {
+    const battler = new (class extends PlayerBattler {
+      override get smart() {
+        if (options.unblockable) {
+          return false;
+        }
+        return super.smart;
+      }
+      override *generateDamageVoice(): Generator<Log> {
+        if (options.overrideDamageVoice) {
+          yield Log.dialog(options.overrideDamageVoice);
+        } else {
+          yield* super.generateDamageVoice();
+        }
+      }
+    })(player);
+    return yield* Battle.generateHit(g, power, battler);
   }
 }

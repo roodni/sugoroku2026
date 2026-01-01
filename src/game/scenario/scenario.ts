@@ -83,6 +83,7 @@ const playerAttrs = [
   PlayerAttr.personality,
   PlayerAttr.position,
   PlayerAttr.hp,
+  PlayerAttr.weapon,
 ];
 
 // 1ターンを経過させる。

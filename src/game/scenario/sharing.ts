@@ -137,7 +137,7 @@ function* generateSharingPositionPhobic(g: GameState, player: Player) {
   if (player.position !== Config.goalPosition) {
     yield Log.description(
       `${player.name}は先客を避けて1マス進んだ。`,
-      "positive"
+      "negative"
     );
     yield* LogUtil.generatePlayerAttrChange(
       player,
@@ -146,7 +146,8 @@ function* generateSharingPositionPhobic(g: GameState, player: Player) {
     );
   } else {
     yield Log.description(
-      `${player.name}は先客を避けようとしたが、これ以上進めなかった。`
+      `${player.name}は先客を避けようとしたが、これ以上進めなかった。`,
+      "negative"
     );
     yield Log.description(
       `精神的な苦痛が${player.name}の体を蝕んだ。`,
