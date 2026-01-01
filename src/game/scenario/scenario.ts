@@ -1,4 +1,4 @@
-import { Battle, PlayerBattler } from "../battle";
+import { PlayerBattler } from "../battle";
 import { Config } from "../config";
 import { GameState } from "../gameState";
 import {
@@ -142,19 +142,21 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   );
 
   let playerDead = false;
-
   if (smartDamage !== undefined) {
     yield Log.description(`急停止が体に負担をかけた！`, "negative");
-    const battler = new (class extends PlayerBattler {
-      override get smart() {
-        return false; // このダメージは半減できない
-      }
-    })(player);
-    yield* Battle.generateHit(g, smartDamage, battler);
+    const { knockedOut } = yield* PlayerBattler.generateHitPlayer(
+      g,
+      smartDamage,
+      player,
+      { unblockable: true }
+    );
+    playerDead = knockedOut;
   }
 
   // 相席イベント
-  playerDead = (yield* generateSharingPositionEvent(g, player)).playerDead;
+  if (!playerDead) {
+    playerDead = (yield* generateSharingPositionEvent(g, player)).playerDead;
+  }
 
   // マスイベント
   if (!playerDead) {
