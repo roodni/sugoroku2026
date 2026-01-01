@@ -115,7 +115,7 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
     if (player.personality === "smart") {
       yield Log.dialog("おっと！　ここがゴールだね");
       yield Log.description(
-        `${player.name}はスマートに急停止した。`,
+        `${player.name}はスマートに停止した (${power}マスの余りを無視した) 。`,
         "positive"
       );
       nextPos = Config.goalPosition;

@@ -182,7 +182,7 @@ function* generateSharingPositionSmart(
         yield Log.dialog(`ひいっ……`);
         break;
       case "smart":
-        yield Log.dialog(`おや……君も中々スマートだね`);
+        yield Log.dialog(`おや、君も中々スマートだね`);
         break;
     }
     yield Log.description("人望が高まった。");
