@@ -1,6 +1,6 @@
 import type { GameState } from "../game/gameState";
 
-const HASHTAG = "sugoroku2026";
+const HASHTAG = "新春ログすごろく";
 const INTENT_BASE = "https://twitter.com/intent/tweet";
 const HERE_URL = location.href;
 

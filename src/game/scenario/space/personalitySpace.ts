@@ -12,8 +12,6 @@ export const liveSpace: Space = {
     yield Log.description("ライブ会場がある。");
     yield Log.description("暗黒デスメタルバンドが演奏している。");
     yield Log.dialog("ゴォトゥヘル");
-    yield Log.description("ギュイーン！");
-    yield Log.dialog("ヴォオオオオ");
     yield Log.description("ドガガガガ！");
     yield Log.dialog("ロックだ……");
     yield Log.description(`${player.name}は深く感銘を受けた。`);

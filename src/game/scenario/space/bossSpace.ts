@@ -33,7 +33,7 @@ class BigFishBattler implements Battler {
     yield Log.dialog("ギョエー！");
   }
   *generateKnockedOut() {
-    yield Log.dialog("馬鹿な……人間ごときに……");
+    yield Log.dialog("バカな……人間ごときに……");
     yield Log.description("巨大魚は気絶した。", "negative");
   }
 }
@@ -96,7 +96,7 @@ export const fishingSpace: Space = {
       }
       case "phobic":
         yield Log.dialog("衛生的にちょっと……");
-        yield Log.description(`${player.name}は釣りをしなかった。`, "negative");
+        yield Log.description(`${player.name}は釣りをしなかった。`);
         break;
       case "smart":
         yield Log.description(

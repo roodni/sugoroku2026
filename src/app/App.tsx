@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import type { Log } from "../game/log";
 import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { GameMap } from "./GameMap";
-import { Logs } from "./Logs";
 import { Goaled } from "./Goaled";
-import type { Log } from "../game/log";
+import { Logs } from "./Logs";
 
 const WAIT = 50;
 
@@ -274,7 +274,7 @@ function App() {
         <div className="main-scrollee">
           {playingState.type === "beforeStart" && (
             <div className="turn-logs">
-              <span className="log-system-neutral">迎春すごろく2026</span>
+              <span className="log-system-neutral">新春ログすごろく</span>
               {"\n\n"}
               <span className="log-description-neutral">
                 {"　"}
