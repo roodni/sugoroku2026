@@ -1,4 +1,5 @@
 import { PlayerBattler, Weapon } from "../../battle";
+import { Config } from "../../config";
 import { PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
 import type { Space } from "./space";
@@ -55,4 +56,62 @@ export const konbiniSpace: Space = {
         break;
     }
   },
+};
+
+export const hospitalSpace: Space = {
+  name: "病院",
+  *generate(g) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("病院がある。");
+
+    if (player.hp >= Config.initialHp) {
+      yield Log.dialog(
+        {
+          gentle: "特に用はないね",
+          violent: "どうでもいいぜ",
+          phobic: "大丈夫……ですよね",
+          smart: "僕の体調管理は完璧さ",
+        }[player.personality]
+      );
+      yield Log.description(`${player.name}は病院を素通りした。`);
+      return;
+    }
+
+    yield Log.description(
+      `${player.name}は${Config.initialHp - player.hp}ダメージを受けている。`,
+      "negative"
+    );
+
+    const threshold = Math.floor(Config.initialHp / 2);
+    if (player.hp >= threshold) {
+      yield Log.dialog(
+        {
+          gentle: "大げさかな",
+          violent: "大したことないぜ",
+          phobic: "あまり入りたくない場所です",
+          smart: "西洋医学はスマートではないのさ",
+        }[player.personality]
+      );
+      yield Log.description(
+        `HPが半分以上あるので、${player.name}は病院を素通りした。`
+      );
+      return;
+    }
+
+    yield Log.dialog(
+      {
+        gentle: "つ、つらい",
+        violent: "助けてくれ……",
+        phobic: "痛い……苦しい！",
+        smart: "流石に堪えるね",
+      }[player.personality]
+    );
+    yield Log.description(`${player.name}は治療を受けた。`, "positive");
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.hp(threshold),
+      "positive"
+    );
+  },
+  isHospital: true,
 };

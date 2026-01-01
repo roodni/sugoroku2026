@@ -8,12 +8,12 @@ import { Log, LogUtil } from "../log";
 export function* generateSharingPositionEvent(
   g: GameState,
   currentPlayer: Player
-): Generator<Log> {
+): Generator<Log, { playerDead: boolean }> {
   const others = g.players.filter(
     (p) => p !== currentPlayer && p.position === currentPlayer.position
   );
   if (others.length === 0) {
-    return;
+    return { playerDead: false };
   }
 
   yield Log.newSection();
@@ -24,8 +24,7 @@ export function* generateSharingPositionEvent(
       yield* generateSharingPositionGentle(g, currentPlayer, others);
       break;
     case "violent":
-      yield* generateSharingPositionViolent(g, currentPlayer, others);
-      break;
+      return yield* generateSharingPositionViolent(g, currentPlayer, others);
     case "phobic":
       yield* generateSharingPositionPhobic(g, currentPlayer);
       break;
@@ -33,6 +32,7 @@ export function* generateSharingPositionEvent(
       yield* generateSharingPositionSmart(g, currentPlayer, others);
       break;
   }
+  return { playerDead: false };
 }
 
 // 来た人から逃げる
@@ -97,7 +97,7 @@ function* generateSharingPositionViolent(
   g: GameState,
   player: Player,
   others: Player[]
-) {
+): Generator<Log, { playerDead: boolean }> {
   for (const other of others) {
     if (other.personality === "phobic") {
       const { escaped } = yield* generatePhobicEscape(other, player);
@@ -126,10 +126,11 @@ function* generateSharingPositionViolent(
       );
       if (attack2.knockedOut) {
         // 反撃で倒されたら後続の人を殴れない
-        break;
+        return { playerDead: true };
       }
     }
   }
+  return { playerDead: false };
 }
 
 function* generateSharingPositionPhobic(g: GameState, player: Player) {

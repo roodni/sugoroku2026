@@ -57,7 +57,7 @@ export class Weapon {
     name: "こん棒",
     *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
-        `${attacker.name}は${blocker.name}をこん棒で打った。`
+        `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
       const power = yield* LogUtil.generateDiceRoll(g, 1, 10, attacker.isBot);
       return { power };

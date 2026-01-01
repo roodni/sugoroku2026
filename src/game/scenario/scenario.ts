@@ -141,6 +141,8 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
     nextPos > player.position ? "positive" : "negative"
   );
 
+  let playerDead = false;
+
   if (smartDamage !== undefined) {
     yield Log.description(`急停止が体に負担をかけた！`, "negative");
     const battler = new (class extends PlayerBattler {
@@ -152,13 +154,15 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   }
 
   // 相席イベント
-  yield* generateSharingPositionEvent(g, player);
+  playerDead = (yield* generateSharingPositionEvent(g, player)).playerDead;
 
   // マスイベント
-  const space = SPACE_MAP[player.position];
-  if (space?.generate) {
-    yield Log.newSection();
-    yield* space.generate(g);
+  if (!playerDead) {
+    const space = SPACE_MAP[player.position];
+    if (space?.generate) {
+      yield Log.newSection();
+      yield* space.generate(g);
+    }
   }
 
   // ゴールチェック
