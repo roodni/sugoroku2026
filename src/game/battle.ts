@@ -2,7 +2,7 @@ import { Config } from "./config";
 import { GameState, Player } from "./gameState";
 import { PlayerAttr, PlayerAttrChanger } from "./indicator";
 import { Log, LogUtil } from "./log";
-import { SPACE_MAP } from "./scenario/space";
+import { SPACE_MAP } from "./scenario/space/space";
 
 // 攻撃するもの
 export interface Attacker {

@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState, type JSX } from "react";
 import type { GameState } from "../game/gameState";
 import type { Observer } from "../util";
 import { Config } from "../game/config";
-import { SPACE_MAP } from "../game/scenario/space";
+import { SPACE_MAP } from "../game/scenario/space/space";
 
 function drawMapElements(gameState: GameState): JSX.Element[] {
   // まず描画対象のマスを決める

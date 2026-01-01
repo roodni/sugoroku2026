@@ -1,16 +1,9 @@
-import { Config } from "../config";
-import { type GameState } from "../gameState";
-import { PlayerAttrChanger } from "../indicator";
-import { Log, LogUtil } from "../log";
+import type { GameState } from "../../gameState";
+import { PlayerAttrChanger } from "../../indicator";
+import { Log, LogUtil } from "../../log";
+import type { Space } from "./space";
 
-// マス（で発生するイベント）の定義
-export interface Space {
-  name: string;
-  generate?: (g: GameState) => Generator<Log>;
-  isHospital?: boolean; // 復帰地点
-}
-
-const liveSpace: Space = {
+export const liveSpace: Space = {
   name: "ライブ会場",
   *generate(g: GameState) {
     const player = g.players[g.currentPlayerIndex];
@@ -34,7 +27,7 @@ const liveSpace: Space = {
   },
 };
 
-const librarySpace: Space = {
+export const librarySpace: Space = {
   name: "図書館",
   *generate(g: GameState) {
     const player = g.players[g.currentPlayerIndex];
@@ -58,7 +51,7 @@ const librarySpace: Space = {
   },
 };
 
-const hauntedHouseSpace: Space = {
+export const hauntedHouseSpace: Space = {
   name: "幽霊屋敷",
   *generate(g: GameState) {
     const player = g.players[g.currentPlayerIndex];
@@ -84,19 +77,4 @@ const hauntedHouseSpace: Space = {
       yield Log.dialog("もう嫌だ……二度と来ない……");
     }
   },
-};
-
-export const SPACE_MAP: Record<number, Space | undefined> = {
-  0: {
-    name: "スタート",
-    isHospital: true,
-  },
-  [Config.goalPosition]: {
-    name: "ゴール",
-    isHospital: true,
-  },
-
-  3: liveSpace,
-  5: librarySpace,
-  6: hauntedHouseSpace,
 };
