@@ -150,13 +150,13 @@ export class PlayerBattler implements Battler {
     }
   }
 
-  *generateKnockedOut(): Generator<Log> {
-    yield Log.description(`${this.name}は気絶した。`, "negative");
-    yield Log.description(`${this.name}は最寄りの病院に運ばれた。`, "negative");
+  static *generateToHospital(player: Player) {
+    yield Log.description(`${player.name}は気絶した。`, "negative");
+    yield Log.description(`${player.name}は最寄りの病院に運ばれた。`);
 
     // 病院を探す
     let hospitalPosition = 0;
-    for (let pos = this.p.position; pos >= 0; pos--) {
+    for (let pos = player.position; pos >= 0; pos--) {
       if (SPACE_MAP[pos]?.isHospital) {
         hospitalPosition = pos;
         break;
@@ -167,13 +167,32 @@ export class PlayerBattler implements Battler {
       PlayerAttrChanger.position(hospitalPosition),
       PlayerAttrChanger.hp(Config.initialHp),
     ];
-    yield* LogUtil.generatePlayerAttrsChange(this.p, attrs, "negative");
+    yield* LogUtil.generatePlayerAttrsChange(player, attrs, "neutral");
   }
 
-  // attacker
+  *generateKnockedOut(): Generator<Log> {
+    switch (this.p.personality) {
+      case "gentle":
+        yield Log.dialog("うっ");
+        break;
+      case "violent":
+        yield Log.dialog("ゴハッ");
+        break;
+      case "phobic":
+        yield Log.dialog("呪ってやる……！");
+        break;
+      case "smart":
+        yield Log.dialog("バカな……この僕が……");
+        break;
+    }
+    yield* PlayerBattler.generateToHospital(this.p);
+  }
+
   get smart() {
     return this.p.personality === "smart";
   }
+
+  // attacker
   get isBot() {
     return this.p.isBot;
   }

@@ -1,3 +1,4 @@
+import { Battle, PlayerBattler } from "../battle";
 import { Config } from "../config";
 import { GameState } from "../gameState";
 import {
@@ -106,16 +107,48 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   yield Log.newSection();
   const dice = yield* LogUtil.generateDiceRoll(g, 1, 6, player.isBot);
   yield Log.description(`${player.name}は${dice}マス進んだ。`, "positive");
+
   let nextPos = player.position + dice;
+  let smartDamage: number | undefined = undefined;
   if (nextPos > Config.goalPosition) {
-    nextPos = Config.goalPosition - (nextPos - Config.goalPosition);
-    yield Log.description(`ゴールで折り返した。`, "negative");
+    const power = nextPos - Config.goalPosition;
+    if (player.personality === "smart") {
+      yield Log.dialog("おっと！　ここがゴールだね");
+      yield Log.description(
+        `${player.name}はスマートに急停止した。`,
+        "positive"
+      );
+      nextPos = Config.goalPosition;
+      smartDamage = power;
+      if (player.hp < power) {
+        const back = power - player.hp;
+        yield Log.description(
+          `勢いを殺しきれず、${player.name}は${back}マス跳ね返った。`,
+          "negative"
+        );
+        nextPos = Math.max(0, Config.goalPosition - back);
+      }
+    } else {
+      nextPos = Config.goalPosition - power;
+      yield Log.description(`ゴールで折り返した。`, "negative");
+    }
   }
+
   yield* LogUtil.generatePlayerAttrChange(
     player,
     PlayerAttrChanger.position(nextPos),
     nextPos > player.position ? "positive" : "negative"
   );
+
+  if (smartDamage !== undefined) {
+    yield Log.description(`急停止が体に負担をかけた！`, "negative");
+    const battler = new (class extends PlayerBattler {
+      override get smart() {
+        return false; // このダメージは半減できない
+      }
+    })(player);
+    yield* Battle.generateHit(g, smartDamage, battler);
+  }
 
   // 相席イベント
   yield* generateSharingPositionEvent(g, player);

@@ -55,14 +55,11 @@ function App() {
   const isLoadableNow = lastLog === undefined || lastLog.type === "turnEnd";
 
   // デバッグ盤をゲーム初期化に合わせて初期化する
-  const initializeDebugJson = useCallback(() => {
+  useEffect(() => {
     const json = scenarioRef.current!.save();
     setDebugJsonHistory({ undo: [], current: json, redo: [] });
     setDebugJson(json);
   }, []);
-  useEffect(() => {
-    initializeDebugJson(); // 初期化。もっと他にやり方ないのか
-  }, [initializeDebugJson]);
 
   // デバッグ盤の内容をゲームにロードする
   const loadDebugJson = useCallback(
@@ -140,16 +137,21 @@ function App() {
   const scrollerElementRef = useRef<HTMLElement>(null);
   const debugTextareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // ゲーム初期化
+  // はじめから
   const restartGame = useCallback(() => {
     scenarioRef.current = new Scenario();
     setPlayingState({ type: "beforeStart" });
     setAllLogs([]);
     setLogOffset(0);
 
-    initializeDebugJson();
+    setDebugJsonHistory({
+      undo: [],
+      current: scenarioRef.current.save(),
+      redo: [],
+    });
+    // デバッグ盤は変えなくていい。前ゲームのゴール直前の状態を使いたいことがある
     mapRenderObserver.notify();
-  }, [mapRenderObserver, initializeDebugJson]);
+  }, [mapRenderObserver]);
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
