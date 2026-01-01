@@ -114,7 +114,7 @@ function App() {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "@") {
         setIsDebug((v) => !v);
-        setTimeout(() => debugTextareaRef.current?.focus());
+        setTimeout(() => debugTextareaRef.current?.focus(), 10);
       }
     };
     window.addEventListener("keydown", handler);
