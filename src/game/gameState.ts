@@ -102,6 +102,8 @@ export const GameState = {
     const players = [];
     players.push(Player.initial("あなた", false));
     for (let i = 1; i <= Config.computerPlayerNumber; i++) {
+      // const nameTable = "〇一二三四五六七八九";
+      // const name = [...`${i}`].map((d) => nameTable[Number(d)]).join("") + "郎";
       players.push(Player.initial(`CP${i}`, true));
     }
 

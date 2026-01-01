@@ -167,8 +167,10 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   );
   if (justGoaledPlayers.length > 0) {
     yield Log.newSection();
-    yield Log.description("おめでとう！", "positive");
-
+    const you = g.players[0];
+    if (justGoaledPlayers.includes(you)) {
+      yield Log.description("おめでとう！", "positive");
+    }
     const alreadyGoaled = g.players.filter((p) => p.goaled).length;
     const rank = alreadyGoaled + 1;
     const justGoaledNames = justGoaledPlayers.map((p) => p.name).join("と");
@@ -181,7 +183,6 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
       p.goaled = true;
     }
 
-    const you = g.players[0];
     if (justGoaledPlayers.includes(you)) {
       const attrs = [
         PlayerAttr.turn,

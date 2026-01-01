@@ -68,6 +68,8 @@ export class Weapon {
 }
 
 type HitResult = { knockedOut: boolean };
+type BattleResult = { firstDead: boolean; secondDead: boolean };
+
 export const Battle = {
   *generateHit(
     g: GameState,
@@ -118,13 +120,26 @@ export const Battle = {
     return yield* this.generateHit(g, power, blocker);
   },
 
-  // *generateDefaultKnockedOut(
-  //   g: GameState,
-  //   blocker: Blocker
-  // ): Generator<Log> {
-  //   yield Log.description(`${blocker.name}は気絶した。`, "negative");
-  //   yield Log.description(`${blocker.name}は最寄りの病院に運ばれた。`, "negative");
-  // }
+  *generateBattle(
+    g: GameState,
+    first: Battler,
+    second: Battler
+  ): Generator<Log, BattleResult> {
+    yield Log.newSection();
+    yield Log.system("<戦闘開始>");
+    const battleResult = { firstDead: false, secondDead: false };
+    while (true) {
+      if ((yield* this.generateAttack(g, first, second)).knockedOut) {
+        battleResult.secondDead = true;
+        break;
+      }
+      if ((yield* this.generateAttack(g, second, first)).knockedOut) {
+        battleResult.firstDead = true;
+        break;
+      }
+    }
+    return battleResult;
+  },
 };
 
 // Player
@@ -150,7 +165,7 @@ export class PlayerBattler implements Battler {
         yield Log.dialog("痛っ");
         break;
       case "violent":
-        yield Log.dialog("ギャー！");
+        yield Log.dialog("グエッ！");
         break;
       case "phobic":
         yield Log.dialog("嫌あああ！");
@@ -187,7 +202,7 @@ export class PlayerBattler implements Battler {
         yield Log.dialog("うっ");
         break;
       case "violent":
-        yield Log.dialog("ゴハッ");
+        yield Log.dialog("ゴハアッ");
         break;
       case "phobic":
         yield Log.dialog("呪ってやる……！");

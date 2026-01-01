@@ -61,7 +61,7 @@ export const hauntedHouseSpace: Space = {
     yield Log.description(`${player.name}は足を踏み入れた。`);
     yield Log.dialog("うらめしや……");
     if (player.personality === "violent") {
-      yield Log.dialog("邪魔だー！");
+      yield Log.dialog("うるせぇ！");
       yield Log.description(`${player.name}は幽霊を殴り倒して通り抜けた。`);
     } else if (player.personality === "smart") {
       yield Log.dialog("フッ、怖くなどないさ");

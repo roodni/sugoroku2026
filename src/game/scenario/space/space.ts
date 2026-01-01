@@ -2,6 +2,7 @@ import { Config } from "../../config";
 import { type GameState } from "../../gameState";
 import * as personalitySpace from "./personalitySpace";
 import * as HelpSpace from "./helpSpace";
+import * as BossSpace from "./bossSpace";
 import { Log } from "../../log";
 
 // マス（で発生するイベント）の定義
@@ -25,4 +26,5 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   5: personalitySpace.librarySpace,
   6: personalitySpace.hauntedHouseSpace,
   8: HelpSpace.konbiniSpace,
+  12: BossSpace.fishingSpace,
 };
