@@ -146,8 +146,7 @@ function* generateSharingPositionPhobic(g: GameState, player: Player) {
     );
   } else {
     yield Log.description(
-      `${player.name}は先客を避けようとしたが、これ以上進めなかった。`,
-      "negative"
+      `${player.name}は先客を避けようとしたが、これ以上進めなかった。`
     );
     yield Log.description(
       `精神的な苦痛が${player.name}の体を蝕んだ。`,

@@ -3,7 +3,7 @@ import { PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
 import type { Space } from "./space";
 
-// お助け系イベント
+// お助け系マス
 
 export const konbiniSpace: Space = {
   name: "コンビニ",

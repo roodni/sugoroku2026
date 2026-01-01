@@ -1,7 +1,7 @@
 import { Config } from "../../config";
 import { type GameState } from "../../gameState";
-import * as PersonalityEvent from "./personalityEvent";
-import * as HelpEvent from "./helpEvent";
+import * as personalitySpace from "./personalitySpace";
+import * as HelpSpace from "./helpSpace";
 import { Log } from "../../log";
 
 // マス（で発生するイベント）の定義
@@ -21,8 +21,8 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
     isHospital: true,
   },
 
-  4: PersonalityEvent.liveSpace,
-  5: PersonalityEvent.librarySpace,
-  6: PersonalityEvent.hauntedHouseSpace,
-  8: HelpEvent.konbiniSpace,
+  4: personalitySpace.liveSpace,
+  5: personalitySpace.librarySpace,
+  6: personalitySpace.hauntedHouseSpace,
+  8: HelpSpace.konbiniSpace,
 };

@@ -3,7 +3,7 @@ import { PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
 import type { Space } from "./space";
 
-// 性格変更系イベント
+// 性格変更系マス
 
 export const liveSpace: Space = {
   name: "ライブ会場",
