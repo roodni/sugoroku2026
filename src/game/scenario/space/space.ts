@@ -1,4 +1,4 @@
-import { Config } from "../../config";
+import { GOAL_POSITION } from "../../config";
 import { type GameState } from "../../gameState";
 import { Log } from "../../log";
 import * as BossSpace from "./bossSpace";
@@ -17,7 +17,7 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
     name: "スタート",
     isHospital: true,
   },
-  [Config.goalPosition]: {
+  [GOAL_POSITION]: {
     name: "ゴール",
     isHospital: true,
   },

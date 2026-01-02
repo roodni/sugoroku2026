@@ -1,4 +1,4 @@
-import { Config } from "./config";
+import { INITIAL_HP } from "./config";
 import { GameState, Player } from "./gameState";
 import { PlayerAttr, PlayerAttrChanger } from "./indicator";
 import { Log, LogUtil } from "./log";
@@ -191,7 +191,7 @@ export class PlayerBattler implements Battler {
 
     const attrs = [
       PlayerAttrChanger.position(hospitalPosition),
-      PlayerAttrChanger.hp(Config.initialHp),
+      PlayerAttrChanger.hp(INITIAL_HP),
     ];
     yield* LogUtil.generatePlayerAttrsChange(player, attrs, "neutral");
   }

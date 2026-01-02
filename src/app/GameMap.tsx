@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, type JSX } from "react";
-import { Config } from "../game/config";
+import { GOAL_POSITION } from "../game/config";
 import type { GameState } from "../game/gameState";
 import { SPACE_MAP } from "../game/scenario/space/space";
 import type { Observer } from "../util";
@@ -8,7 +8,7 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
   // まず描画対象のマスを決める
   const positions: number[] = [];
   const isSpaceIncluded = (pos: number): boolean => {
-    if (pos === 0 || pos === Config.goalPosition) {
+    if (pos === 0 || pos === GOAL_POSITION) {
       return true;
     }
     for (const player of gameState.players) {
@@ -19,9 +19,9 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
 
     const max = gameState.cameraStart + 6;
     let min = gameState.cameraStart;
-    if (max > Config.goalPosition) {
+    if (max > GOAL_POSITION) {
       // 折り返す可能性があれば、最大折り返し地点まで表示する
-      min = Math.min(min, Config.goalPosition - (max - Config.goalPosition));
+      min = Math.min(min, GOAL_POSITION - (max - GOAL_POSITION));
     }
     if (min <= pos && pos <= max) {
       return true;
@@ -29,7 +29,7 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
     return false;
   };
 
-  for (let i = 0; i <= Config.goalPosition; i++) {
+  for (let i = 0; i <= GOAL_POSITION; i++) {
     if (isSpaceIncluded(i)) {
       positions.push(i);
     }

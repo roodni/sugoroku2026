@@ -1,4 +1,4 @@
-import { Config } from "../config";
+import { GOAL_POSITION } from "../config";
 import type { GameState } from "../gameState";
 import { Log } from "../log";
 
@@ -6,13 +6,13 @@ import { Log } from "../log";
 export function* generateHello(g: GameState): Generator<Log> {
   const player = g.players[g.currentPlayerIndex];
   const index = g.currentPlayerIndex + player.position;
-  const desiredDice = Math.min(6, Config.goalPosition - player.position);
+  const desiredDice = Math.min(6, GOAL_POSITION - player.position);
   const dialogs = (() => {
     switch (player.personality) {
       case "gentle":
         return [
           "よろしくお願いします",
-          player.position < Config.goalPosition / 2
+          player.position < GOAL_POSITION / 2
             ? "ゴールまで遠いなあ"
             : "ゴールが近づいてきた",
           `${desiredDice}の目を出したい`,
@@ -50,7 +50,7 @@ export function* generateHello(g: GameState): Generator<Log> {
           "データに基づいて最適に行動するのさ",
           "すごろくは頭脳戦さ",
           `僕の計算によれば、あと${Math.ceil(
-            (Config.goalPosition - player.position) / 6
+            (GOAL_POSITION - player.position) / 6
           )}ターンだね`,
         ];
     }

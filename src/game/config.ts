@@ -1,5 +1,3 @@
-export const Config = {
-  goalPosition: 50,
-  computerPlayerNumber: 3,
-  initialHp: 20,
-} as const;
+export const GOAL_POSITION = 50;
+export const COMPUTER_PLAYER_NUMBER = 3;
+export const INITIAL_HP = 20;

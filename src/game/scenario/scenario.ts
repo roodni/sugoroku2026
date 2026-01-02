@@ -1,5 +1,5 @@
 import { PlayerBattler } from "../battle";
-import { Config } from "../config";
+import { GOAL_POSITION } from "../config";
 import { GameState } from "../gameState";
 import {
   PlayerAttr,
@@ -111,15 +111,15 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
 
   let nextPos = player.position + dice;
   let smartDamage: number | undefined = undefined;
-  if (nextPos > Config.goalPosition) {
-    const power = nextPos - Config.goalPosition;
+  if (nextPos > GOAL_POSITION) {
+    const power = nextPos - GOAL_POSITION;
     if (player.personality === "smart") {
       yield Log.dialog("おっと！　ここがゴールだね");
       yield Log.description(
         `${player.name}はスマートに停止した (${power}マスの余りを無視した) 。`,
         "positive"
       );
-      nextPos = Config.goalPosition;
+      nextPos = GOAL_POSITION;
       smartDamage = power;
       if (player.hp < power) {
         const back = power - player.hp;
@@ -127,10 +127,10 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
           `勢いを殺しきれず、${player.name}は${back}マス跳ね返った。`,
           "negative"
         );
-        nextPos = Math.max(0, Config.goalPosition - back);
+        nextPos = Math.max(0, GOAL_POSITION - back);
       }
     } else {
-      nextPos = Config.goalPosition - power;
+      nextPos = GOAL_POSITION - power;
       yield Log.description(`ゴールで折り返した。`, "negative");
     }
   }
@@ -169,7 +169,7 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
 
   // ゴールチェック
   const justGoaledPlayers = g.players.filter(
-    (p) => p.position === Config.goalPosition && !p.goaled
+    (p) => p.position === GOAL_POSITION && !p.goaled
   );
   if (justGoaledPlayers.length > 0) {
     yield Log.newSection();

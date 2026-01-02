@@ -1,5 +1,5 @@
 import { PlayerBattler, Weapon } from "../../battle";
-import { Config } from "../../config";
+import { INITIAL_HP } from "../../config";
 import { PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
 import type { Space } from "./space";
@@ -63,7 +63,7 @@ export const hospitalSpace: Space = {
     const player = g.players[g.currentPlayerIndex];
     yield Log.description("病院がある。");
 
-    if (player.hp >= Config.initialHp) {
+    if (player.hp >= INITIAL_HP) {
       yield Log.dialog(
         {
           gentle: "特に用はないね",
@@ -77,11 +77,11 @@ export const hospitalSpace: Space = {
     }
 
     yield Log.description(
-      `${player.name}は${Config.initialHp - player.hp}ダメージを受けている。`,
+      `${player.name}は${INITIAL_HP - player.hp}ダメージを受けている。`,
       "negative"
     );
 
-    const threshold = Math.floor(Config.initialHp / 2);
+    const threshold = Math.floor(INITIAL_HP / 2);
     if (player.hp >= threshold) {
       yield Log.dialog(
         {

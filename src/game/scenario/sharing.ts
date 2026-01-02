@@ -1,5 +1,5 @@
 import { Battle, PlayerBattler } from "../battle";
-import { Config } from "../config";
+import { GOAL_POSITION } from "../config";
 import type { GameState, Player } from "../gameState";
 import { PlayerAttrChanger } from "../indicator";
 import { Log, LogUtil } from "../log";
@@ -40,7 +40,7 @@ function* generatePhobicEscape(
   phobic: Player,
   coming: Player
 ): Generator<Log, { escaped: boolean }> {
-  const isGoal = phobic.position === Config.goalPosition;
+  const isGoal = phobic.position === GOAL_POSITION;
   if (isGoal) {
     yield Log.description(
       `${phobic.name}は${coming.name}を避けようとしたが、これ以上進めなかった。`,
@@ -155,7 +155,7 @@ function* generateSharingPositionPhobic(
   const peopleInNextSpace = g.players.filter(
     (p) => p.position === player.position + 1
   );
-  if (player.position === Config.goalPosition) {
+  if (player.position === GOAL_POSITION) {
     yield Log.description(
       `${player.name}は先客を避けようとしたが、これ以上進めなかった。`,
       "negative"

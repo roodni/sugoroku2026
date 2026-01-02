@@ -1,6 +1,6 @@
 import { Weapon } from "./battle";
-import { Config } from "./config";
-import type { Personality, Player } from "./gameState";
+import { INITIAL_HP } from "./config";
+import { Personality, type Player } from "./gameState";
 
 // プレイヤーの属性を文字列化するための仕組み
 export class PlayerAttr {
@@ -22,24 +22,13 @@ export class PlayerAttr {
   static turn = new this("ターン", (p: Player) => `${p.turn}`);
   static personality = new this(
     "性格",
-    (p: Player) => {
-      switch (p.personality) {
-        case "gentle":
-          return "温厚";
-        case "violent":
-          return "凶暴";
-        case "phobic":
-          return "恐怖症";
-        case "smart":
-          return "スマート";
-      }
-    },
+    (p: Player) => Personality.toLabel(p.personality),
     (p: Player) => p.personality === "gentle"
   );
   static hp = new this(
     "HP",
     (p: Player) => `${p.hp}`,
-    (p: Player) => p.hp === Config.initialHp
+    (p: Player) => p.hp === INITIAL_HP
   );
   static weapon = new this(
     "装備",

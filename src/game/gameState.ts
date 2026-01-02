@@ -1,10 +1,9 @@
 import { ExhaustiveError } from "../util";
 import { Weapon } from "./battle";
-import { Config } from "./config";
+import { COMPUTER_PLAYER_NUMBER, INITIAL_HP } from "./config";
 
 export type Personality = "gentle" | "violent" | "phobic" | "smart";
-
-const Personality = {
+export const Personality = {
   // JSONでtypoするので
   validate(p: Personality): void {
     switch (p) {
@@ -15,6 +14,18 @@ const Personality = {
         return;
       default:
         throw new ExhaustiveError(p);
+    }
+  },
+  toLabel(p: Personality): string {
+    switch (p) {
+      case "gentle":
+        return "温厚";
+      case "violent":
+        return "凶暴";
+      case "phobic":
+        return "恐怖症";
+      case "smart":
+        return "スマート";
     }
   },
 };
@@ -51,7 +62,7 @@ export const Player = {
       position: 0,
       goaled: false,
       personality: "gentle",
-      hp: Config.initialHp,
+      hp: INITIAL_HP,
       weapon: Weapon.hand,
     };
   },
@@ -101,7 +112,7 @@ export const GameState = {
   initial(): GameState {
     const players = [];
     players.push(Player.initial("あなた", false));
-    for (let i = 1; i <= Config.computerPlayerNumber; i++) {
+    for (let i = 1; i <= COMPUTER_PLAYER_NUMBER; i++) {
       const nameTable = ["アリス", "ボブ", "チャーリー", "ダニエル"];
       const name = nameTable.at(i - 1) ?? `CP${i}`;
       players.push(Player.initial(name, true));
