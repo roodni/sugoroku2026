@@ -174,6 +174,7 @@ function* generateSharingPositionPhobic(
       `${player.name}は先客を避けようとしたが、前に${peopleInNextSpace[0].name}がいて進めなかった。`,
       "negative"
     );
+    yield* LogUtil.generateEarnTrophy(g, "挟み撃ち");
   } else {
     yield Log.description(
       `${player.name}は先客を避けて1マス進んだ。`,
@@ -227,7 +228,7 @@ function* generateSharingPositionSmart(
         yield Log.dialog(`ひいっ……`);
         break;
       case "smart":
-        yield Log.dialog(`おや、君も中々スマートだね`);
+        yield Log.dialog(`フフ……君も中々スマートだね`);
         break;
     }
     yield Log.description("人望が高まった。");

@@ -27,9 +27,7 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
       const player = g.players[g.currentPlayerIndex];
       if (player.turn === 1) {
         yield Log.dialog("1しか進めなかった");
-        if (!player.isBot) {
-          yield* LogUtil.generateEarnTrophy(g, "腰が重い");
-        }
+        yield* LogUtil.generateEarnTrophy(g, "腰が重い");
       }
     },
   },

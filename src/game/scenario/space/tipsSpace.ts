@@ -2,6 +2,7 @@ import { Log } from "../../log";
 import type { Space } from "./space";
 
 export const destinyTipsSpace: Space = {
+  name: "演説",
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
     yield Log.description("怪しい演説が聞こえる。");
