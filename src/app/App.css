@@ -39,8 +39,13 @@
 .game-map {
   border: 2px solid #ccc;
   color: #ccc;
+  overflow-x: auto;
+}
+
+.game-map-scrollee {
   padding: 4px;
   margin: 0;
+  width: max-content;
 }
 
 .map-line-current {

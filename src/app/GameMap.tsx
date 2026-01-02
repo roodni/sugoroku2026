@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useState, type JSX } from "react";
-import type { GameState } from "../game/gameState";
-import type { Observer } from "../util";
 import { Config } from "../game/config";
+import type { GameState } from "../game/gameState";
 import { SPACE_MAP } from "../game/scenario/space/space";
+import type { Observer } from "../util";
 
 function drawMapElements(gameState: GameState): JSX.Element[] {
   // まず描画対象のマスを決める
@@ -94,5 +94,9 @@ export const GameMap: React.FC<{
   if (lines.length === 0) {
     return undefined;
   }
-  return <pre className="game-map">{lines}</pre>;
+  return (
+    <div className="game-map">
+      <pre className="game-map-scrollee">{lines}</pre>
+    </div>
+  );
 };

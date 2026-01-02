@@ -102,7 +102,7 @@ export const GameState = {
     const players = [];
     players.push(Player.initial("あなた", false));
     for (let i = 1; i <= Config.computerPlayerNumber; i++) {
-      const nameTable = ["アリス", "ボブ", "チャーリー"];
+      const nameTable = ["アリス", "ボブ", "チャーリー", "ダニエル"];
       const name = nameTable.at(i - 1) ?? `CP${i}`;
       players.push(Player.initial(name, true));
     }
