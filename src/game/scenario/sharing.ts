@@ -128,9 +128,17 @@ function* generateSharingPositionViolent(
       otherBattler,
       { skipAttackVoice: true }
     );
-    if (!attack1.knockedOut && other.personality === "violent") {
+    if (
+      !attack1.knockedOut &&
+      (other.personality === "violent" || other.personality === "phobic")
+    ) {
       // 反撃
-      yield Log.dialog("何しやがる！");
+      yield Log.dialog(
+        {
+          violent: "何しやがる！",
+          phobic: "来ないで！",
+        }[other.personality]
+      );
       const attack2 = yield* Battle.generateAttack(
         g,
         otherBattler,

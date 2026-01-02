@@ -6,7 +6,7 @@ export const destinyTipsSpace: Space = {
     const player = g.players[g.currentPlayerIndex];
     yield Log.description("怪しい演説が聞こえる。");
     yield Log.dialog("貴方は運命を信じますか？");
-    yield Log.dialog("この世界にはサイコロ以外のランダム性が存在しません。");
+    yield Log.dialog("この世界にサイコロ以外のランダム性は存在しません。");
     yield Log.dialog(
       "貴方が何気なく発するセリフもまた、運命に決定されているのです。"
     );

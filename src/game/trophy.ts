@@ -21,7 +21,7 @@ const trophies = [
   { name: "腰が重い", description: `最初に1マスだけ進む` },
   {
     name: "挟み撃ち",
-    description: `やってくる人を避けようとして前マスの人に阻まれる`,
+    description: `人を避けようとして前マスの人に阻まれる`,
   },
 ] as const satisfies Trophy[];
 

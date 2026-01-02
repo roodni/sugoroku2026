@@ -1,6 +1,6 @@
 import { Weapon } from "./battle";
 import { INITIAL_HP } from "./config";
-import { Personality, type Player } from "./gameState";
+import { Personality, type DiceKind, type Player } from "./gameState";
 
 // プレイヤーの属性を文字列化するための仕組み
 export class PlayerAttr {
@@ -35,6 +35,19 @@ export class PlayerAttr {
     (p: Player) => p.weapon.name,
     (p: Player) => p.weapon === Weapon.hand
   );
+  static dice = new this(
+    "サイコロ",
+    (p: Player) => p.dice,
+    (p: Player) => p.dice === "1d6"
+  );
+
+  static attrsShownInTurnStart = [
+    PlayerAttr.personality,
+    PlayerAttr.position,
+    PlayerAttr.hp,
+    PlayerAttr.weapon,
+    PlayerAttr.dice,
+  ];
 }
 
 // プレイヤーの属性をほぼ全てログ出力用に文字列化する
@@ -82,6 +95,7 @@ export const PlayerAttrChanger = {
   hp: (next: number) => new GeneralChanger(PlayerAttr.hp, "hp", next),
   weapon: (next: Weapon) =>
     new GeneralChanger(PlayerAttr.weapon, "weapon", next),
+  dice: (next: DiceKind) => new GeneralChanger(PlayerAttr.dice, "dice", next),
 };
 
 // プレイヤーの属性を変更した後で、その変更内容を文字列化して返す

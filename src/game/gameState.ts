@@ -36,6 +36,8 @@ export const Personality = {
   },
 };
 
+export type DiceKind = "1d6" | "1d100";
+
 // 駒
 export type Player = {
   name: string;
@@ -46,6 +48,7 @@ export type Player = {
   personality: Personality;
   hp: number;
   weapon: Weapon;
+  dice: DiceKind;
 };
 
 type PlayerJson = {
@@ -57,6 +60,7 @@ type PlayerJson = {
   personality: Personality;
   hp: number;
   weapon: string;
+  dice: DiceKind;
 };
 
 export const Player = {
@@ -70,6 +74,7 @@ export const Player = {
       personality: "gentle",
       hp: INITIAL_HP,
       weapon: Weapon.hand,
+      dice: "1d6",
     };
   },
 
@@ -81,8 +86,9 @@ export const Player = {
       position: p.position,
       weapon: p.weapon.name,
       hp: p.hp,
-      goaled: p.goaled,
       turn: p.turn,
+      dice: p.dice,
+      goaled: p.goaled,
       isBot: p.isBot,
     };
   },

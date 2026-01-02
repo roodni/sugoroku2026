@@ -99,7 +99,7 @@ export const hospitalSpace: Space = {
 
     yield Log.dialog(
       {
-        gentle: "つ、つらい",
+        gentle: "つらい",
         violent: "助けてくれ……",
         phobic: "痛い……苦しい！",
         smart: "流石に堪えるね",
@@ -113,4 +113,71 @@ export const hospitalSpace: Space = {
     );
   },
   isHospital: true,
+};
+
+export const LaboratorySpace: Space = {
+  // クソイベ
+  name: "研究所",
+  *generate(g) {
+    const player = g.players[g.currentPlayerIndex];
+    if (player.dice !== "1d100") {
+      // 初回
+      yield Log.description("研究所がある。");
+      yield Log.dialog(
+        "ワシは人体改造研究所の所長じゃ。君の体も改造してあげよう"
+      );
+      if (player.personality === "phobic") {
+        yield Log.dialog("絶対に嫌です！");
+        yield Log.description(`${player.name}は研究所を後にした。`, "positive");
+      } else {
+        yield Log.dialog(
+          {
+            gentle: "お願いします",
+            violent: "おう頼むわ",
+            smart: "よろしく頼むよ",
+          }[player.personality]
+        );
+        yield Log.description(`${player.name}は改造手術を受けた。`);
+        yield Log.description(
+          `${player.name}にジェットエンジンが取り付けられた。`,
+          "negative"
+        );
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.dice("1d100"),
+          "negative"
+        );
+        yield Log.dialog("ホッホッホ、これで君は高速移動できるぞい");
+      }
+    } else {
+      // 2回目
+      yield Log.description("人体改造研究所がある。", "negative");
+      yield Log.dialog("ホッホッホ、ジェットエンジンの調子はどうかね？");
+      if (player.personality === "smart") {
+        yield Log.dialog("どうにか扱えそうだよ");
+        yield Log.dialog("マジか");
+        yield Log.description(`${player.name}は研究所を後にした。`);
+      } else {
+        yield Log.description(`${player.name}は文句を言った。`);
+        switch (player.personality) {
+          case "gentle":
+            yield Log.dialog("ゴールで止まれないんですが");
+            break;
+          case "violent":
+            yield Log.dialog("ふざけんな！　全然制御できねえぞ!?");
+            break;
+          case "phobic":
+            yield Log.dialog("よくも……よくも私の体を、こんな……！");
+        }
+        yield Log.dialog("ならば脳にも改造が必要じゃな");
+        yield Log.description("あなたは更に改造されてしまった。", "negative");
+        yield Log.description("あなたの脳はスマートになった。", "positive");
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.personality("smart"),
+          "positive"
+        );
+      }
+    }
+  },
 };

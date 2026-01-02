@@ -80,13 +80,6 @@ export class Scenario {
   }
 }
 
-const playerAttrs = [
-  PlayerAttr.personality,
-  PlayerAttr.position,
-  PlayerAttr.hp,
-  PlayerAttr.weapon,
-];
-
 // 1ターンを経過させる。
 // ターンの切れ目に安全にセーブ&ロード（デバッグ用）できるように、
 // 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
@@ -102,12 +95,20 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
 
   // ターン開始
   yield Log.description(`${player.name}のターン${player.turn}。`);
-  yield* LogUtil.generatePlayerAttrs(player, playerAttrs);
+  yield* LogUtil.generatePlayerAttrs(player, PlayerAttr.attrsShownInTurnStart);
   yield* generateHello(g);
 
   // ダイス移動
   yield Log.newSection();
-  const dice = yield* LogUtil.generateDiceRoll(g, 1, 6, player.isBot);
+  const diceSides = (() => {
+    switch (player.dice) {
+      case "1d6":
+        return 6;
+      case "1d100":
+        return 100;
+    }
+  })();
+  const dice = yield* LogUtil.generateDiceRoll(g, 1, diceSides, player.isBot);
   yield Log.description(`${player.name}は${dice}マス進んだ。`, "positive");
 
   let nextPos = player.position + dice;
@@ -128,11 +129,30 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
           `勢いを殺しきれず、${player.name}は${back}マス跳ね返った。`,
           "negative"
         );
-        nextPos = Math.max(0, GOAL_POSITION - back);
+        nextPos = GOAL_POSITION - back;
       }
     } else {
       nextPos = GOAL_POSITION - power;
       yield Log.description(`ゴールで折り返した。`, "negative");
+    }
+  }
+
+  if (nextPos < 0) {
+    nextPos = -nextPos;
+    yield Log.description("スタートで折り返した。", "negative");
+    switch (player.personality) {
+      case "gentle":
+        yield Log.dialog("うわあああ！");
+        break;
+      case "violent":
+        yield Log.dialog("止めてくれえええ！");
+        break;
+      case "phobic":
+        yield Log.dialog(" (声にならない悲鳴) ");
+        break;
+      case "smart":
+        // noop
+        break;
     }
   }
 
@@ -220,7 +240,9 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
     if (youGoaled) {
       const attrs = [
         PlayerAttr.turn,
-        ...playerAttrs.filter((a) => a !== PlayerAttr.position),
+        ...PlayerAttr.attrsShownInTurnStart.filter(
+          (a) => a !== PlayerAttr.position
+        ),
       ];
       const attrsText = stringifyPlayerAttrs(you, attrs);
       const dialog = goaledDialog(you, rank);
