@@ -127,7 +127,7 @@ export const LaboratorySpace: Space = {
         "ワシは人体改造研究所の所長じゃ。君の体も改造してあげよう"
       );
       if (player.personality === "phobic") {
-        yield Log.dialog("絶対に嫌です！");
+        yield Log.dialog("絶対に嫌です");
         yield Log.description(`${player.name}は研究所を後にした。`, "positive");
       } else {
         yield Log.dialog(
