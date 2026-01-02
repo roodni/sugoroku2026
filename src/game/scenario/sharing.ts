@@ -57,6 +57,7 @@ function* generatePhobicEscape(
       `${phobic.name}は${coming.name}を避けようとしたが、前に${peopleInNextSpace[0].name}がいて進めなかった。`,
       "negative"
     );
+    yield* LogUtil.generateEarnTrophy(g, "挟み撃ち");
     return { escaped: false };
   }
 

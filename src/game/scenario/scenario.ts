@@ -223,13 +223,14 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
         PlayerAttr.turn,
         ...playerAttrs.filter((a) => a !== PlayerAttr.position),
       ];
+      const attrsText = stringifyPlayerAttrs(you, attrs);
       const dialog = goaledDialog(you, rank);
-      g.gameOverMessage = `${
-        you.name
-      }は${rank}位でゴールした (${stringifyPlayerAttrs(
-        you,
-        attrs
-      )})。「${dialog}」`;
+      g.gameOverMessage = `${you.name}は${rank}位でゴールした。「${dialog}」`;
+      g.gameOverMessage += `\n[状態] ${attrsText}`;
+      if (g.trophies.length > 0) {
+        const trophiesText = g.trophies.map((t) => t.name).join(", ");
+        g.gameOverMessage += `\n[トロフィー] ${trophiesText}`;
+      }
       return { skipped: true }; // ゲーム終了
     }
   }
