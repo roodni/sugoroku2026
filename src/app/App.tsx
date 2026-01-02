@@ -7,7 +7,7 @@ import { GameMap } from "./GameMap";
 import { Goaled } from "./Goaled";
 import { Logs } from "./Logs";
 
-const WAIT = 50;
+const WAIT = 80;
 
 type PlayingState = Readonly<
   | { type: "beforeStart" }

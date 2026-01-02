@@ -206,7 +206,7 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
           break;
       }
     }
-    if (g.trophies.length > 0) {
+    if (youGoaled && g.trophies.length > 0) {
       yield Log.newSection();
       yield Log.system("<今回のトロフィー>");
       for (const trophy of g.trophies) {
@@ -217,7 +217,6 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
         );
       }
     }
-
     if (youGoaled) {
       const attrs = [
         PlayerAttr.turn,
