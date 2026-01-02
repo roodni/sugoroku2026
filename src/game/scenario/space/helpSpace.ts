@@ -48,7 +48,6 @@ export const konbiniSpace: Space = {
         yield Log.dialog("スマートに酒を嗜むとしよう");
         yield Log.description(`${player.name}は高級ワインを購入した。`);
         yield Log.description("飲みすぎた！", "negative");
-        yield Log.description(`${player.name}は嘔吐した。`, "negative");
         yield* PlayerBattler.generateHitPlayer(g, 3, player, {
           unblockable: true,
           overrideDamageVoice: "オロロロロ",

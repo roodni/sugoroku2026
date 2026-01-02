@@ -34,10 +34,10 @@ export function* generateHello(g: GameState): Generator<Log> {
       case "phobic":
         return [
           "あ、あの……頑張ります",
+          "うう、進まないと",
           "なんで私がこんなことを……",
           "帰りたい",
           "サイコロも消毒しなきゃ",
-          "うう、進まないと",
           "誰にも会いませんように……！",
           "早く行きましょう……",
         ];

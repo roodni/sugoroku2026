@@ -104,7 +104,7 @@ export const fishingSpace: Space = {
           "positive"
         );
         yield Log.dialog("僕のスマートな包丁捌きを見たまえ");
-        yield Log.description(`${player.name}はマグロを刺身にして食べた。`);
+        yield Log.description(`${player.name}はマグロを活け造りにして食べた。`);
         yield Log.description("加熱しなかったので腹を壊した！", "negative");
         yield* PlayerBattler.generateHitPlayer(g, 5, player, {
           unblockable: true,
