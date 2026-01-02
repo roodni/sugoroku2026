@@ -26,8 +26,7 @@ export function* generateSharingPositionEvent(
     case "violent":
       return yield* generateSharingPositionViolent(g, currentPlayer, others);
     case "phobic":
-      yield* generateSharingPositionPhobic(g, currentPlayer);
-      break;
+      return yield* generateSharingPositionPhobic(g, currentPlayer);
     case "smart":
       yield* generateSharingPositionSmart(g, currentPlayer, others);
       break;
@@ -35,40 +34,53 @@ export function* generateSharingPositionEvent(
   return { playerDead: false };
 }
 
-// 来た人から逃げる
+// 来た人を嫌がって逃げる
 function* generatePhobicEscape(
+  g: GameState,
   phobic: Player,
   coming: Player
 ): Generator<Log, { escaped: boolean }> {
-  if (phobic.position !== Config.goalPosition) {
-    yield Log.description(
-      `${phobic.name}は${coming.name}を嫌がって1マス進んだ。`,
-      "negative"
-    );
-    yield Log.dialog("近い！");
-    yield* LogUtil.generatePlayerAttrChange(
-      phobic,
-      PlayerAttrChanger.position(phobic.position + 1),
-      "positive"
-    );
-    return { escaped: true };
-  } else {
+  const isGoal = phobic.position === Config.goalPosition;
+  if (isGoal) {
     yield Log.description(
       `${phobic.name}は${coming.name}を避けようとしたが、これ以上進めなかった。`,
       "negative"
     );
     return { escaped: false };
   }
+
+  const peopleInNextSpace = g.players.filter(
+    (p) => p.position === phobic.position + 1
+  );
+  if (peopleInNextSpace.length > 0) {
+    yield Log.description(
+      `${phobic.name}は${coming.name}を避けようとしたが、前に${peopleInNextSpace[0].name}がいて進めなかった。`,
+      "negative"
+    );
+    return { escaped: false };
+  }
+
+  yield Log.description(
+    `${phobic.name}は${coming.name}を嫌がって1マス進んだ。`,
+    "negative"
+  );
+  yield Log.dialog("近い！");
+  yield* LogUtil.generatePlayerAttrChange(
+    phobic,
+    PlayerAttrChanger.position(phobic.position + 1),
+    "positive"
+  );
+  return { escaped: true };
 }
 
 function* generateSharingPositionGentle(
-  _g: GameState,
+  g: GameState,
   player: Player,
   others: Player[]
 ) {
   for (const other of others) {
     if (other.personality === "phobic") {
-      const { escaped } = yield* generatePhobicEscape(other, player);
+      const { escaped } = yield* generatePhobicEscape(g, other, player);
       if (escaped) {
         continue;
       }
@@ -100,7 +112,7 @@ function* generateSharingPositionViolent(
 ): Generator<Log, { playerDead: boolean }> {
   for (const other of others) {
     if (other.personality === "phobic") {
-      const { escaped } = yield* generatePhobicEscape(other, player);
+      const { escaped } = yield* generatePhobicEscape(g, other, player);
       if (escaped) {
         continue;
       }
@@ -133,9 +145,27 @@ function* generateSharingPositionViolent(
   return { playerDead: false };
 }
 
-function* generateSharingPositionPhobic(g: GameState, player: Player) {
+function* generateSharingPositionPhobic(
+  g: GameState,
+  player: Player
+): Generator<Log, { playerDead: boolean }> {
   yield Log.dialog("ひっ");
-  if (player.position !== Config.goalPosition) {
+
+  let escaped = false;
+  const peopleInNextSpace = g.players.filter(
+    (p) => p.position === player.position + 1
+  );
+  if (player.position === Config.goalPosition) {
+    yield Log.description(
+      `${player.name}は先客を避けようとしたが、これ以上進めなかった。`,
+      "negative"
+    );
+  } else if (peopleInNextSpace.length > 0) {
+    yield Log.description(
+      `${player.name}は先客を避けようとしたが、前に${peopleInNextSpace[0].name}がいて進めなかった。`,
+      "negative"
+    );
+  } else {
     yield Log.description(
       `${player.name}は先客を避けて1マス進んだ。`,
       "negative"
@@ -145,27 +175,32 @@ function* generateSharingPositionPhobic(g: GameState, player: Player) {
       PlayerAttrChanger.position(player.position + 1),
       "positive"
     );
-  } else {
-    yield Log.description(
-      `${player.name}は先客を避けようとしたが、これ以上進めなかった。`
-    );
-    yield Log.description(
-      `精神的な苦痛が${player.name}の体を蝕んだ。`,
-      "negative"
-    );
-    const battler = new PlayerBattler(player);
-    yield* Battle.generateHit(g, 10, battler);
+    escaped = true;
   }
+
+  if (!escaped) {
+    yield Log.description(`精神的な苦痛が${player.name}を蝕んだ。`, "negative");
+    const { knockedOut } = yield* PlayerBattler.generateHitPlayer(
+      g,
+      3,
+      player,
+      {
+        overrideDamageVoice: "ううっ……",
+      }
+    );
+    return { playerDead: knockedOut };
+  }
+  return { playerDead: false };
 }
 
 function* generateSharingPositionSmart(
-  _g: GameState,
+  g: GameState,
   player: Player,
   others: Player[]
 ) {
   for (const other of others) {
     if (other.personality === "phobic") {
-      const { escaped } = yield* generatePhobicEscape(other, player);
+      const { escaped } = yield* generatePhobicEscape(g, other, player);
       if (escaped) {
         continue;
       }
