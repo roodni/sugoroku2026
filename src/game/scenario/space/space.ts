@@ -26,7 +26,7 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
     *generate(g) {
       const player = g.players[g.currentPlayerIndex];
       if (player.turn === 1) {
-        yield Log.dialog("1しか進めなかった");
+        yield Log.dialog("1マスしか進めなかった");
         yield* LogUtil.generateEarnTrophy(g, "腰が重い");
       }
     },
@@ -36,12 +36,13 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   5: personalitySpace.librarySpace,
   6: personalitySpace.hauntedHouseSpace,
 
-  8: HelpSpace.konbiniSpace,
-  9: TipsSpace.destinyTipsSpace,
+  8: TipsSpace.personalityTipsSpace,
+  9: HelpSpace.konbiniSpace,
   10: HelpSpace.hospitalSpace,
 
   12: BossSpace.fishingSpace,
 
+  19: TipsSpace.destinyTipsSpace,
   20: HelpSpace.hospitalSpace,
 
   30: HelpSpace.hospitalSpace,

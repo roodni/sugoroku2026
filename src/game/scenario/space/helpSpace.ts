@@ -171,13 +171,13 @@ export const LaboratorySpace: Space = {
         }
         yield Log.dialog("ならば脳にも改造が必要じゃな");
         yield Log.description("あなたは更に改造されてしまった。", "negative");
-        yield* LogUtil.generateEarnTrophy(g, "身も心も");
         yield Log.description("あなたの脳はスマートになった。", "positive");
         yield* LogUtil.generatePlayerAttrChange(
           player,
           PlayerAttrChanger.personality("smart"),
           "positive"
         );
+        yield* LogUtil.generateEarnTrophy(g, "身も心も");
       }
     }
   },

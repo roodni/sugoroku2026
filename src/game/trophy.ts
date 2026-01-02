@@ -37,7 +37,7 @@ export const Trophy = {
 
   load(): Trophy[] {
     const json = localStorage.getItem(TROPHY_KEY);
-    if (!json) {
+    if (json === null) {
       return [];
     }
     const raw = JSON.parse(json) as TrophyName[];
