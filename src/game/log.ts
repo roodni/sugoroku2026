@@ -6,6 +6,7 @@ import {
   stringifyPlayerAttrs,
   stringifyPlayerAttrsChange,
 } from "./indicator";
+import { Trophy, type TrophyName } from "./trophy";
 
 export type Emotion = "positive" | "neutral" | "negative";
 
@@ -82,5 +83,15 @@ export const LogUtil = {
     emotion: Emotion
   ): Generator<Log> {
     yield* this.generatePlayerAttrsChange(player, [attr], emotion);
+  },
+
+  *generateEarnTrophy(g: GameState, trophyName: TrophyName): Generator<Log> {
+    if (g.trophies.map((t) => t.name).includes(trophyName)) {
+      return;
+    }
+    const { firstTime } = Trophy.earn(trophyName);
+    g.trophies.push({ name: trophyName, firstTime });
+    const firstTimeText = firstTime ? " (new)" : "";
+    yield Log.system(`[トロフィー獲得] ${trophyName}${firstTimeText}`);
   },
 };

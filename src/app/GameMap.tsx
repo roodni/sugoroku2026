@@ -46,9 +46,9 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
     lastPos = pos;
 
     let text = `${pos}`;
-    const space = SPACE_MAP[pos];
-    if (space) {
-      text += ` ${space.name}`;
+    const spaceName = SPACE_MAP[pos]?.name;
+    if (spaceName) {
+      text += ` ${spaceName}`;
     }
 
     const players = gameState.players.filter((p) => p.position === pos);

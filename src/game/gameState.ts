@@ -1,6 +1,12 @@
 import { ExhaustiveError } from "../util";
 import { Weapon } from "./battle";
-import { COMPUTER_PLAYER_NUMBER, INITIAL_HP } from "./config";
+import {
+  COMPUTER_NAME_TABLE,
+  COMPUTER_PLAYER_NUMBER,
+  INITIAL_HP,
+  YOUR_NAME,
+} from "./config";
+import type { TrophyName } from "./trophy";
 
 export type Personality = "gentle" | "violent" | "phobic" | "smart";
 export const Personality = {
@@ -97,6 +103,7 @@ export type GameState = {
   cameraPlayerIndex: number; // 地図で注目している駒
   gameOverMessage: string | null; // null でなくなったときゲーム終了と判定される
   futureDice: number[]; // デバッグ用
+  trophies: { name: TrophyName; firstTime: boolean }[];
 };
 
 export type GameStateJson = {
@@ -106,15 +113,15 @@ export type GameStateJson = {
   cameraPlayerIndex: number;
   gameOverMessage: string | null;
   futureDice: number[];
+  trophies: { name: TrophyName; firstTime: boolean }[];
 };
 
 export const GameState = {
   initial(): GameState {
     const players = [];
-    players.push(Player.initial("あなた", false));
+    players.push(Player.initial(YOUR_NAME, false));
     for (let i = 1; i <= COMPUTER_PLAYER_NUMBER; i++) {
-      const nameTable = ["アリス", "ボブ", "チャーリー", "ダニエル"];
-      const name = nameTable.at(i - 1) ?? `CP${i}`;
+      const name = COMPUTER_NAME_TABLE.at(i - 1) ?? `CP${i}`;
       players.push(Player.initial(name, true));
     }
 
@@ -125,6 +132,7 @@ export const GameState = {
       cameraPlayerIndex: 0,
       gameOverMessage: null,
       futureDice: [],
+      trophies: [],
     };
   },
 
@@ -135,6 +143,7 @@ export const GameState = {
       currentPlayerIndex: g.currentPlayerIndex,
       cameraPlayerIndex: g.cameraPlayerIndex,
       players: g.players.map((p) => Player.save(p)),
+      trophies: g.trophies,
       cameraStart: g.cameraStart,
       gameOverMessage: g.gameOverMessage,
     };

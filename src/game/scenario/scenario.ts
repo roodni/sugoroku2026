@@ -7,6 +7,7 @@ import {
   stringifyPlayerAttrs,
 } from "../indicator";
 import { Log, LogUtil } from "../log";
+import { Trophy } from "../trophy";
 import { goaledDialog } from "./goal";
 import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./sharing";
@@ -174,7 +175,8 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   if (justGoaledPlayers.length > 0) {
     yield Log.newSection();
     const you = g.players[0];
-    if (justGoaledPlayers.includes(you)) {
+    const youGoaled = justGoaledPlayers.includes(you);
+    if (youGoaled) {
       yield Log.description("おめでとう！", "positive");
     }
     const alreadyGoaled = g.players.filter((p) => p.goaled).length;
@@ -182,14 +184,41 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
     const justGoaledNames = justGoaledPlayers.map((p) => p.name).join("と");
     const goaledDescription = `${justGoaledNames}は${rank}位でゴールした。`;
     yield Log.description(goaledDescription, "positive");
-
     for (const p of justGoaledPlayers) {
       const dialog = goaledDialog(p, rank);
       yield Log.dialog(dialog);
       p.goaled = true;
     }
 
-    if (justGoaledPlayers.includes(you)) {
+    if (youGoaled && rank === 1) {
+      switch (you.personality) {
+        case "gentle":
+          yield* LogUtil.generateEarnTrophy(g, "聖人君子");
+          break;
+        case "violent":
+          yield* LogUtil.generateEarnTrophy(g, "世紀末");
+          break;
+        case "phobic":
+          yield* LogUtil.generateEarnTrophy(g, "戦々恐々");
+          break;
+        case "smart":
+          yield* LogUtil.generateEarnTrophy(g, "超スマート");
+          break;
+      }
+    }
+    if (g.trophies.length > 0) {
+      yield Log.newSection();
+      yield Log.system("<今回のトロフィー>");
+      for (const trophy of g.trophies) {
+        const detail = Trophy.detail(trophy.name);
+        const firstTimeText = trophy.firstTime ? " (new)" : "";
+        yield Log.system(
+          `・${detail.name}: ${detail.description}${firstTimeText}`
+        );
+      }
+    }
+
+    if (youGoaled) {
       const attrs = [
         PlayerAttr.turn,
         ...playerAttrs.filter((a) => a !== PlayerAttr.position),
