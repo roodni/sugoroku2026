@@ -124,3 +124,29 @@ export const NewYearBellSpace: Space = {
     }
   },
 };
+
+export const SeminarSpace: Space = {
+  name: "研修",
+  *generate(g: GameState) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("あなたは研修を受講した。");
+    yield Log.dialog(
+      `これからの市場を生き抜くにはグローバル人材としてソリューションにコミットすることです`
+    );
+    yield Log.dialog("なるほどね……");
+    yield Log.description(`${player.name}は意識が高まった。`);
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.personality("smart"),
+      "neutral"
+    );
+    yield Log.dialog("さあ、皆で歩いて一体感を高めましょう！");
+    yield Log.description("無駄に一駅分行進させられた。", "negative");
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.position(player.position + 2),
+      "positive"
+    );
+    yield Log.dialog("自己成長の機会になったよ");
+  },
+};

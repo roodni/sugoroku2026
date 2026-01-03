@@ -3,7 +3,7 @@ import { type GameState } from "../../gameState";
 import { Log } from "../../log";
 import * as BossSpace from "./bossSpace";
 import * as HelpSpace from "./helpSpace";
-import * as personalitySpace from "./personalitySpace";
+import * as PersonalitySpace from "./personalitySpace";
 import * as TipsSpace from "./tipsSpace";
 
 // マス（で発生するイベント）の定義
@@ -23,9 +23,9 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
     isHospital: true,
   },
 
-  4: personalitySpace.liveSpace,
-  5: personalitySpace.librarySpace,
-  6: personalitySpace.hauntedHouseSpace,
+  4: PersonalitySpace.liveSpace,
+  5: PersonalitySpace.librarySpace,
+  6: PersonalitySpace.hauntedHouseSpace,
 
   8: TipsSpace.personalityTipsSpace,
   9: HelpSpace.konbiniSpace,
@@ -36,7 +36,8 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   19: TipsSpace.destinyTipsSpace,
   20: HelpSpace.hospitalSpace,
 
-  23: personalitySpace.NewYearBellSpace,
+  23: PersonalitySpace.NewYearBellSpace,
+  24: PersonalitySpace.SeminarSpace,
 
   30: HelpSpace.hospitalSpace,
   32: HelpSpace.LaboratorySpace,
