@@ -20,7 +20,7 @@ export interface Blocker {
   smart?: boolean;
   generateDamageVoice(
     g: GameState,
-    details: { damage: number }
+    details: { beforeHp: number; damage: number }
   ): Generator<Log>;
   generateKnockedOut(g: GameState): Generator<Log>;
 }
@@ -91,7 +91,7 @@ export const Battle = {
       `${blocker.name}は${damage}ダメージを受けた。`,
       "negative"
     );
-    yield* blocker.generateDamageVoice(g, { damage });
+    yield* blocker.generateDamageVoice(g, { beforeHp, damage });
     yield Log.system(
       `(${blocker.name}) ${PlayerAttr.hp.label}: ${beforeHp} -> ${afterHp}`,
       "negative"
@@ -159,19 +159,23 @@ export class PlayerBattler implements Battler {
   setHp(hp: number): void {
     this.p.hp = hp;
   }
-  *generateDamageVoice(): Generator<Log> {
+  *generateDamageVoice(
+    _g: GameState,
+    details: { beforeHp: number; damage: number }
+  ): Generator<Log> {
+    const fatal = details.damage * 4 >= details.beforeHp;
     switch (this.p.personality) {
       case "gentle":
-        yield Log.dialog("痛っ");
+        yield Log.dialog(fatal ? "うっ" : "痛っ");
         break;
       case "violent":
-        yield Log.dialog("グエッ！");
+        yield Log.dialog(fatal ? "グエッ！" : "痛って！");
         break;
       case "phobic":
         yield Log.dialog("嫌あああ！");
         break;
       case "smart":
-        yield Log.dialog("ぐはっ");
+        yield Log.dialog(fatal ? "ぐはっ" : "その程度かい？");
         break;
     }
   }
@@ -199,7 +203,7 @@ export class PlayerBattler implements Battler {
   *generateKnockedOut(): Generator<Log> {
     switch (this.p.personality) {
       case "gentle":
-        yield Log.dialog("うっ");
+        yield Log.dialog("ひどい……");
         break;
       case "violent":
         yield Log.dialog("ゴハアッ");
@@ -263,11 +267,14 @@ export class PlayerBattler implements Battler {
         }
         return super.smart;
       }
-      override *generateDamageVoice(): Generator<Log> {
+      override *generateDamageVoice(
+        g: GameState,
+        details: { beforeHp: number; damage: number }
+      ): Generator<Log> {
         if (options.overrideDamageVoice) {
           yield Log.dialog(options.overrideDamageVoice);
         } else {
-          yield* super.generateDamageVoice();
+          yield* super.generateDamageVoice(g, details);
         }
       }
     })(player);

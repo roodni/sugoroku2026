@@ -7,11 +7,15 @@ export function goaledDialog(player: Player, rank: number): string {
         case "gentle":
           return ["やったね", "嬉しい", "運が良かった"];
         case "violent":
-          return ["俺の勝ちだァ！", "フハハハ！", "俺は全てを終わらせる"];
+          return ["俺の勝ちだァ！", "フハハハ！", "力が全て！"];
         case "phobic":
-          return ["私が……1位？", "誰もいませんね", "勝てるものですね"];
+          return ["私が……1位？", "誰もいませんね", "勝てるものですね……"];
         case "smart":
-          return ["フッ、当然の結果さ", "実力を示したまで", "スマートな勝利！"];
+          return [
+            "フッ、当然の結果さ",
+            "実力を示したまでさ",
+            "スマートな勝利！",
+          ];
       }
     } else {
       switch (player.personality) {

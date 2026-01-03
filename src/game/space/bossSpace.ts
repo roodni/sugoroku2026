@@ -34,7 +34,7 @@ class BigFishBattler implements Battler {
   }
   *generateKnockedOut() {
     yield Log.dialog("バカな……人間ごときに……");
-    yield Log.description("巨大魚は気絶した。", "negative");
+    yield Log.description("巨大魚は食材になった。", "negative");
   }
 }
 
@@ -112,6 +112,7 @@ export const fishingSpace: Space = {
         yield Log.description("加熱しなかったので腹を壊した！", "negative");
         yield* PlayerBattler.generateHitPlayer(g, 5, player, {
           unblockable: true,
+          overrideDamageVoice: "うっ",
         });
         break;
     }

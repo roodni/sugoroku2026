@@ -169,7 +169,7 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
       g,
       smartDamage,
       player,
-      { unblockable: true }
+      { unblockable: true, overrideDamageVoice: "ぐはっ" }
     );
     playerDead = knockedOut;
   }

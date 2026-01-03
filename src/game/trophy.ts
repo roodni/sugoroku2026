@@ -21,7 +21,7 @@ const trophies = [
   // 性格
   {
     name: "挟み撃ち",
-    description: `前マスの人に阻まれる`,
+    description: `恐怖症で前マスの人に阻まれる`,
   },
   // ボス
   { name: "池の主釣り", description: `巨大魚が倒される` },

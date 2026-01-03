@@ -144,7 +144,7 @@ export const seminarSpace: Space = {
     yield Log.description("無駄に一駅分行進させられた。", "negative");
     yield* LogUtil.generatePlayerAttrChange(
       player,
-      PlayerAttrChanger.position(player.position + 2),
+      PlayerAttrChanger.position(player.position + 3),
       "positive"
     );
     yield Log.dialog("自己成長の機会になったよ");
