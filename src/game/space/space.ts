@@ -28,29 +28,29 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   4: PersonalitySpace.liveSpace,
   5: PersonalitySpace.librarySpace,
   6: PersonalitySpace.hauntedHouseSpace,
-  8: TipsSpace.personalityTipsSpace,
-  9: HelpSpace.konbiniSpace,
+  7: TipsSpace.personalityTipsSpace,
 
   10: HelpSpace.hospitalSpace,
-  12: BossSpace.fishingSpace,
-  15: HelpSpace.weaponShopSpace,
-  18: BossSpace.ninjaSpace,
+  12: HelpSpace.konbiniSpace,
+  15: BossSpace.fishingSpace,
+  16: BossSpace.ninjaSpace,
 
   20: HelpSpace.hospitalSpace,
-  21: TipsSpace.illegalWeaponTipsSpace, // 武器屋の6マス先が一番踏みやすい
-  23: PersonalitySpace.newYearBellSpace, // 性格イベント第二弾
-  24: PersonalitySpace.seminarSpace,
-  25: PersonalitySpace.onlineGameSpace,
-  26: PersonalitySpace.hygieneSpace,
-  28: HelpSpace.shortCutSpace,
-  29: TrapSpace.LaboratorySpace,
+  22: PersonalitySpace.newYearBellSpace, // 性格イベント第二弾
+  23: PersonalitySpace.seminarSpace,
+  24: PersonalitySpace.onlineGameSpace,
+  25: PersonalitySpace.hygieneSpace,
+  27: HelpSpace.weaponShopSpace,
 
   30: HelpSpace.hospitalSpace,
-  32: BossSpace.policeSpace,
-  36: BossSpace.goddessSpace,
+  33: TipsSpace.illegalWeaponTipsSpace, // 武器屋の6マス先が一番踏みやすい
+  34: BossSpace.policeSpace,
+  35: BossSpace.goddessSpace,
+  36: HelpSpace.shortCutSpace,
+  37: TrapSpace.LaboratorySpace,
 
   40: HelpSpace.hospitalSpace,
-  43: TipsSpace.destinyTipsSpace,
+  44: TipsSpace.destinyTipsSpace,
   45: TrapSpace.spikyFloorSpace,
   49: BossSpace.godZeusSpace,
 };
