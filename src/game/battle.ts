@@ -75,7 +75,7 @@ export class Weapon {
   // 武器屋のラインナップ
   static chikuwa = new this({
     name: "ちくわ",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
@@ -143,7 +143,7 @@ export class Weapon {
   });
   static beam = new this({
     name: "ビーム砲",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}にビーム砲を発射した。`
       );

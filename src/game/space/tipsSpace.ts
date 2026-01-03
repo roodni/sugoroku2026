@@ -1,3 +1,4 @@
+import { Battle, PlayerBattler, Weapon, type Blocker } from "../battle";
 import { Log } from "../log";
 import type { Space } from "./space";
 
@@ -38,6 +39,57 @@ export const personalityTipsSpace: Space = {
         yield Log.dialog("本は知識の宝庫だね");
         yield Log.description("すぐ忘れた。");
         break;
+    }
+  },
+};
+
+class BoardBlocker implements Blocker {
+  name = "立て看板";
+  hp = 10;
+  getHp() {
+    return this.hp;
+  }
+  setHp(hp: number) {
+    this.hp = hp;
+  }
+  *generateDamageVoice(): Generator<never> {}
+  *generateKnockedOut() {
+    yield Log.description(`${this.name}は木っ端微塵になった。`);
+  }
+}
+
+export const illegalWeaponTipsSpace: Space = {
+  name: "看板",
+  *generate(g) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("立て看板がある。");
+    yield Log.dialog(
+      "期待値10ダメージ以上の装備は法令により所持が禁止されています"
+    );
+
+    if (player.weapon === Weapon.hand) {
+      yield Log.description(`${player.name}は装備を持っていない。`);
+    } else if (player.weapon.expected >= 10) {
+      yield Log.description(
+        `${player.name}の${player.weapon.name} (${player.weapon.expected}) は違法だ。`,
+        "negative"
+      );
+    } else {
+      yield Log.description(
+        `${player.name}の${player.weapon.name} (${player.weapon.expected}) は合法だ。`,
+        "positive"
+      );
+    }
+
+    if (player.personality === "violent") {
+      const attacker = new PlayerBattler(player);
+      const board = new BoardBlocker();
+      const { knockedOut } = yield* Battle.generateAttack(g, attacker, board);
+      if (knockedOut) {
+        yield Log.dialog("警察には気を付けねえとな");
+      } else {
+        yield Log.dialog("ちっ");
+      }
     }
   },
 };
