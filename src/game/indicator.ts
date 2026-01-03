@@ -4,12 +4,12 @@ import { Personality, type DiceKind, type Player } from "./gameState";
 
 // プレイヤーの属性を文字列化するための仕組み
 export class PlayerAttr {
-  label: string;
+  label: string | undefined;
   valueString: (p: Player) => string;
   isDefaultValue?: (p: Player) => boolean;
 
   constructor(
-    label: string,
+    label: string | undefined,
     valueString: (p: Player) => string,
     isDefaultValue?: (p: Player) => boolean
   ) {
@@ -19,7 +19,7 @@ export class PlayerAttr {
   }
 
   static position = new this("現在地", (p: Player) => `${p.position}`);
-  static turn = new this("ターン", (p: Player) => `${p.turn}`);
+  static turn = new this(undefined, (p: Player) => `ターン${p.turn}`);
   static personality = new this(
     "性格",
     (p: Player) => Personality.toLabel(p.personality),
@@ -45,8 +45,14 @@ export class PlayerAttr {
     (p: Player) => `${p.desire}`,
     (p: Player) => p.desire === 108
   );
+  static turnSkip = new this(
+    undefined,
+    (p: Player) => `${p.turnSkip}回休み`,
+    (p: Player) => p.turnSkip === 0
+  );
 
   static attrsShownInTurnStart = [
+    PlayerAttr.turnSkip,
     PlayerAttr.personality,
     PlayerAttr.position,
     PlayerAttr.hp,
@@ -67,7 +73,11 @@ export function stringifyPlayerAttrs(
       if (attr.isDefaultValue?.(player)) {
         return [];
       }
-      return `${attr.label}: ${attr.valueString(player)}`;
+      if (attr.label === undefined) {
+        return attr.valueString(player);
+      } else {
+        return `${attr.label}: ${attr.valueString(player)}`;
+      }
     })
     .join(attrSeparator);
   return attrsText;
@@ -104,6 +114,8 @@ export const PlayerAttrChanger = {
   dice: (next: DiceKind) => new GeneralChanger(PlayerAttr.dice, "dice", next),
   desire: (next: number) =>
     new GeneralChanger(PlayerAttr.desire, "desire", next),
+  turnSkip: (next: number) =>
+    new GeneralChanger(PlayerAttr.turnSkip, "turnSkip", next),
 };
 
 // プレイヤーの属性を変更した後で、その変更内容を文字列化して返す
@@ -116,7 +128,11 @@ export function stringifyPlayerAttrsChange(
     const before = changer.attr.valueString(player);
     changer.change(player);
     const after = changer.attr.valueString(player);
-    attrTexts.push(`${changer.attr.label}: ${before} -> ${after}`);
+    if (changer.attr.label === undefined) {
+      attrTexts.push(`${before} -> ${after}`);
+    } else {
+      attrTexts.push(`${changer.attr.label}: ${before} -> ${after}`);
+    }
   }
   return attrTexts.join(attrSeparator);
 }

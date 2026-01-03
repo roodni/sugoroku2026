@@ -524,3 +524,124 @@ export const goddessSpace: Space = {
     }
   },
 };
+
+class NinjaBattler implements Battler {
+  name = "忍者";
+  isBot = true;
+
+  hp = 14;
+  weapon = Weapon.ninjaStar;
+
+  getHp() {
+    return this.hp;
+  }
+  setHp(hp: number) {
+    this.hp = hp;
+  }
+
+  *generateDamageVoice() {
+    yield Log.dialog("あなや！");
+  }
+  *generateKnockedOut() {
+    yield Log.dialog("無念……");
+    yield* Battle.generateDefaultKnockedOut(this.name);
+  }
+  *generateAttackVoice(): Generator<Log> {
+    yield Log.dialog("アチョー！");
+  }
+}
+
+export const ninjaSpace: Space = {
+  name: "和風庭園",
+  *generate(g: GameState) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("和風庭園がある。");
+    yield Log.description("突然、忍者が現れた！", "negative");
+    yield Log.dialog("ニンニン……");
+    switch (player.personality) {
+      case "gentle":
+        yield Log.description(`${player.name}は忍者に挨拶した。`);
+        yield Log.dialog("こんにちは！");
+        yield Log.dialog("朗らかな一日でござるな");
+        yield Log.description("心が温かくなった。");
+        yield Log.description("忍者は兵糧丸を分けてくれた。", "positive");
+        yield Log.dialog("何とも言えない味だね");
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.hp(player.hp + 3),
+          "positive"
+        );
+        yield Log.description("忍者はドロンと消えた。");
+        break;
+      case "violent": {
+        yield Log.dialog("なっ何だお前！");
+        yield Log.dialog("お覚悟召されよ！");
+        yield Log.description(
+          `忍者は${player.name}に襲い掛かった。`,
+          "negative"
+        );
+        const { winner } = yield* Battle.generateBattle(
+          g,
+          new PlayerBattler(player),
+          new NinjaBattler()
+        );
+        yield Log.newSection();
+        if (winner === "first") {
+          yield Log.dialog("何だったんだ……");
+          yield Log.description(
+            `${player.name}は忍者の武器を拾った。`,
+            "positive"
+          );
+          yield* LogUtil.generatePlayerAttrChange(
+            player,
+            PlayerAttrChanger.weapon(Weapon.ninjaStar),
+            "positive"
+          );
+          yield* LogUtil.generateEarnTrophy(g, "曲者退治");
+        }
+        break;
+      }
+      case "phobic": {
+        yield Log.dialog("うわあっ！");
+        const add = 4;
+        yield Log.description(
+          `${player.name}は全力疾走で逃げて${add}マス進んだ。`,
+          "positive"
+        );
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.position(player.position + add),
+          "positive"
+        );
+        yield Log.description("しかし忍者に追いつかれてしまった！", "negative");
+        yield Log.dialog("ひいいい！");
+        yield Log.dialog("拙者、走力には自信がござるよ");
+        yield Log.description("忍者は満足げにドロンと消えた。");
+        yield Log.dialog("はあ、はあ……");
+        yield Log.description(
+          `${player.name}は疲れ果ててしまった。`,
+          "negative"
+        );
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.turnSkip(1),
+          "negative"
+        );
+        break;
+      }
+      case "smart":
+        yield Log.description(`${player.name}は忍者に指摘した。`);
+        yield Log.dialog("時代錯誤ではないかい？");
+        yield Log.dialog("忍者も良いものでござるよ。お近づきの印にこれを");
+        yield Log.description("忍者は手裏剣を分けてくれた。", "positive");
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.weapon(Weapon.ninjaStar),
+          "positive"
+        );
+        yield Log.dialog("フッ……使ってみるよ");
+        yield Log.description("忍者は満足げに頷いてドロンと消えた。");
+        break;
+    }
+  },
+};

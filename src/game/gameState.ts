@@ -50,6 +50,7 @@ export type Player = {
   weapon: Weapon;
   dice: DiceKind;
   desire: number; // 煩悩
+  turnSkip: number;
 };
 
 type PlayerJson = {
@@ -63,6 +64,7 @@ type PlayerJson = {
   weapon: string;
   dice: DiceKind;
   desire: number;
+  turnSkip: number;
 };
 
 export const Player = {
@@ -78,6 +80,7 @@ export const Player = {
       weapon: Weapon.hand,
       dice: "1d6",
       desire: 108,
+      turnSkip: 0,
     };
   },
 
@@ -92,6 +95,7 @@ export const Player = {
       turn: p.turn,
       dice: p.dice,
       desire: p.desire,
+      turnSkip: p.turnSkip,
       goaled: p.goaled,
       isBot: p.isBot,
     };

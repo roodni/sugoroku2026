@@ -25,6 +25,7 @@ const trophies = [
   },
   // ボス
   { name: "池の主釣り", description: `巨大魚が倒される` },
+  { name: "曲者退治", description: `忍者が倒される` },
   { name: "凶悪犯", description: `警察が倒される` },
   { name: "湖の女神", description: `女神が倒される` },
   // イベント

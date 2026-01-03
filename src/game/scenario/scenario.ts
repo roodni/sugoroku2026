@@ -96,7 +96,19 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   // ターン開始
   yield Log.description(`${player.name}のターン${player.turn}。`);
   yield* LogUtil.generatePlayerAttrs(player, PlayerAttr.attrsShownInTurnStart);
-  yield* generateHello(g);
+
+  if (player.turnSkip > 0) {
+    yield Log.newSection();
+    yield Log.description(`${player.name}は動けない。`, "negative");
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.turnSkip(player.turnSkip - 1),
+      "negative"
+    );
+    return { skipped: false }; // falseでいい。真のskipはログを全く表示しない。つまり命名が悪いのだがもう時間がない
+  } else {
+    yield* generateHello(g);
+  }
 
   // ダイス移動
   yield Log.newSection();

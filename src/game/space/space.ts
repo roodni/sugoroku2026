@@ -34,7 +34,7 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   10: HelpSpace.hospitalSpace,
   12: BossSpace.fishingSpace,
   15: HelpSpace.weaponShopSpace,
-  19: TipsSpace.destinyTipsSpace,
+  18: BossSpace.ninjaSpace,
 
   20: HelpSpace.hospitalSpace,
   21: TipsSpace.illegalWeaponTipsSpace, // 武器屋の6マス先が一番踏みやすい
@@ -50,5 +50,6 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   36: BossSpace.goddessSpace,
 
   40: HelpSpace.hospitalSpace,
+  43: TipsSpace.destinyTipsSpace,
   45: TrapSpace.spikyFloorSpace,
 };
