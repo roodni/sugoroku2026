@@ -2,6 +2,7 @@
 
 import { diceExpected } from "../../util";
 import { Battle, PlayerBattler, Weapon, type Battler } from "../battle";
+import { GOAL_POSITION } from "../config";
 import { Player, type GameState } from "../gameState";
 import { PlayerAttrChanger } from "../indicator";
 import { Log, LogUtil } from "../log";
@@ -352,7 +353,7 @@ class GoddessBattler implements Battler {
 
   *generateDamageVoice(): Generator<never> {}
   *generateKnockedOut() {
-    yield Log.dialog("バカな……人間ごときに……");
+    yield Log.dialog("バカな……人間ごときに……？");
     yield* Battle.generateDefaultKnockedOut(this.name);
   }
   *generateAttackVoice(): Generator<Log> {
@@ -440,10 +441,19 @@ export const goddessSpace: Space = {
             playerBattler,
             goddess
           );
-          yield Log.newSection();
           if (winner === "first") {
             // 凶暴 => 金の斧 => 勝利
-            yield Log.dialog("やはりズルが一番だぜ");
+            yield Log.newSection();
+            yield Log.description(
+              `${player.name}は女神の力の一片を得た。`,
+              "positive"
+            );
+            yield* LogUtil.generatePlayerAttrChange(
+              player,
+              PlayerAttrChanger.hp(player.hp + 100),
+              "positive"
+            );
+            yield Log.dialog("オオオオ！　力が湧き出て止まらないぜ！");
             yield* LogUtil.generateEarnTrophy(g, "湖の女神");
           } else {
             // 凶暴 => 金の斧 => 敗北
@@ -574,7 +584,7 @@ export const ninjaSpace: Space = {
         yield Log.description("忍者はドロンと消えた。");
         break;
       case "violent": {
-        yield Log.dialog("なっ何だお前！");
+        yield Log.dialog("うわっ何だお前！");
         yield Log.dialog("お覚悟召されよ！");
         yield Log.description(
           `忍者は${player.name}に襲い掛かった。`,
@@ -585,8 +595,8 @@ export const ninjaSpace: Space = {
           new PlayerBattler(player),
           new NinjaBattler()
         );
-        yield Log.newSection();
         if (winner === "first") {
+          yield Log.newSection();
           yield Log.dialog("何だったんだ……");
           yield Log.description(
             `${player.name}は忍者の武器を拾った。`,
@@ -642,6 +652,122 @@ export const ninjaSpace: Space = {
         yield Log.dialog("フッ……使ってみるよ");
         yield Log.description("忍者は満足げに頷いてドロンと消えた。");
         break;
+    }
+  },
+};
+
+class GodZeusBattler implements Battler {
+  name = "ゴッドゼウス";
+  isBot = true;
+  gameState: GameState;
+
+  constructor(gameState: GameState) {
+    this.gameState = gameState;
+  }
+
+  getHp() {
+    return this.gameState.zeusHp;
+  }
+  setHp(hp: number) {
+    this.gameState.zeusHp = hp;
+  }
+  weapon = Weapon.lightning;
+
+  *generateDamageVoice() {
+    yield Log.dialog("愚か");
+  }
+  *generateKnockedOut() {
+    yield Log.dialog("バカな……我が……人間ごときに……！");
+    yield* Battle.generateDefaultKnockedOut(this.name);
+  }
+  *generateAttackVoice(): Generator<Log> {
+    yield Log.dialog("滅びよ");
+  }
+}
+
+export const godZeusSpace: Space = {
+  name: "神殿",
+  *generate(g: GameState) {
+    const player = g.players[g.currentPlayerIndex];
+    const alreadyMet = g.zeusHp < 100;
+    yield Log.description(
+      `${alreadyMet ? "ゴッドゼウス" : "謎"}の神殿がある。`,
+      alreadyMet ? "negative" : "neutral"
+    );
+    yield Log.description(
+      `${alreadyMet ? "神" : "何か"}が${player.name}に語り掛けた。`
+    );
+    yield Log.dialog("愚かな人間よ……");
+
+    if (player.personality === "gentle") {
+      yield Log.description(`${player.name}は挨拶した。`);
+      yield Log.dialog("こんにちは！");
+      yield Log.dialog("ほう、挨拶とは殊勝な");
+      yield Log.description("心が温かくなった。");
+      yield Log.description(
+        `呼応するように追い風が吹き、${player.name}は${
+          GOAL_POSITION - player.position
+        }マス進んだ。`,
+        "positive"
+      );
+      yield* LogUtil.generatePlayerAttrChange(
+        player,
+        PlayerAttrChanger.position(GOAL_POSITION),
+        "positive"
+      );
+      return;
+    }
+
+    if (g.zeusHp === 100) {
+      yield Log.dialog(
+        {
+          violent: "あ!?　何だてめえ！　姿を見せろ！",
+          phobic: "は、話しかけないでください！",
+          smart: "いきなりマウントとは驚いたね。まず名前を教えてくれないかな？",
+        }[player.personality]
+      );
+      yield Log.description(`それは${player.name}の眼前に降臨した。`);
+      yield Log.dialog(`我は最強神ゴッドゼウス。裁きの時は来たれり`);
+    } else {
+      yield Log.description(`怒り狂った神が再臨した。`);
+      yield Log.dialog("何度でも裁きを下そうぞ");
+      yield Log.dialog(
+        {
+          violent: "まだいやがったか！",
+          phobic: "も、もう嫌だ……",
+          smart: "フッ……どうやら、HP消耗は継続するようだね",
+        }[player.personality]
+      );
+    }
+    yield Log.description(
+      `ゴッドゼウスは${player.name}に襲い掛かった！`,
+      "negative"
+    );
+
+    const { winner } = yield* Battle.generateBattle(
+      g,
+      new PlayerBattler(player),
+      new GodZeusBattler(g)
+    );
+    if (winner === "first") {
+      yield Log.newSection();
+      yield Log.description(
+        `${player.name}はゴッドゼウスの力の一片を得た。`,
+        "positive"
+      );
+      yield* LogUtil.generatePlayerAttrChange(
+        player,
+        PlayerAttrChanger.weapon(Weapon.lightning),
+        "positive"
+      );
+      yield Log.dialog(
+        {
+          violent: "ハハハハ！　俺が最強だぜ！",
+          phobic: "フフフ……もう怖くない……",
+          smart: "確かに人間は愚かさ。だからこそ僕たちはスマートを追求するんだ",
+        }[player.personality]
+      );
+      yield* LogUtil.generateEarnTrophy(g, "最強神");
     }
   },
 };

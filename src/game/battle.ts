@@ -187,6 +187,18 @@ export class Weapon {
     },
     expected: 10,
   });
+  static lightning = new this({
+    name: "天罰",
+    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}に天罰を下した。`
+      );
+      yield Log.description(`裁きの雷が落ちる！`, "negative");
+      const power = yield* LogUtil.generateDiceRoll(_g, attacker.isBot, 1, 100);
+      return { power };
+    },
+    expected: diceExpected(1, 100),
+  });
 
   static list: Weapon[] = [
     this.hand,
@@ -200,6 +212,7 @@ export class Weapon {
     this.ninjaStar,
     this.gun,
     this.goldenAxe,
+    this.lightning,
   ];
 }
 
@@ -382,7 +395,7 @@ export class PlayerBattler implements Battler {
         yield Log.dialog("消えて！");
         break;
       case "smart":
-        yield Log.dialog("僕の力を見せてあげよう");
+        yield Log.dialog("僕はスマートに勝利する");
         // ・圧倒的な力を見るがいい
         // ・僕に勝てると思っているのかな？
         // ・少しは楽しませてもらおうか

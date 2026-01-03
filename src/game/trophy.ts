@@ -21,17 +21,18 @@ const trophies = [
   // 性格
   {
     name: "挟み撃ち",
-    description: `恐怖症で前マスの人に阻まれる`,
+    description: `人を避けようとして前マスの人に阻まれる`,
   },
+  // イベント
+  { name: "腰が重い", description: `最初のターンに1マスだけ進む` },
+  { name: "境地", description: `煩悩を克服する` },
+  { name: "身も心も", description: `2回改造される` },
   // ボス
   { name: "池の主釣り", description: `巨大魚が倒される` },
   { name: "曲者退治", description: `忍者が倒される` },
   { name: "凶悪犯", description: `警察が倒される` },
   { name: "湖の女神", description: `女神が倒される` },
-  // イベント
-  { name: "腰が重い", description: `最初のターンに1マスだけ進む` },
-  { name: "境地", description: `煩悩を克服する` },
-  { name: "身も心も", description: `2回改造される` },
+  { name: "最強神", description: `ゴッドゼウスが倒される` },
 ] as const satisfies Trophy[];
 
 export type TrophyName = (typeof trophies)[number]["name"];

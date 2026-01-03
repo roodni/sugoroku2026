@@ -118,6 +118,7 @@ export type GameState = {
   gameOverMessage: string | null; // null でなくなったときゲーム終了と判定される
   futureDice: number[]; // デバッグ用
   trophies: { name: TrophyName; firstTime: boolean }[];
+  zeusHp: number; // ゼウスのHPは永続
 };
 
 export type GameStateJson = {
@@ -128,6 +129,7 @@ export type GameStateJson = {
   gameOverMessage: string | null;
   futureDice: number[];
   trophies: { name: TrophyName; firstTime: boolean }[];
+  zeusHp: number;
 };
 
 export const GameState = {
@@ -147,6 +149,7 @@ export const GameState = {
       gameOverMessage: null,
       futureDice: [],
       trophies: [],
+      zeusHp: 100,
     };
   },
 
@@ -157,9 +160,10 @@ export const GameState = {
       currentPlayerIndex: g.currentPlayerIndex,
       cameraPlayerIndex: g.cameraPlayerIndex,
       players: g.players.map((p) => Player.save(p)),
-      trophies: g.trophies,
       cameraStart: g.cameraStart,
+      trophies: g.trophies,
       gameOverMessage: g.gameOverMessage,
+      zeusHp: g.zeusHp,
     };
   },
   load(json: GameStateJson): GameState {
