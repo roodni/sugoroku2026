@@ -26,6 +26,7 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
     if (min <= pos && pos <= max) {
       return true;
     }
+    // return true;
     return false;
   };
 
