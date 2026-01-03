@@ -50,5 +50,5 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   36: BossSpace.goddessSpace,
 
   40: HelpSpace.hospitalSpace,
-  44: TrapSpace.spikyFloorSpace,
+  45: TrapSpace.spikyFloorSpace,
 };
