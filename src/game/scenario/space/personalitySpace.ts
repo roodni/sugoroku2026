@@ -80,7 +80,7 @@ export const hauntedHouseSpace: Space = {
   },
 };
 
-export const NewYearBellSpace: Space = {
+export const newYearBellSpace: Space = {
   name: "除夜の鐘",
   *generate(g: GameState) {
     const player = g.players[g.currentPlayerIndex];
@@ -125,7 +125,7 @@ export const NewYearBellSpace: Space = {
   },
 };
 
-export const SeminarSpace: Space = {
+export const seminarSpace: Space = {
   name: "研修",
   *generate(g: GameState) {
     const player = g.players[g.currentPlayerIndex];
@@ -148,5 +148,47 @@ export const SeminarSpace: Space = {
       "positive"
     );
     yield Log.dialog("自己成長の機会になったよ");
+  },
+};
+
+export const onlineGameSpace: Space = {
+  name: "ネトゲ",
+  *generate(g: GameState) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description(`${player.name}はオンライン対戦ゲームで遊んだ。`);
+    yield Log.dialog("oh shit! noob! lagger! asshole!");
+    yield Log.description("かなりエキサイトした。");
+    yield Log.description(
+      `${player.name}はゲームと現実の区別がつかなくなった。`,
+      "negative"
+    );
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.personality("violent"),
+      "neutral"
+    );
+    yield Log.dialog("うおおお俺は現実でも暴力を振るいたいぜ");
+  },
+};
+
+export const hygieneSpace: Space = {
+  name: "衛生講習会",
+  *generate(g: GameState) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description(`${player.name}は衛生講習会に参加した。`);
+    yield Log.dialog(
+      "未加熱の食材は寄生虫に汚染されている場合があります。このように！"
+    );
+    yield Log.dialog("ひえええ！");
+    yield Log.description(
+      `衛生講習会は${player.name}のトラウマになった。`,
+      "negative"
+    );
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.personality("phobic"),
+      "neutral"
+    );
+    yield Log.dialog("怖い……もう何も食べたくない……");
   },
 };

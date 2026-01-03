@@ -36,8 +36,10 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   19: TipsSpace.destinyTipsSpace,
   20: HelpSpace.hospitalSpace,
 
-  23: PersonalitySpace.NewYearBellSpace,
-  24: PersonalitySpace.SeminarSpace,
+  23: PersonalitySpace.newYearBellSpace,
+  24: PersonalitySpace.seminarSpace,
+  25: PersonalitySpace.onlineGameSpace,
+  26: PersonalitySpace.hygieneSpace,
 
   30: HelpSpace.hospitalSpace,
   32: HelpSpace.LaboratorySpace,
