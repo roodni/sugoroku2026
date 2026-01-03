@@ -49,6 +49,7 @@ export type Player = {
   hp: number;
   weapon: Weapon;
   dice: DiceKind;
+  desire: number; // 煩悩
 };
 
 type PlayerJson = {
@@ -61,6 +62,7 @@ type PlayerJson = {
   hp: number;
   weapon: string;
   dice: DiceKind;
+  desire: number;
 };
 
 export const Player = {
@@ -75,6 +77,7 @@ export const Player = {
       hp: INITIAL_HP,
       weapon: Weapon.hand,
       dice: "1d6",
+      desire: 108,
     };
   },
 
@@ -88,6 +91,7 @@ export const Player = {
       hp: p.hp,
       turn: p.turn,
       dice: p.dice,
+      desire: p.desire,
       goaled: p.goaled,
       isBot: p.isBot,
     };

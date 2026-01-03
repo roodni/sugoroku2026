@@ -15,7 +15,7 @@ class BigFishBattler implements Battler {
     name: "噛みつき",
     *generateAttack(g, attacker, blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}に噛みついた。`);
-      const power = yield* LogUtil.generateDiceRoll(g, 2, 6, attacker.isBot);
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 6);
       return { power };
     },
   });

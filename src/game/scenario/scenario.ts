@@ -108,7 +108,7 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
         return 100;
     }
   })();
-  const dice = yield* LogUtil.generateDiceRoll(g, 1, diceSides, player.isBot);
+  const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, diceSides);
   yield Log.description(`${player.name}は${dice}マス進んだ。`, "positive");
 
   let nextPos = player.position + dice;

@@ -40,6 +40,11 @@ export class PlayerAttr {
     (p: Player) => p.dice,
     (p: Player) => p.dice === "1d6"
   );
+  static desire = new this(
+    "煩悩",
+    (p: Player) => `${p.desire}`,
+    (p: Player) => p.desire === 108
+  );
 
   static attrsShownInTurnStart = [
     PlayerAttr.personality,
@@ -47,6 +52,7 @@ export class PlayerAttr {
     PlayerAttr.hp,
     PlayerAttr.weapon,
     PlayerAttr.dice,
+    PlayerAttr.desire,
   ];
 }
 
@@ -96,6 +102,8 @@ export const PlayerAttrChanger = {
   weapon: (next: Weapon) =>
     new GeneralChanger(PlayerAttr.weapon, "weapon", next),
   dice: (next: DiceKind) => new GeneralChanger(PlayerAttr.dice, "dice", next),
+  desire: (next: number) =>
+    new GeneralChanger(PlayerAttr.desire, "desire", next),
 };
 
 // プレイヤーの属性を変更した後で、その変更内容を文字列化して返す

@@ -48,7 +48,7 @@ export class Weapon {
     name: "素手",
     *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}を殴った。`);
-      const power = yield* LogUtil.generateDiceRoll(g, 1, 6, attacker.isBot);
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 6);
       return { power };
     },
   });
@@ -59,7 +59,7 @@ export class Weapon {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
-      const power = yield* LogUtil.generateDiceRoll(g, 1, 10, attacker.isBot);
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 10);
       return { power };
     },
   });

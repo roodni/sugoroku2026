@@ -46,17 +46,23 @@ export const Log = {
 export const LogUtil = {
   *generateDiceRoll(
     g: GameState,
+    isBot: boolean,
     times: number,
     sides: number,
-    isBot: boolean
+    cnst: number = 0
   ): Generator<Log, number> {
-    const expression = `${times}d${sides}`;
+    let expression = `${times}d${sides}`;
+    if (cnst > 0) {
+      expression += `+${cnst}`;
+    } else if (cnst < 0) {
+      expression += `${cnst}`;
+    }
     yield Log.diceRollBefore(expression, isBot);
     let result;
     if (g.futureDice.length > 0) {
       result = g.futureDice.shift()!;
     } else {
-      result = dice(times, sides);
+      result = dice(times, sides) + cnst;
     }
     yield Log.diceRollAfter(expression, result);
     return result;

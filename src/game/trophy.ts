@@ -13,17 +13,22 @@ const violent = Personality.toLabel("violent");
 const phobic = Personality.toLabel("phobic");
 const smart = Personality.toLabel("smart");
 const trophies = [
+  // 1位
   { name: "聖人君子", description: `${YOUR_NAME}が${gentle}で1位になる` },
   { name: "世紀末", description: `${YOUR_NAME}が${violent}で1位になる` },
   { name: "戦々恐々", description: `${YOUR_NAME}が${phobic}で1位になる` },
   { name: "超スマート", description: `${YOUR_NAME}が${smart}で1位になる` },
-  { name: "池の主釣り", description: `巨大魚が倒される` },
-  { name: "腰が重い", description: `最初に1マスだけ進む` },
-  { name: "身も心も", description: `2回改造される` },
+  // 性格
   {
     name: "挟み撃ち",
     description: `前マスの人に阻まれる`,
   },
+  // ボス
+  { name: "池の主釣り", description: `巨大魚が倒される` },
+  // イベント
+  { name: "腰が重い", description: `最初のターンに1マスだけ進む` },
+  { name: "境地", description: `煩悩を克服する` },
+  { name: "身も心も", description: `2回改造される` },
 ] as const satisfies Trophy[];
 
 export type TrophyName = (typeof trophies)[number]["name"];

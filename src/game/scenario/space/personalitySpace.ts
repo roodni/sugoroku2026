@@ -1,3 +1,4 @@
+import { GOAL_POSITION } from "../../config";
 import type { GameState } from "../../gameState";
 import { PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
@@ -75,6 +76,51 @@ export const hauntedHouseSpace: Space = {
         "neutral"
       );
       yield Log.dialog("もう嫌だ……二度と来ない……");
+    }
+  },
+};
+
+export const NewYearBellSpace: Space = {
+  name: "除夜の鐘",
+  *generate(g: GameState) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("除夜の鐘が鳴り響く。");
+    const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, 100, 8);
+    yield Log.description(
+      `${player.name}の煩悩が${dice}浄化された。`,
+      "positive"
+    );
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.desire(player.desire - dice),
+      "positive"
+    );
+
+    if (player.desire <= 0) {
+      yield Log.description(`${player.name}は煩悩を完全に克服した。`);
+      yield Log.dialog("もう迷いません……");
+      yield Log.description(
+        `${player.name}は導かれるようにゴールへ飛翔した。`,
+        "positive"
+      );
+      const changers: PlayerAttrChanger[] = [
+        PlayerAttrChanger.position(GOAL_POSITION),
+      ];
+      if (player.personality !== "gentle") {
+        changers.push(PlayerAttrChanger.personality("gentle"));
+      }
+      yield* LogUtil.generatePlayerAttrsChange(player, changers, "positive");
+      yield* LogUtil.generateEarnTrophy(g, "境地");
+    } else {
+      if (player.personality !== "gentle") {
+        yield Log.description(`${player.name}は心が洗われた。`);
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.personality("gentle"),
+          "neutral"
+        );
+      }
+      yield Log.dialog("良い年になりますように");
     }
   },
 };
