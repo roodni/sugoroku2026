@@ -247,3 +247,78 @@ export const LaboratorySpace: Space = {
     }
   },
 };
+
+export const weaponShopSpace: Space = {
+  name: "武器屋",
+  *generate(g) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("武器屋がある。");
+    yield Log.dialog("らっしゃい！");
+    switch (player.personality) {
+      case "gentle":
+        yield Log.dialog("いらないかな");
+        yield Log.description(`${player.name}は武器屋を後にした。`);
+        return;
+      case "violent":
+        yield Log.dialog("強い武器が欲しいぜ");
+        break;
+      case "phobic":
+        yield Log.dialog("まあ護身用に……");
+        break;
+      case "smart":
+        yield Log.dialog("スマートに物色といこうか");
+        break;
+    }
+
+    yield Log.description("何を買う？");
+    const weaponList = [
+      [Weapon.chikuwa, "固定1ダメージの武器だぜ"],
+      [Weapon.knuckle, "素手より3ダメージ強くなるぜ"],
+      [
+        Weapon.magicalStaff,
+        "そいつは1d10+3のマジカルアイテムだ。敵をどんどん呪っていけ！",
+      ],
+      [
+        Weapon.hammer,
+        `そいつは1d100の超兵器！　ただし重すぎてゾロ目じゃないと外れるぜ`,
+      ],
+      [Weapon.darkSword, "そいつは4d6の魔剣だな。掘り出し物だぜ"],
+      [Weapon.beam, "固定20ダメージの最強装備だ。ちなみに違法だぜ"],
+    ] as const;
+    for (let i = 1; i <= 6; i++) {
+      const weapon = weaponList[i - 1][0];
+      yield Log.system(`・${i}: ${weapon.name}`);
+    }
+    const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, 6);
+    const [weapon, description] = weaponList[dice - 1];
+    yield Log.description(`${player.name}は${weapon.name}を購入した。`);
+    if (weapon === Weapon.chikuwa && player.personality === "smart") {
+      yield Log.dialog(description);
+      yield Log.dialog("食べ物だよね");
+      yield Log.description("あなたはちくわを食べた。", "positive");
+      yield* LogUtil.generatePlayerAttrChange(
+        player,
+        PlayerAttrChanger.hp(player.hp + 5),
+        "positive"
+      );
+    } else {
+      yield* LogUtil.generatePlayerAttrChange(
+        player,
+        PlayerAttrChanger.weapon(weapon),
+        "neutral"
+      );
+      yield Log.dialog(description);
+      switch (player.personality) {
+        case "violent":
+          yield Log.dialog("ククク……心得た");
+          break;
+        case "phobic":
+          yield Log.dialog("は、はい……");
+          break;
+        case "smart":
+          yield Log.dialog("承知したよ");
+          break;
+      }
+    }
+  },
+};

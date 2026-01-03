@@ -8,6 +8,11 @@ export function dice(times: number, sides: number): number {
   return total;
 }
 
+// 期待値
+export function diceExpected(times: number, sides: number): number {
+  return (times * (sides + 1)) / 2;
+}
+
 export class ExhaustiveError extends Error {
   constructor(value: never, message = `Unsupported type: ${value}`) {
     super(message);

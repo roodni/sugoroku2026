@@ -23,6 +23,7 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
     isHospital: true,
   },
 
+  // 性格イベント
   4: PersonalitySpace.liveSpace,
   5: PersonalitySpace.librarySpace,
   6: PersonalitySpace.hauntedHouseSpace,
@@ -33,9 +34,12 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
 
   12: BossSpace.fishingSpace,
 
+  17: HelpSpace.weaponShopSpace,
+
   19: TipsSpace.destinyTipsSpace,
   20: HelpSpace.hospitalSpace,
 
+  // 性格イベント第二弾
   23: PersonalitySpace.newYearBellSpace,
   24: PersonalitySpace.seminarSpace,
   25: PersonalitySpace.onlineGameSpace,

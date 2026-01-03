@@ -1,3 +1,4 @@
+import { diceExpected } from "../util";
 import { INITIAL_HP } from "./config";
 import { GameState, Player } from "./gameState";
 import { PlayerAttr, PlayerAttrChanger } from "./indicator";
@@ -38,10 +39,16 @@ type WeaponAttackGenerator = (
 export class Weapon {
   name: string;
   generateAttack: WeaponAttackGenerator;
+  expected: number; // 期待値
 
-  constructor(arg: { name: string; generateAttack: WeaponAttackGenerator }) {
+  constructor(arg: {
+    name: string;
+    generateAttack: WeaponAttackGenerator;
+    expected: number;
+  }) {
     this.name = arg.name;
     this.generateAttack = arg.generateAttack;
+    this.expected = arg.expected;
   }
 
   static hand = new this({
@@ -51,8 +58,8 @@ export class Weapon {
       const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 6);
       return { power };
     },
+    expected: diceExpected(1, 6),
   });
-
   static stick = new this({
     name: "こん棒",
     *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
@@ -62,9 +69,113 @@ export class Weapon {
       const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 10);
       return { power };
     },
+    expected: diceExpected(1, 10),
   });
 
-  static list: Weapon[] = [this.hand, this.stick];
+  // 武器屋のラインナップ
+  static chikuwa = new this({
+    name: "ちくわ",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}を${this.name}で殴った。`
+      );
+      return { power: 1 };
+    },
+    expected: 1,
+  });
+  static knuckle = new this({
+    name: "ナックル",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}を${this.name}で殴った。`
+      );
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 6, 3);
+      return { power };
+    },
+    expected: diceExpected(1, 6) + 3,
+  });
+  static magicalStaff = new this({
+    name: "魔法の杖",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}${blocker.name}を${this.name}で呪った。`
+      );
+      const power = yield* LogUtil.generateDiceRoll(
+        g,
+        attacker.isBot,
+        1,
+        10,
+        3
+      );
+      return { power };
+    },
+    expected: diceExpected(1, 10) + 3,
+  });
+  static hammer = new this({
+    name: "100tハンマー",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}に向かって${this.name}を振りかぶった。`
+      );
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 100);
+      // ぞろ目
+      if (power % 11 === 0 || power === 100) {
+        yield Log.description("ゾロ目だ！", "positive");
+        yield Log.description("強烈な一撃！", "negative");
+        return { power };
+      } else {
+        yield Log.description("ゾロ目以外なので攻撃は外れた。", "negative");
+        return { power: 0 };
+      }
+    },
+    expected: (11 + 22 + 33 + 44 + 55 + 66 + 77 + 88 + 99 + 100) / 100, // 5.95
+  });
+  static darkSword = new this({
+    name: "暗黒破壊剣",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}を${this.name}で斬った。`
+      );
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 3, 6, 2);
+      return { power };
+    },
+    expected: diceExpected(3, 6) + 2,
+  });
+  static beam = new this({
+    name: "ビーム砲",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}にビーム砲を発射した。`
+      );
+      return { power: 20 };
+    },
+    expected: 20,
+  });
+
+  // ボス
+  static ninjaStar = new this({
+    name: "手裏剣",
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}に${this.name}を投げた。`
+      );
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 6);
+      return { power };
+    },
+    expected: diceExpected(2, 6),
+  });
+
+  static list: Weapon[] = [
+    this.hand,
+    this.stick,
+    this.chikuwa,
+    this.knuckle,
+    this.magicalStaff,
+    this.hammer,
+    this.darkSword,
+    this.beam,
+    this.ninjaStar,
+  ];
 }
 
 type HitResult = { knockedOut: boolean };
@@ -117,6 +228,9 @@ export const Battle = {
       attacker,
       blocker
     );
+    if (power === 0) {
+      return { knockedOut: false };
+    }
     return yield* this.generateHit(g, power, blocker);
   },
 

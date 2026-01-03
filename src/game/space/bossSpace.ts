@@ -1,5 +1,6 @@
 // ボス系マス
 
+import { diceExpected } from "../../util";
 import { Battle, PlayerBattler, Weapon, type Battler } from "../battle";
 import type { GameState } from "../gameState";
 import { PlayerAttrChanger } from "../indicator";
@@ -18,6 +19,7 @@ class BigFishBattler implements Battler {
       const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 6);
       return { power };
     },
+    expected: diceExpected(2, 6),
   });
   *generateAttackVoice(): Generator<Log> {
     yield Log.dialog("いただきます！");
