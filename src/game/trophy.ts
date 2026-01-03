@@ -28,17 +28,17 @@ const trophies = [
   { name: "境地", description: `煩悩を克服する` },
   { name: "身も心も", description: `2回改造される` },
   // ボス
-  { name: "池の主釣り", description: `巨大魚が倒される` },
-  { name: "曲者退治", description: `忍者が倒される` },
-  { name: "凶悪犯", description: `警察が倒される` },
-  { name: "湖の女神", description: `女神が倒される` },
-  { name: "最強神", description: `ゴッドゼウスが倒される` },
+  { name: "池の主釣り", description: `巨大魚を倒す` },
+  { name: "曲者退治", description: `忍者を倒す` },
+  { name: "凶悪犯", description: `警察を倒す` },
+  { name: "湖の女神", description: `女神を倒す` },
+  { name: "最強神", description: `ゴッドゼウスを倒す` },
 ] as const satisfies Trophy[];
 
 export type TrophyName = (typeof trophies)[number]["name"];
 
 export const Trophy = {
-  max: trophies.length,
+  all: trophies,
 
   detail(name: TrophyName): Trophy {
     return trophies.find((t) => t.name === name)!;

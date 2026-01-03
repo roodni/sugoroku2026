@@ -694,6 +694,11 @@ export const godZeusSpace: Space = {
       `${alreadyMet ? "ゴッドゼウス" : "謎"}の神殿がある。`,
       alreadyMet ? "negative" : "neutral"
     );
+    if (g.zeusHp <= 0) {
+      yield Log.description(`ゴッドゼウスは一時的に不在のようだ。`, "positive");
+      return;
+    }
+
     yield Log.description(
       `${alreadyMet ? "神" : "何か"}が${player.name}に語り掛けた。`
     );
@@ -751,10 +756,7 @@ export const godZeusSpace: Space = {
     );
     if (winner === "first") {
       yield Log.newSection();
-      yield Log.description(
-        `${player.name}はゴッドゼウスの力の一片を得た。`,
-        "positive"
-      );
+      yield Log.description(`${player.name}は神の力の一片を得た。`, "positive");
       yield* LogUtil.generatePlayerAttrChange(
         player,
         PlayerAttrChanger.weapon(Weapon.lightning),

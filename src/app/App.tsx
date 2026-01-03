@@ -6,6 +6,7 @@ import "./App.css";
 import { GameMap } from "./GameMap";
 import { Goaled } from "./Goaled";
 import { Logs } from "./Logs";
+import { Start } from "./Start";
 
 const WAIT = 80;
 
@@ -273,25 +274,14 @@ function App() {
     <div className="app">
       <main className="main" ref={scrollerElementRef}>
         <div className="main-scrollee">
-          {playingState.type === "beforeStart" && (
-            <div className="turn-logs">
-              <span className="log-system-neutral">新春ログすごろく</span>
-              {"\n\n"}
-              <span className="log-description-neutral">
-                {"　"}
-                あなたの目的は1位でゴールに辿り着くことです。画面下のボタンを押すとゲームが始まります。
-              </span>
-              {/* {"\n\n"}
-              <span className="log-system-neutral">
-                [設定] CPの数: <input type="number" value={2} max={10}></input>
-              </span> */}
-            </div>
+          {playingState.type === "beforeStart" && <Start></Start>}
+          {playingState.type !== "beforeStart" && (
+            <GameMap
+              getGameState={getGameState}
+              renderObserver={mapRenderObserver}
+              showAll={mapShowAll}
+            ></GameMap>
           )}
-          <GameMap
-            getGameState={getGameState}
-            renderObserver={mapRenderObserver}
-            showAll={mapShowAll}
-          ></GameMap>
           <Logs logs={allLogs} offset={logOffsetActual} />
           {playingState.type === "goaled" && (
             <Goaled getGameState={getGameState} restartGame={restartGame} />
