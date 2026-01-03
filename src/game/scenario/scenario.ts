@@ -7,11 +7,11 @@ import {
   stringifyPlayerAttrs,
 } from "../indicator";
 import { Log, LogUtil } from "../log";
+import { SPACE_MAP } from "../space/space";
 import { Trophy } from "../trophy";
 import { goaledDialog } from "./goal";
 import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./sharing";
-import { SPACE_MAP } from "./space/space";
 
 type TurnResult = {
   skipped: boolean;

@@ -1,9 +1,9 @@
 // ボス系マス
 
-import { Battle, PlayerBattler, Weapon, type Battler } from "../../battle";
-import type { GameState } from "../../gameState";
-import { PlayerAttrChanger } from "../../indicator";
-import { Log, LogUtil } from "../../log";
+import { Battle, PlayerBattler, Weapon, type Battler } from "../battle";
+import type { GameState } from "../gameState";
+import { PlayerAttrChanger } from "../indicator";
+import { Log, LogUtil } from "../log";
 import type { Space } from "./space";
 
 class BigFishBattler implements Battler {

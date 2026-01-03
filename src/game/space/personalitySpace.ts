@@ -1,7 +1,7 @@
-import { GOAL_POSITION } from "../../config";
-import type { GameState } from "../../gameState";
-import { PlayerAttrChanger } from "../../indicator";
-import { Log, LogUtil } from "../../log";
+import { GOAL_POSITION } from "../config";
+import type { GameState } from "../gameState";
+import { PlayerAttrChanger } from "../indicator";
+import { Log, LogUtil } from "../log";
 import type { Space } from "./space";
 
 // 性格変更系マス

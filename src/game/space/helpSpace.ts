@@ -1,7 +1,7 @@
-import { PlayerBattler, Weapon } from "../../battle";
-import { INITIAL_HP } from "../../config";
-import { PlayerAttrChanger } from "../../indicator";
-import { Log, LogUtil } from "../../log";
+import { PlayerBattler, Weapon } from "../battle";
+import { INITIAL_HP } from "../config";
+import { PlayerAttrChanger } from "../indicator";
+import { Log, LogUtil } from "../log";
 import type { Space } from "./space";
 
 // お助け系マス
