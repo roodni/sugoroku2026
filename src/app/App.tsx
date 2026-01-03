@@ -29,6 +29,7 @@ function App() {
     (playingState.type === "playing" && playingState.isWaitingButton);
 
   const [mapRenderObserver] = useState(() => new Observer<void>());
+  const [mapShowAll, setMapShowAll] = useState(false);
 
   // ログ系
   const [allLogs, setAllLogs] = useState<Log[]>([]);
@@ -255,7 +256,7 @@ function App() {
       }
       switch (lastLog?.type) {
         case "diceRollBefore":
-          return `${lastLog.expression}`;
+          return `サイコロを振る (${lastLog.expression})`;
         case "turnEnd":
           return "次のターンへ";
         default:
@@ -289,6 +290,7 @@ function App() {
           <GameMap
             getGameState={getGameState}
             renderObserver={mapRenderObserver}
+            showAll={mapShowAll}
           ></GameMap>
           <Logs logs={allLogs} offset={logOffsetActual} />
           {playingState.type === "goaled" && (
@@ -332,43 +334,51 @@ function App() {
             ></textarea>
           </div>
         )}
-        <button
-          ref={mainButtonRef}
-          type="button"
-          onClick={mainButtonHandler}
-          disabled={!isWaitingButton}
-          className="main-button"
-        >
-          {mainButtonLabel}
-        </button>
-        <label
-          className={
-            isAuto &&
-            playingState.type === "playing" &&
-            !playingState.isWaitingButton
-              ? "auto-stepping"
-              : ""
-          }
-        >
-          <input
-            type="checkbox"
-            checked={isAuto}
-            onChange={(e) => setIsAuto(e.target.checked)}
-          ></input>
-          自動進行
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={isAllLogsShown}
-            onChange={(e) => setIsAllLogsShown(e.target.checked)}
-          ></input>
-          全ログ表示
-        </label>
-        {/* <label>
-          <input type="checkbox"></input>
-          読み上げ
-        </label> */}
+        <div className="footer-row">
+          <div className="footer-row-scrollee">
+            <button
+              ref={mainButtonRef}
+              type="button"
+              onClick={mainButtonHandler}
+              disabled={!isWaitingButton}
+              className="main-button"
+            >
+              {mainButtonLabel}
+            </button>
+            <label
+              className={
+                isAuto &&
+                playingState.type === "playing" &&
+                !playingState.isWaitingButton
+                  ? "auto-stepping"
+                  : ""
+              }
+            >
+              <input
+                type="checkbox"
+                checked={isAuto}
+                onChange={(e) => setIsAuto(e.target.checked)}
+              ></input>
+              自動進行
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={isAllLogsShown}
+                onChange={(e) => setIsAllLogsShown(e.target.checked)}
+              ></input>
+              全ログ表示
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={mapShowAll}
+                onChange={(e) => setMapShowAll(e.target.checked)}
+              ></input>
+              全マス表示
+            </label>
+          </div>
+        </div>
       </footer>
     </div>
   );

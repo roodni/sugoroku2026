@@ -4,10 +4,17 @@ import type { GameState } from "../game/gameState";
 import { SPACE_MAP } from "../game/space/space";
 import type { Observer } from "../util";
 
-function drawMapElements(gameState: GameState): JSX.Element[] {
+function drawMapElements(
+  gameState: GameState,
+  showAll: boolean
+): JSX.Element[] {
   // まず描画対象のマスを決める
   const positions: number[] = [];
   const isSpaceIncluded = (pos: number): boolean => {
+    if (showAll) {
+      return true;
+    }
+
     if (pos === 0 || pos === GOAL_POSITION) {
       return true;
     }
@@ -46,7 +53,7 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
     }
     lastPos = pos;
 
-    let text = `${pos}`;
+    let text = `${pos}`.padStart(2, "0");
     const spaceName = SPACE_MAP[pos]?.name;
     if (spaceName) {
       text += ` ${spaceName}`;
@@ -55,7 +62,7 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
     const players = gameState.players.filter((p) => p.position === pos);
     const cameraPlayer = gameState.players[gameState.cameraPlayerIndex];
     if (players.length > 0) {
-      text += " <- ";
+      text += " <-- ";
       text += players
         .map((p) => (p === cameraPlayer ? `[${p.name}]` : p.name))
         .join(" ");
@@ -78,19 +85,27 @@ function drawMapElements(gameState: GameState): JSX.Element[] {
 export const GameMap: React.FC<{
   getGameState: () => GameState;
   renderObserver: Observer<void>;
-}> = ({ getGameState, renderObserver }) => {
-  const [lines, setLines] = useState(() => drawMapElements(getGameState()));
+  showAll: boolean;
+}> = ({ getGameState, renderObserver, showAll }) => {
+  const [lines, setLines] = useState<JSX.Element[]>(
+    drawMapElements(getGameState(), showAll)
+  ); // こうしないと出現の瞬間に一瞬空になる
+
+  // showAllが変わった時
+  useEffect(() => {
+    setLines(drawMapElements(getGameState(), showAll));
+  }, [getGameState, showAll]);
 
   // イベント購読
   useEffect(() => {
     const unsubscribe = renderObserver.subscribe(() => {
       // console.log("マップ再描画");
-      setLines(drawMapElements(getGameState()));
+      setLines(drawMapElements(getGameState(), showAll));
     });
     return () => {
       unsubscribe();
     };
-  }, [renderObserver, getGameState]);
+  }, [renderObserver, getGameState, showAll]); // showAllで作り直されるの気持ち悪いけどもういい
 
   if (lines.length === 0) {
     return undefined;

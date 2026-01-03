@@ -17,14 +17,12 @@
   overflow: auto;
 }
 .footer {
-  padding: var(--gap);
+  padding: var(--gap) 0;
   background-color: #555;
 
-  align-items: center;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  /* justify-content: center; */
   gap: var(--gap);
 }
 
@@ -117,6 +115,7 @@
 /* デバッグパネル */
 .debug {
   width: 100%;
+  padding: 0 var(--gap);
 
   display: flex;
   flex-direction: row;
@@ -133,9 +132,26 @@
 }
 
 /* フッターのUI */
+.footer-row {
+  width: 100%;
+  overflow-x: auto;
+}
+.footer-row-scrollee {
+  padding: 0 var(--gap);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--gap);
+
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
 .main-button {
   flex-grow: 1;
   height: 40px;
+  min-width: 60%;
 }
 
 @keyframes notice {

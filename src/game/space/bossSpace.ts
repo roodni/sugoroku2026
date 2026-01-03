@@ -11,7 +11,7 @@ class BigFishBattler implements Battler {
   name = "巨大魚";
   isBot = true;
 
-  hp = 8;
+  hp = 9;
   weapon = new Weapon({
     name: "噛みつき",
     *generateAttack(g, attacker, blocker) {
@@ -54,7 +54,7 @@ export const fishingSpace: Space = {
         yield Log.dialog("おいしい");
         yield* LogUtil.generatePlayerAttrChange(
           player,
-          PlayerAttrChanger.hp(player.hp + 5),
+          PlayerAttrChanger.hp(player.hp + 3),
           "positive"
         );
         break;
