@@ -181,6 +181,13 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
 
   // マスイベント
   if (!playerDead) {
+    if (player.position === 1 && player.turn === 1 && !player.isBot) {
+      // spaceで実装すると余計なsectionが入る
+      yield Log.newSection();
+      yield Log.dialog("1マスしか進めなかった");
+      yield* LogUtil.generateEarnTrophy(g, "腰が重い");
+    }
+
     const space = SPACE_MAP[player.position];
     if (space?.generate) {
       yield Log.newSection();

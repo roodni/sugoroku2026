@@ -147,14 +147,15 @@ export const LaboratorySpace: Space = {
           PlayerAttrChanger.dice("1d100"),
           "negative"
         );
-        yield Log.dialog("ホッホッホ、これで君は高速移動できるぞい");
+        yield Log.dialog("ホッホッホ、これで君も高速移動できるぞい");
+        yield Log.description(`${player.name}は研究所から放り出された。`);
       }
     } else {
       // 2回目
       yield Log.description("人体改造研究所がある。", "negative");
       yield Log.dialog("ホッホッホ、ジェットエンジンの調子はどうかね？");
       if (player.personality === "smart") {
-        yield Log.dialog("どうにか扱えそうだよ");
+        yield Log.dialog("フッ……どうにか扱えそうだよ");
         yield Log.dialog("マジか");
         yield Log.description(`${player.name}は研究所を後にした。`);
       } else {
@@ -177,6 +178,7 @@ export const LaboratorySpace: Space = {
           PlayerAttrChanger.personality("smart"),
           "positive"
         );
+        yield Log.dialog("感謝します……ドクター……");
         yield* LogUtil.generateEarnTrophy(g, "身も心も");
       }
     }

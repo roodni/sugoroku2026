@@ -1,6 +1,6 @@
 import { GOAL_POSITION } from "../../config";
 import { type GameState } from "../../gameState";
-import { Log, LogUtil } from "../../log";
+import { Log } from "../../log";
 import * as BossSpace from "./bossSpace";
 import * as HelpSpace from "./helpSpace";
 import * as personalitySpace from "./personalitySpace";
@@ -22,15 +22,6 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
     name: "ゴール",
     isHospital: true,
   },
-  1: {
-    *generate(g) {
-      const player = g.players[g.currentPlayerIndex];
-      if (player.turn === 1) {
-        yield Log.dialog("1マスしか進めなかった");
-        yield* LogUtil.generateEarnTrophy(g, "腰が重い");
-      }
-    },
-  },
 
   4: personalitySpace.liveSpace,
   5: personalitySpace.librarySpace,
@@ -45,8 +36,8 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   19: TipsSpace.destinyTipsSpace,
   20: HelpSpace.hospitalSpace,
 
+  28: HelpSpace.LaboratorySpace,
   30: HelpSpace.hospitalSpace,
 
-  39: HelpSpace.LaboratorySpace,
   40: HelpSpace.hospitalSpace,
 };
