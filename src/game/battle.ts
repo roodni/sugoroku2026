@@ -254,7 +254,7 @@ export class PlayerBattler implements Battler {
     options: {
       overrideDamageVoice?: string;
       unblockable?: boolean; // スマートガード不能
-    }
+    } = {}
   ): Generator<Log, HitResult> {
     const battler = new (class extends PlayerBattler {
       override get smart() {

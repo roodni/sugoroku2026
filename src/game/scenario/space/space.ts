@@ -41,8 +41,9 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   25: PersonalitySpace.onlineGameSpace,
   26: PersonalitySpace.hygieneSpace,
 
+  28: HelpSpace.shortCutSpace,
+  29: HelpSpace.LaboratorySpace,
   30: HelpSpace.hospitalSpace,
-  32: HelpSpace.LaboratorySpace,
 
   40: HelpSpace.hospitalSpace,
 };

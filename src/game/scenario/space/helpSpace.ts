@@ -115,6 +115,69 @@ export const hospitalSpace: Space = {
   isHospital: true,
 };
 
+export const shortCutSpace: Space = {
+  name: "近道",
+  *generate(g) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("近道がある。");
+    switch (player.personality) {
+      case "gentle":
+        yield Log.dialog("こっちに行こう");
+        yield Log.description(
+          `${player.name}は近道を通って2マス進んだ。`,
+          "positive"
+        );
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.position(player.position + 2),
+          "positive"
+        );
+        break;
+      case "violent": {
+        yield Log.dialog("俺は最短ルートを行くぜ");
+        yield Log.description(`${player.name}は最悪治安路地裏に踏み込んだ。`);
+        yield Log.description("武装集団が抗争を繰り広げている。", "negative");
+        yield Log.dialog("撃て！");
+        yield Log.description(
+          `${player.name}に流れ弾（BB弾）が命中した！`,
+          "negative"
+        );
+        const { knockedOut } = yield* PlayerBattler.generateHitPlayer(
+          g,
+          3,
+          player
+        );
+        if (!knockedOut) {
+          yield Log.description(
+            `${player.name}はどうにか路地裏を抜けて3マス進んだ。`,
+            "positive"
+          );
+          yield* LogUtil.generatePlayerAttrChange(
+            player,
+            PlayerAttrChanger.position(player.position + 3),
+            "positive"
+          );
+        }
+        break;
+      }
+      case "phobic":
+        yield Log.dialog("治安が心配です");
+        yield Log.description(`${player.name}は近道を通らなかった。`);
+        break;
+      case "smart":
+        yield Log.dialog("ふむ……急がば回れとも言うね");
+        yield Log.description(`${player.name}は全然違う道を通った。`);
+        yield Log.description(`${player.name}は1マス戻った。`, "negative");
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.position(player.position - 1),
+          "negative"
+        );
+        break;
+    }
+  },
+};
+
 export const LaboratorySpace: Space = {
   // クソイベ
   name: "研究所",
