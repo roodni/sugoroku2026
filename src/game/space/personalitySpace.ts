@@ -129,7 +129,7 @@ export const seminarSpace: Space = {
   name: "研修",
   *generate(g: GameState) {
     const player = g.players[g.currentPlayerIndex];
-    yield Log.description("あなたは研修を受講した。");
+    yield Log.description(`${player.name}は研修を受講した。`);
     yield Log.dialog(
       `これからの市場を生き抜くにはグローバル人材としてソリューションにコミットすることです`
     );

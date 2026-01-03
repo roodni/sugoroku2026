@@ -51,6 +51,10 @@ export class Weapon {
     this.expected = arg.expected;
   }
 
+  get isIllegal() {
+    return this.expected > 10;
+  }
+
   static hand = new this({
     name: "素手",
     *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
@@ -164,6 +168,15 @@ export class Weapon {
     },
     expected: diceExpected(2, 6),
   });
+  static gun = new this({
+    name: "クラッカー", // 警察の武器
+    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(`${attacker.name}は${blocker.name}に発砲した！`);
+      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 10);
+      return { power };
+    },
+    expected: diceExpected(2, 10),
+  });
 
   static list: Weapon[] = [
     this.hand,
@@ -179,7 +192,7 @@ export class Weapon {
 }
 
 type HitResult = { knockedOut: boolean };
-type BattleResult = { firstDead: boolean; secondDead: boolean };
+type BattleResult = { winner: "first" | "second" };
 
 export const Battle = {
   *generateHit(
@@ -241,18 +254,19 @@ export const Battle = {
   ): Generator<Log, BattleResult> {
     yield Log.newSection();
     yield Log.system("<戦闘開始>");
-    const battleResult = { firstDead: false, secondDead: false };
     while (true) {
       if ((yield* this.generateAttack(g, first, second)).knockedOut) {
-        battleResult.secondDead = true;
-        break;
+        return { winner: "first" };
       }
       if ((yield* this.generateAttack(g, second, first)).knockedOut) {
-        battleResult.firstDead = true;
-        break;
+        return { winner: "second" };
       }
     }
-    return battleResult;
+  },
+
+  *generateDefaultKnockedOut(name: string) {
+    yield Log.description(`${name}は気絶した。`, "negative");
+    yield Log.description(`${name}は最寄りの病院に運ばれた。`);
   },
 };
 
@@ -295,8 +309,7 @@ export class PlayerBattler implements Battler {
   }
 
   static *generateToHospital(player: Player) {
-    yield Log.description(`${player.name}は気絶した。`, "negative");
-    yield Log.description(`${player.name}は最寄りの病院に運ばれた。`);
+    yield* Battle.generateDefaultKnockedOut(player.name);
 
     // 病院を探す
     let hospitalPosition = 0;

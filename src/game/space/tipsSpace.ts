@@ -20,7 +20,7 @@ export const personalityTipsSpace: Space = {
   name: "性格診断",
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
-    yield Log.description("あなたは性格診断の本を立ち読みした。");
+    yield Log.description(`${player.name}は性格診断の本を立ち読みした。`);
     yield Log.dialog("人々の性格は4種類に分類されます");
     switch (player.personality) {
       case "gentle":
@@ -59,7 +59,7 @@ class BoardBlocker implements Blocker {
 }
 
 export const illegalWeaponTipsSpace: Space = {
-  name: "看板",
+  name: "立て看板",
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
     yield Log.description("立て看板がある。");
@@ -69,7 +69,7 @@ export const illegalWeaponTipsSpace: Space = {
 
     if (player.weapon === Weapon.hand) {
       yield Log.description(`${player.name}は装備を持っていない。`);
-    } else if (player.weapon.expected >= 10) {
+    } else if (player.weapon.isIllegal) {
       yield Log.description(
         `${player.name}の${player.weapon.name} (${player.weapon.expected}) は違法だ。`,
         "negative"

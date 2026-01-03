@@ -16,11 +16,11 @@ function isSpaceNeededBeforeNext(sentence: string): boolean {
   }
 }
 
-function logsToElements(logs: Log[]): JSX.Element[] {
+function logsToElements(logs: Log[], offset: number): JSX.Element[] {
   const elements: JSX.Element[] = [];
   let isReturned = true; // 最後に改行されたかどうか
   let lastLog: Log | undefined = undefined;
-  for (let i = 0; i < logs.length; i++) {
+  for (let i = offset; i < logs.length; i++) {
     const log = logs[i];
     let logElement: JSX.Element | undefined = undefined;
     const newLine = () => !isReturned && "\n";
@@ -111,7 +111,6 @@ export const Logs: React.FC<{
   logs: Log[];
   offset: number;
 }> = ({ logs, offset }) => {
-  const elements = useMemo(() => logsToElements(logs), [logs]);
-  const slice = elements.slice(offset);
-  return <div className="turn-logs">{slice}</div>;
+  const elements = useMemo(() => logsToElements(logs, offset), [logs, offset]);
+  return <div className="turn-logs">{elements}</div>;
 };

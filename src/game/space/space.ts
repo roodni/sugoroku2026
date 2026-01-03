@@ -50,5 +50,7 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
   29: HelpSpace.LaboratorySpace,
   30: HelpSpace.hospitalSpace,
 
+  35: BossSpace.policeSpace,
+
   40: HelpSpace.hospitalSpace,
 };

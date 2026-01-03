@@ -234,8 +234,14 @@ export const LaboratorySpace: Space = {
             yield Log.dialog("よくも……よくも私の体を、こんな……！");
         }
         yield Log.dialog("ならば脳にも改造が必要じゃな");
-        yield Log.description("あなたは更に改造されてしまった。", "negative");
-        yield Log.description("あなたの脳はスマートになった。", "positive");
+        yield Log.description(
+          `${player.name}は更に改造されてしまった。`,
+          "negative"
+        );
+        yield Log.description(
+          `${player.name}の脳はスマートになった。`,
+          "positive"
+        );
         yield* LogUtil.generatePlayerAttrChange(
           player,
           PlayerAttrChanger.personality("smart"),
@@ -270,6 +276,7 @@ export const weaponShopSpace: Space = {
         break;
     }
 
+    yield Log.newSection();
     yield Log.description("何を買う？");
     const weaponList = [
       [Weapon.chikuwa, "固定1ダメージの武器だぜ"],
@@ -289,13 +296,15 @@ export const weaponShopSpace: Space = {
       const weapon = weaponList[i - 1][0];
       yield Log.system(`・${i}: ${weapon.name}`);
     }
+
+    yield Log.newSection();
     const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, 6);
     const [weapon, description] = weaponList[dice - 1];
     yield Log.description(`${player.name}は${weapon.name}を購入した。`);
     if (weapon === Weapon.chikuwa && player.personality === "smart") {
       yield Log.dialog(description);
       yield Log.dialog("食べ物だよね");
-      yield Log.description("あなたはちくわを食べた。", "positive");
+      yield Log.description(`${player.name}はちくわを食べた。`, "positive");
       yield* LogUtil.generatePlayerAttrChange(
         player,
         PlayerAttrChanger.hp(player.hp + 5),
