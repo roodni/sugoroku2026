@@ -2,7 +2,7 @@
 
 import { diceExpected } from "../../util";
 import { Battle, PlayerBattler, Weapon, type Battler } from "../battle";
-import { type GameState } from "../gameState";
+import { Player, type GameState } from "../gameState";
 import { PlayerAttrChanger } from "../indicator";
 import { Log, LogUtil } from "../log";
 import type { Space } from "./space";
@@ -324,6 +324,203 @@ export const policeSpace: Space = {
           yield Log.description(`${player.name}は解放された。`, "positive");
         }
       }
+    }
+  },
+};
+
+class GoddessBattler implements Battler {
+  name = "女神";
+  player: Player;
+  get isBot() {
+    return this.player.isBot; // ログが長いので、ダイスで止まるようにする
+  }
+
+  hp = 100;
+  weapon: Weapon;
+
+  constructor(weapon: Weapon, player: Player) {
+    this.weapon = weapon;
+    this.player = player;
+  }
+
+  getHp() {
+    return this.hp;
+  }
+  setHp(hp: number) {
+    this.hp = hp;
+  }
+
+  *generateDamageVoice(): Generator<never> {}
+  *generateKnockedOut() {
+    yield Log.dialog("バカな……人間ごときに……");
+    yield* Battle.generateDefaultKnockedOut(this.name);
+  }
+  *generateAttackVoice(): Generator<Log> {
+    yield Log.dialog("お仕置きです");
+  }
+}
+
+export const goddessSpace: Space = {
+  name: "湖",
+  *generate(g: GameState) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("湖がある。");
+    if (player.weapon === Weapon.hand) {
+      // 1. 素手
+      yield Log.description("特に何も起こらなかった。");
+      return;
+    }
+    if (player.weapon === Weapon.goldenAxe) {
+      // 2. 周回済み
+      yield Log.dialog(
+        {
+          gentle: `斧を落とさないよう注意しないと`,
+          violent: `もうここには近づきたくないぜ`,
+          phobic: `もう湖は嫌だ……`,
+          smart: `フッ……湖は避けるのが賢明だね`,
+        }[player.personality]
+      );
+      yield Log.description(`${player.name}は湖を素通りした。`);
+      return;
+    }
+    yield Log.description(
+      `${player.name}は装備を湖に落としてしまった。`,
+      "negative"
+    );
+    const droppedWeapon = player.weapon;
+    yield* LogUtil.generatePlayerAttrChange(
+      player,
+      PlayerAttrChanger.weapon(Weapon.hand),
+      "negative"
+    );
+    yield Log.description("湖から女神が現れた。", "positive");
+    yield Log.dialog(
+      `貴方が落としたのは${droppedWeapon.name}ですか？　それとも、この金の斧ですか？`
+    );
+    const goddess = new GoddessBattler(droppedWeapon, player);
+    const playerBattler = new PlayerBattler(player);
+    switch (player.personality) {
+      case "gentle":
+        // 3. 温厚
+        yield Log.dialog(`${droppedWeapon.name}です`);
+        yield Log.description("女神は微笑んだ。", "positive");
+        yield Log.dialog("正直者の貴方には金の斧を与えましょう");
+        // yield Log.description(`${player.name}は金の斧を貰った。`);
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.weapon(Weapon.goldenAxe),
+          "neutral"
+        );
+        yield Log.dialog("ありがとうございます");
+        break;
+      case "violent": {
+        yield Log.description(`${player.name}は質問した。`);
+        yield Log.dialog(`金の斧ってダメージいくつだ？`);
+        yield Log.dialog(`${Weapon.goldenAxe.expected}ダメージですね`);
+        if (Weapon.goldenAxe.expected > droppedWeapon.expected) {
+          // 4. 凶暴 => 弱装備
+          yield Log.dialog(`じゃあ俺が落としたのは金の斧です`);
+          yield Log.description("女神は微笑んだ。", "negative");
+          yield Log.dialog(`……なら、金の斧をお渡しします`);
+          yield* LogUtil.generatePlayerAttrChange(
+            player,
+            PlayerAttrChanger.weapon(Weapon.goldenAxe),
+            "positive"
+          );
+          yield Log.dialog("マジ？　やったぜ");
+          yield Log.dialog("ただし");
+          yield Log.description(`女神は冷たく言った。`);
+          yield Log.dialog("嘘をついた報いを今受けてもらいますよ");
+          yield Log.description(
+            `女神は${player.name}に襲い掛かった！`,
+            "negative"
+          );
+          const { winner } = yield* Battle.generateBattle(
+            g,
+            playerBattler,
+            goddess
+          );
+          yield Log.newSection();
+          if (winner === "first") {
+            // 凶暴 => 金の斧 => 勝利
+            yield Log.dialog("やはりズルが一番だぜ");
+            yield* LogUtil.generateEarnTrophy(g, "湖の女神");
+          } else {
+            // 凶暴 => 金の斧 => 敗北
+            // noop
+          }
+        } else {
+          // 5. 凶暴 => 強装備
+          yield Log.dialog(`じゃあ俺が落としたのは${droppedWeapon.name}です`);
+          yield Log.description("女神は微笑んだ。", "negative");
+          yield Log.dialog(`……正直物の貴方には金の斧を与えましょう`);
+          yield* LogUtil.generatePlayerAttrChange(
+            player,
+            PlayerAttrChanger.weapon(Weapon.goldenAxe),
+            "positive"
+          );
+          yield Log.dialog(`いや${droppedWeapon.name}を返してくれよ`);
+          yield Log.dialog(`それは人の手に余る代物です。斧で我慢なさい`);
+          yield Log.description(`女神は湖の底に消えていった。`, "negative");
+          yield Log.dialog("おい待てコラ！");
+        }
+        break;
+      }
+      case "phobic":
+        // 6. 恐怖症
+        yield Log.dialog(`${droppedWeapon.name}です……`);
+        yield Log.description("女神は微笑んだ。", "positive");
+        yield Log.dialog("正直者の貴方には金の斧を与えましょう");
+        yield Log.dialog(
+          `そんな、（水辺から出たものは触りたくないので）受け取れません`
+        );
+        yield Log.description(
+          `${player.name}は断ったが、女神は更に気に入った様子だった。`,
+          "negative"
+        );
+        yield Log.dialog(`なんと謙虚な人間。貴方こそが金の斧にふさわしい`);
+        yield Log.dialog(`いや本当にいらな……`);
+        yield Log.dialog(`受け取れって言ってるでしょッ！`);
+        goddess.weapon = Weapon.goldenAxe;
+        yield* Battle.generateAttack(g, goddess, playerBattler, {
+          skipAttackVoice: true,
+        });
+        yield Log.description(
+          `女神の呪いで、斧が${player.name}の手から離れなくなった！`,
+          "positive"
+        );
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.weapon(Weapon.goldenAxe),
+          "positive"
+        );
+        yield Log.dialog("嫌゛あ゛あ゛あ゛！゛");
+        break;
+      case "smart":
+        // 7. スマート
+        yield Log.description(`${player.name}は女神の手を取って言った。`);
+        yield Log.dialog("貴方が欲しい……");
+        yield Log.dialog("は？");
+        yield* Battle.generateAttack(g, goddess, playerBattler, {
+          skipAttackVoice: true,
+        });
+        yield Log.dialog(`不敬ぞ`);
+        goddess.weapon = Weapon.goldenAxe;
+        yield* Battle.generateAttack(g, goddess, playerBattler, {
+          skipAttackVoice: true,
+        });
+        yield Log.description(
+          `女神は怒りながら湖の底に消えていった。`,
+          "negative"
+        );
+        yield Log.description(`${player.name}は金の斧を拾った。`, "positive");
+        yield* LogUtil.generatePlayerAttrChange(
+          player,
+          PlayerAttrChanger.weapon(Weapon.goldenAxe),
+          "positive"
+        );
+        yield Log.dialog(`フッ……神には敬意が必要だったね`);
+        break;
     }
   },
 };

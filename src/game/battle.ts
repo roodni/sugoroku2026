@@ -177,6 +177,16 @@ export class Weapon {
     },
     expected: diceExpected(2, 10),
   });
+  static goldenAxe = new this({
+    name: "金の斧",
+    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
+      yield Log.description(
+        `${attacker.name}は${blocker.name}に${this.name}を投げつけた！`
+      );
+      return { power: 10 };
+    },
+    expected: 10,
+  });
 
   static list: Weapon[] = [
     this.hand,
@@ -188,6 +198,8 @@ export class Weapon {
     this.darkSword,
     this.beam,
     this.ninjaStar,
+    this.gun,
+    this.goldenAxe,
   ];
 }
 
