@@ -114,7 +114,7 @@ function App() {
   // @ を押すとデバッグ盤が開く
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "@") {
+      if (e.key === "@" && !e.repeat) {
         setIsDebug((v) => !v);
         setTimeout(() => debugTextareaRef.current?.focus(), 10);
       }

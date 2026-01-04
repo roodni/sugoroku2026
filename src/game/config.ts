@@ -1,3 +1,6 @@
+export const MAJOR_VERSION = "1";
+export const MINOR_VERSION = "1";
+
 export const GOAL_POSITION = 50;
 export const INITIAL_HP = 20;
 export const YOUR_NAME = "あなた";
