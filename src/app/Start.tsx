@@ -1,9 +1,9 @@
-import { useState, type JSX } from "react";
+import { Fragment, useState, type JSX } from "react";
 import { MAJOR_VERSION, MINOR_VERSION } from "../game/config";
 import { Trophy } from "../game/trophy";
 
 export const Start = (): JSX.Element => {
-  const [trophies] = useState(Trophy.load());
+  const [trophies] = useState(() => Trophy.load());
 
   return (
     <div className="turn-logs">
@@ -29,10 +29,9 @@ export const Start = (): JSX.Element => {
             const name = earned ? trophy.name : "？？？";
             const description = earned ? trophy.description : "？";
             return (
-              <>
+              <Fragment key={trophy.name}>
                 ・
                 <span
-                  key={trophy.name}
                   className={
                     earned ? "log-system-positive" : "log-system-negative"
                   }
@@ -41,7 +40,7 @@ export const Start = (): JSX.Element => {
                 </span>
                 : {description}
                 {"\n"}
-              </>
+              </Fragment>
             );
           })}
         </>
