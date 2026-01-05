@@ -6,21 +6,35 @@ export const destinyTipsSpace: Space = {
   name: "演説",
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
-    yield Log.description("怪しい演説が聞こえる。");
+    yield Log.description("演説が聞こえる。");
     yield Log.dialog("貴方は運命を信じますか？");
-    yield Log.dialog("この世界にサイコロ以外のランダム性は存在しません。");
+    yield Log.description("内容は胡散臭い。");
     yield Log.dialog(
-      "貴方が何気なく発するセリフもまた、運命に決定されているのです。"
+      "この世界にサイコロ以外のランダム性は存在しません。ターン開始の独り言すら、運命に決定されているのです"
     );
+    switch (player.personality) {
+      case "gentle":
+        yield Log.dialog("へー");
+        break;
+      case "violent":
+        yield Log.dialog("どうでもいいぜ");
+        break;
+      case "phobic":
+        yield Log.dialog("うるさい……離れよう");
+        break;
+      case "smart":
+        yield Log.dialog("サイコロが未来を切り開くってことだね");
+        break;
+    }
     yield Log.description(`${player.name}は素通りした。`);
   },
 };
 
 export const personalityTipsSpace: Space = {
-  name: "性格診断",
+  name: "本屋",
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
-    yield Log.description(`${player.name}は性格診断の本を立ち読みした。`);
+    yield Log.description(`${player.name}は心理テストの本を立ち読みした。`);
     yield Log.dialog("人々の性格は4種類に分類されます");
     switch (player.personality) {
       case "gentle":
