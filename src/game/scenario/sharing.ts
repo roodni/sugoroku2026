@@ -147,6 +147,7 @@ function* generateSharingPositionViolent(
       );
       if (attack2.knockedOut) {
         // 反撃で倒されたら後続の人を殴れない
+        yield* LogUtil.generateEarnTrophy(g, "因果応報");
         return { playerDead: true };
       }
     }

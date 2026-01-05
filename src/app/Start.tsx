@@ -36,7 +36,7 @@ export const Start = (): JSX.Element => {
                     earned ? "log-system-positive" : "log-system-negative"
                   }
                 >
-                  {name.padEnd(5, "　")}
+                  {name.padEnd(6, "　")}
                 </span>
                 : {description}
                 {"\n"}

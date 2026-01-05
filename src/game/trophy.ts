@@ -20,7 +20,10 @@ const trophies = [
   { name: "超スマート", description: `${YOUR_NAME}が${smart}で1位になる` },
   // 性格
   { name: "情緒安定", description: `性格を変えずにゴールする` },
-  { name: "違法チェック", description: `立て看板を破壊する` },
+  {
+    name: "因果応報",
+    description: `返り討ちにされる`,
+  },
   {
     name: "挟み撃ち",
     description: `人を避けようとして前マスの人に阻まれる`,
@@ -32,6 +35,8 @@ const trophies = [
   // 雑多なもの
   { name: "腰が重い", description: `最初のターンに1マスだけ進む` },
   { name: "境地", description: `煩悩を克服する` },
+  { name: "一撃粉砕", description: `100tハンマーで敵を倒す` },
+  { name: "違法チェック", description: `立て看板を破壊する` },
   { name: "身も心も", description: `2回改造される` },
   // ボス
   { name: "池の主釣り", description: `巨大魚を倒す` },

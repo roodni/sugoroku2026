@@ -269,7 +269,11 @@ export const Battle = {
     if (power === 0) {
       return { knockedOut: false };
     }
-    return yield* this.generateHit(g, power, blocker);
+    const { knockedOut } = yield* this.generateHit(g, power, blocker);
+    if (knockedOut && attacker.weapon === Weapon.hammer) {
+      yield* LogUtil.generateEarnTrophy(g, "一撃粉砕");
+    }
+    return { knockedOut };
   },
 
   *generateBattle(
