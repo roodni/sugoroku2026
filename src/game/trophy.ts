@@ -19,11 +19,17 @@ const trophies = [
   { name: "戦々恐々", description: `${YOUR_NAME}が${phobic}で1位になる` },
   { name: "超スマート", description: `${YOUR_NAME}が${smart}で1位になる` },
   // 性格
+  { name: "情緒安定", description: `性格を変えずにゴールする` },
+  { name: "違法チェック", description: `立て看板を破壊する` },
   {
     name: "挟み撃ち",
     description: `人を避けようとして前マスの人に阻まれる`,
   },
-  // イベント
+  {
+    name: "ぴったり賞",
+    description: `スマートに急停止せずゴールする`,
+  },
+  // 雑多なもの
   { name: "腰が重い", description: `最初のターンに1マスだけ進む` },
   { name: "境地", description: `煩悩を克服する` },
   { name: "身も心も", description: `2回改造される` },

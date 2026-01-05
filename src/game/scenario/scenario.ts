@@ -221,14 +221,28 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
     const alreadyGoaled = g.players.filter((p) => p.goaled).length;
     const rank = alreadyGoaled + 1;
     const justGoaledNames = justGoaledPlayers.map((p) => p.name).join("と");
-    const goaledDescription = `${justGoaledNames}は${rank}位でゴールした。`;
-    yield Log.description(goaledDescription, "positive");
+    yield Log.description(
+      `${justGoaledNames}は${rank}位でゴールした。`,
+      "positive"
+    );
     for (const p of justGoaledPlayers) {
+      // ゴール台詞
       const dialog = goaledDialog(p, rank);
       yield Log.dialog(dialog);
       p.goaled = true;
     }
-
+    // ゴール系の実績
+    if (justGoaledPlayers.some((p) => !p.personalityChanged)) {
+      yield* LogUtil.generateEarnTrophy(g, "情緒安定");
+    }
+    if (
+      justGoaledPlayers.includes(player) &&
+      player.personality === "smart" &&
+      nextPos === GOAL_POSITION &&
+      smartDamage === undefined
+    ) {
+      yield* LogUtil.generateEarnTrophy(g, "ぴったり賞");
+    }
     if (youGoaled && rank === 1) {
       switch (you.personality) {
         case "gentle":

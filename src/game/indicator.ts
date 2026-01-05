@@ -89,6 +89,8 @@ export interface PlayerAttrChanger {
   change: (p: Player) => void;
 }
 
+// わざわざクラスにしなくてもクロージャで十分そうだ
+// クラスだと外から見たときに型名が付くのが良いといえば良いのだが
 class GeneralChanger<K extends keyof Player> implements PlayerAttrChanger {
   attr: PlayerAttr;
   key: K;
@@ -106,8 +108,15 @@ class GeneralChanger<K extends keyof Player> implements PlayerAttrChanger {
 export const PlayerAttrChanger = {
   position: (next: number) =>
     new GeneralChanger(PlayerAttr.position, "position", next),
-  personality: (next: Personality) =>
-    new GeneralChanger(PlayerAttr.personality, "personality", next),
+  personality: (next: Personality) => ({
+    attr: PlayerAttr.personality,
+    change: (p: Player) => {
+      if (p.personality !== next) {
+        p.personalityChanged = true; // 実績用
+      }
+      p.personality = next;
+    },
+  }),
   hp: (next: number) => new GeneralChanger(PlayerAttr.hp, "hp", next),
   weapon: (next: Weapon) =>
     new GeneralChanger(PlayerAttr.weapon, "weapon", next),

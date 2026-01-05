@@ -1,5 +1,5 @@
 import { Battle, PlayerBattler, Weapon, type Blocker } from "../battle";
-import { Log } from "../log";
+import { Log, LogUtil } from "../log";
 import type { Space } from "./space";
 
 export const destinyTipsSpace: Space = {
@@ -81,28 +81,31 @@ export const illegalWeaponTipsSpace: Space = {
       "期待値10ダメージ以上の装備は法令により所持が禁止されています"
     );
 
-    if (player.weapon === Weapon.hand) {
-      yield Log.description(`${player.name}は装備を持っていない。`);
-    } else if (player.weapon.isIllegal) {
-      yield Log.description(
-        `${player.name}の${player.weapon.name} (${player.weapon.expected}) は違法だ。`,
-        "negative"
-      );
-    } else {
-      yield Log.description(
-        `${player.name}の${player.weapon.name} (${player.weapon.expected}) は合法だ。`,
-        "positive"
-      );
-    }
-
     if (player.personality === "violent") {
+      // 凶暴の場合、実際に違法かどうか確かめてみる
       const attacker = new PlayerBattler(player);
       const board = new BoardBlocker();
       const { knockedOut } = yield* Battle.generateAttack(g, attacker, board);
       if (knockedOut) {
         yield Log.dialog("警察には気を付けねえとな");
+        yield* LogUtil.generateEarnTrophy(g, "違法チェック");
       } else {
         yield Log.dialog("ちっ");
+      }
+    } else {
+      // それ以外は期待値を教える
+      if (player.weapon === Weapon.hand) {
+        yield Log.description(`${player.name}は丸腰だ。`);
+      } else if (player.weapon.isIllegal) {
+        yield Log.description(
+          `${player.name}の${player.weapon.name} (${player.weapon.expected}) は違法だ。`,
+          "negative"
+        );
+      } else {
+        yield Log.description(
+          `${player.name}の${player.weapon.name} (${player.weapon.expected}) は合法だ。`,
+          "positive"
+        );
       }
     }
   },

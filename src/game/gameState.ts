@@ -46,6 +46,7 @@ export type Player = {
   position: number;
   goaled: boolean;
   personality: Personality;
+  personalityChanged: boolean;
   hp: number;
   weapon: Weapon;
   dice: DiceKind;
@@ -60,6 +61,7 @@ type PlayerJson = {
   position: number;
   goaled: boolean;
   personality: Personality;
+  personalityChanged: boolean;
   hp: number;
   weapon: string;
   dice: DiceKind;
@@ -76,6 +78,7 @@ export const Player = {
       position: 0,
       goaled: false,
       personality: "gentle",
+      personalityChanged: false,
       hp: INITIAL_HP,
       weapon: Weapon.hand,
       dice: "1d6",
@@ -96,6 +99,7 @@ export const Player = {
       dice: p.dice,
       desire: p.desire,
       turnSkip: p.turnSkip,
+      personalityChanged: p.personalityChanged,
       goaled: p.goaled,
       isBot: p.isBot,
     };

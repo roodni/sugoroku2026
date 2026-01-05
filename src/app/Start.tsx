@@ -17,12 +17,12 @@ export const Start = (): JSX.Element => {
       <span className="log-system-neutral">{"<遊び方>\n"}</span>
       {"　"}
       左下のボタンを押し続けてください。
-      {
+      {"\n\n"}
+      <span className="log-system-neutral">{"<トロフィー>\n"}</span>
+      {"　"}
+      {Trophy.all.length}個中の{trophies.length}個が獲得されました。
+      {trophies.length > 0 && (
         <>
-          {"\n\n"}
-          <span className="log-system-neutral">{"<トロフィー>\n"}</span>
-          {"　"}
-          {Trophy.all.length}個中の{trophies.length}個が獲得されました。
           {"\n\n"}
           {Trophy.all.map((trophy) => {
             const earned = trophies.some((t) => t.name === trophy.name);
@@ -44,7 +44,7 @@ export const Start = (): JSX.Element => {
             );
           })}
         </>
-      }
+      )}
     </div>
   );
 };
