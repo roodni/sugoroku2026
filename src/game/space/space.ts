@@ -32,9 +32,11 @@ export const SPACE_MAP: Record<number, Space | undefined> = {
 
   10: HelpSpace.hospitalSpace,
   12: HelpSpace.konbiniSpace,
+
   15: BossSpace.fishingSpace,
   16: BossSpace.ninjaSpace,
 
+  19: TipsSpace.releaseNoteV1Space,
   20: HelpSpace.hospitalSpace,
   22: PersonalitySpace.newYearBellSpace, // 性格イベント第二弾
   23: PersonalitySpace.seminarSpace,

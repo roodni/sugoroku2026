@@ -110,3 +110,30 @@ export const illegalWeaponTipsSpace: Space = {
     }
   },
 };
+
+export const releaseNoteV1Space: Space = {
+  name: "石碑",
+  *generate(g) {
+    const player = g.players[g.currentPlayerIndex];
+    yield Log.description("石碑に何かが刻まれている。");
+    yield Log.system("v1.0 (2026-01-04) 初公開");
+    yield Log.system("v1.1 (2026-01-05) トロフィー追加・台詞修正");
+    switch (player.personality) {
+      case "gentle":
+        yield Log.dialog("v1.2ではUI改善が予定されてるらしいよ");
+        break;
+      case "violent":
+        yield Log.dialog("どうでもいいぜ");
+        break;
+      case "phobic":
+        yield Log.dialog("興味ありません");
+        break;
+      case "smart":
+        yield Log.dialog(
+          "マイナーバージョンの更新ではゲームバランスが変わらないのさ"
+        );
+        break;
+    }
+    yield Log.description(`${player.name}は石碑を後にした。`);
+  },
+};
