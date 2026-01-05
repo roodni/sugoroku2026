@@ -13,7 +13,7 @@ export const liveSpace: Space = {
     yield Log.description("ライブ会場がある。");
     yield Log.description("暗黒デスメタルバンドが演奏している。");
     yield Log.dialog("ゴォトゥヘル");
-    yield Log.description("ドガガガガ！");
+    yield Log.description("ドガガガガ！", "negative");
     yield Log.dialog("ロックだ……");
     yield Log.description(`${player.name}は深く感銘を受けた。`);
     yield Log.description(
@@ -35,10 +35,10 @@ export const librarySpace: Space = {
     yield Log.description("図書館がある。");
     if (player.personality === "violent") {
       yield Log.dialog("あ？　俺は本とか読まないぜ");
-      yield Log.description(`${player.name}は図書館をスルーした。`);
+      yield Log.description(`${player.name}は図書館を素通りした。`);
     } else {
       yield Log.dialog("たまには本でも読むか");
-      yield Log.description(`${player.name}は読書を始めた。`);
+      yield Log.description(`${player.name}は読書を始めた。`, "positive");
       yield Log.description(`${player.name}は読書により頭がスマートになった。`);
       yield* LogUtil.generatePlayerAttrChange(
         player,
@@ -68,7 +68,8 @@ export const hauntedHouseSpace: Space = {
     } else {
       yield Log.dialog(`ギャアアアアアアアアアアアア！`);
       yield Log.description(
-        `恐怖体験がトラウマとして${player.name}の心に刻み込まれた。`
+        `恐怖体験がトラウマとして${player.name}の心に刻み込まれた。`,
+        "negative"
       );
       yield* LogUtil.generatePlayerAttrChange(
         player,
@@ -133,7 +134,7 @@ export const seminarSpace: Space = {
     yield Log.dialog(
       `これからの市場を生き抜くにはグローバル人材としてソリューションにコミットすることです`
     );
-    yield Log.dialog("なるほどね……");
+    yield Log.dialog("なるほど……");
     yield Log.description(`${player.name}は意識が高まった。`);
     yield* LogUtil.generatePlayerAttrChange(
       player,

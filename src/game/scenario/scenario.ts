@@ -136,7 +136,7 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
       nextPos = GOAL_POSITION;
       smartDamage = power;
       if (player.hp < power) {
-        const back = 2; // power - player.hp;
+        const back = 1; // power - player.hp;
         yield Log.description(
           `勢いを殺しきれず、${player.name}は${back}マス跳ね返った。`,
           "negative"

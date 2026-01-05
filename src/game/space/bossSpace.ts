@@ -74,7 +74,7 @@ export const fishingSpace: Space = {
           "あ!?　ナメやがって！　お前こそ丸焼きにして賞味してやるぜェー！"
         );
         yield Log.description(
-          `${player.name}は巨大魚に襲い掛かった。`,
+          `${player.name}は巨大魚に襲いかかった。`,
           "negative"
         );
         const { winner } = yield* Battle.generateBattle(
@@ -183,7 +183,7 @@ export const policeSpace: Space = {
         yield Log.dialog(`${player.weapon.name}だと!?　貴様テロリストか！`);
         yield Log.dialog(`見られたからには消えてもらうぜェー！`);
         yield Log.description(
-          `${player.name}は警察に襲い掛かった。`,
+          `${player.name}は警察に襲いかかった。`,
           "negative"
         );
         const { winner } = yield* Battle.generateBattle(
@@ -208,7 +208,7 @@ export const policeSpace: Space = {
         yield Log.dialog("非協力的な態度。貴様まさかテロリストか？");
         yield Log.dialog("あ!?　冤罪だ！　ぶっ殺してやる！");
         yield Log.description(
-          `${player.name}は警察に襲い掛かった。`,
+          `${player.name}は警察に襲いかかった。`,
           "negative"
         );
         const { winner } = yield* Battle.generateBattle(
@@ -285,7 +285,7 @@ export const policeSpace: Space = {
               );
               yield Log.dialog("触らないでッ！");
               yield Log.description(
-                `${player.name}は警察に襲い掛かった！`,
+                `${player.name}は警察に襲いかかった！`,
                 "negative"
               );
               const { winner } = yield* Battle.generateBattle(
@@ -351,7 +351,14 @@ class GoddessBattler implements Battler {
     this.hp = hp;
   }
 
-  *generateDamageVoice(): Generator<never> {}
+  *generateDamageVoice(
+    _g: GameState,
+    details: { beforeHp: number; damage: number }
+  ): Generator<Log> {
+    if (details.beforeHp === 100) {
+      yield Log.dialog("あらあら");
+    }
+  }
   *generateKnockedOut() {
     yield Log.dialog("バカな……人間ごときに……？");
     yield* Battle.generateDefaultKnockedOut(this.name);
@@ -375,10 +382,10 @@ export const goddessSpace: Space = {
       // 2. 周回済み
       yield Log.dialog(
         {
-          gentle: `斧を落とさないよう注意しないと`,
+          gentle: `斧を落とさないように注意しないと`,
           violent: `もうここには近づきたくないぜ`,
-          phobic: `もう湖は嫌だ……`,
-          smart: `フッ……湖は避けるのが賢明だね`,
+          phobic: `嫌なこと思い出した……`,
+          smart: `フッ……近づかないのが賢明だね`,
         }[player.personality]
       );
       yield Log.description(`${player.name}は湖を素通りした。`);
@@ -433,7 +440,7 @@ export const goddessSpace: Space = {
           yield Log.description(`女神は冷たく言った。`);
           yield Log.dialog("嘘をついた報いを今受けてもらいますよ");
           yield Log.description(
-            `女神は${player.name}に襲い掛かった！`,
+            `女神は${player.name}に襲いかかった！`,
             "negative"
           );
           const { winner } = yield* Battle.generateBattle(
@@ -509,7 +516,7 @@ export const goddessSpace: Space = {
       case "smart":
         // 7. スマート
         yield Log.description(`${player.name}は女神の手を取って言った。`);
-        yield Log.dialog("貴方が欲しい……");
+        yield Log.dialog("君が欲しい……");
         yield Log.dialog("は？");
         yield* Battle.generateAttack(g, goddess, playerBattler, {
           skipAttackVoice: true,
@@ -519,17 +526,14 @@ export const goddessSpace: Space = {
         yield* Battle.generateAttack(g, goddess, playerBattler, {
           skipAttackVoice: true,
         });
-        yield Log.description(
-          `女神は怒りながら湖の底に消えていった。`,
-          "negative"
-        );
+        yield Log.description(`女神は湖の底に消えていった。`, "negative");
         yield Log.description(`${player.name}は金の斧を拾った。`, "positive");
         yield* LogUtil.generatePlayerAttrChange(
           player,
           PlayerAttrChanger.weapon(Weapon.goldenAxe),
           "positive"
         );
-        yield Log.dialog(`フッ……神には敬意が必要だったね`);
+        yield Log.dialog(`あはは……スマートが過ぎたかな`);
         break;
     }
   },
@@ -584,10 +588,10 @@ export const ninjaSpace: Space = {
         yield Log.description("忍者はドロンと消えた。");
         break;
       case "violent": {
-        yield Log.dialog("うわっ何だお前！");
+        yield Log.dialog("うわっ何だお前");
         yield Log.dialog("お覚悟召されよ！");
         yield Log.description(
-          `忍者は${player.name}に襲い掛かった。`,
+          `忍者は${player.name}に襲いかかった。`,
           "negative"
         );
         const { winner } = yield* Battle.generateBattle(
@@ -626,17 +630,14 @@ export const ninjaSpace: Space = {
         yield Log.description("しかし忍者に追いつかれてしまった！", "negative");
         yield Log.dialog("ひいいい！");
         yield Log.dialog("拙者、走力には自信がござるよ");
-        yield Log.description("忍者は満足げにドロンと消えた。");
-        yield Log.dialog("はあ、はあ……");
-        yield Log.description(
-          `${player.name}は疲れ果ててしまった。`,
-          "negative"
-        );
+        yield Log.description("忍者は自慢げにドロンと消えた。");
+        yield Log.description(`${player.name}は疲れ果てた。`, "negative");
         yield* LogUtil.generatePlayerAttrChange(
           player,
           PlayerAttrChanger.turnSkip(1),
           "negative"
         );
+        yield Log.dialog("はあ、はあ……");
         break;
       }
       case "smart":
@@ -673,8 +674,15 @@ class GodZeusBattler implements Battler {
   }
   weapon = Weapon.lightning;
 
-  *generateDamageVoice() {
-    yield Log.dialog("愚か");
+  *generateDamageVoice(
+    _g: GameState,
+    details: { beforeHp: number; damage: number }
+  ) {
+    if (details.beforeHp > details.damage) {
+      yield Log.dialog("愚か");
+    } else {
+      yield Log.dialog("な……");
+    }
   }
   *generateKnockedOut() {
     yield Log.dialog("バカな……我が……人間ごときに……！");
@@ -700,7 +708,7 @@ export const godZeusSpace: Space = {
     }
 
     yield Log.description(
-      `${alreadyMet ? "神" : "何か"}が${player.name}に語り掛けた。`
+      `${alreadyMet ? "神" : "何か"}が${player.name}に語りかけた。`
     );
     yield Log.dialog("愚かな人間よ……");
 
@@ -734,18 +742,18 @@ export const godZeusSpace: Space = {
       yield Log.description(`それは${player.name}の眼前に降臨した。`);
       yield Log.dialog(`我は最強神ゴッドゼウス。裁きの時は来たれり`);
     } else {
-      yield Log.description(`怒り狂った神が再臨した。`);
+      yield Log.description(`怒り狂った神が降臨した。`);
       yield Log.dialog("何度でも裁きを下そうぞ");
       yield Log.dialog(
         {
           violent: "まだいやがったか！",
-          phobic: "も、もう嫌だ……",
-          smart: "フッ……どうやら、HP消耗は継続するようだね",
+          phobic: "私が何をしたって言うんですか！",
+          smart: "フッ……どうやら、HP消耗は累積するようだね",
         }[player.personality]
       );
     }
     yield Log.description(
-      `ゴッドゼウスは${player.name}に襲い掛かった！`,
+      `ゴッドゼウスは${player.name}に襲いかかった！`,
       "negative"
     );
 
@@ -765,7 +773,7 @@ export const godZeusSpace: Space = {
       yield Log.dialog(
         {
           violent: "ハハハハ！　俺が最強だぜ！",
-          phobic: "フフフ……もう怖くない……",
+          phobic: "こんなのいらない……",
           smart: "確かに人間は愚かさ。だからこそ僕たちはスマートを追求するんだ",
         }[player.personality]
       );

@@ -20,10 +20,10 @@ export const spikyFloorSpace: Space = {
         yield Log.dialog("ふざけんな！");
         break;
       case "phobic":
-        yield Log.dialog("もう嫌だ……");
+        yield Log.dialog("痛い……痛いッ！");
         break;
       case "smart":
-        yield Log.dialog("フッ……下手を打ったね");
+        yield Log.dialog("フッ……痛いよ");
         break;
     }
   },

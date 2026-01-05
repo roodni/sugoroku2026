@@ -102,7 +102,7 @@ export class Weapon {
     name: "魔法の杖",
     *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
-        `${attacker.name}${blocker.name}を${this.name}で呪った。`
+        `${attacker.name}は${blocker.name}を${this.name}で呪った。`
       );
       const power = yield* LogUtil.generateDiceRoll(
         g,
@@ -325,7 +325,7 @@ export class PlayerBattler implements Battler {
         yield Log.dialog(fatal ? "グエッ！" : "痛って！");
         break;
       case "phobic":
-        yield Log.dialog("嫌あああ！");
+        yield Log.dialog(fatal ? "（耳をつんざく悲鳴）" : "嫌あああ！");
         break;
       case "smart":
         yield Log.dialog(fatal ? "ぐはっ" : "その程度かい？");
@@ -361,7 +361,7 @@ export class PlayerBattler implements Battler {
         yield Log.dialog("ゴハアッ");
         break;
       case "phobic":
-        yield Log.dialog("呪ってやる……！");
+        yield Log.dialog("呪ってやる……");
         break;
       case "smart":
         yield Log.dialog("バカな……この僕が……");
@@ -384,7 +384,7 @@ export class PlayerBattler implements Battler {
   *generateAttackVoice(): Generator<Log> {
     switch (this.p.personality) {
       case "gentle":
-        // 温厚なやつが攻撃することはないかも
+        // 温厚なやつが攻撃することはない
         yield Log.dialog("くらえー！");
         break;
       case "violent":
@@ -392,7 +392,11 @@ export class PlayerBattler implements Battler {
         break;
       case "phobic":
         // 手が出るタイプ
-        yield Log.dialog("消えて！");
+        if (this.p.hp <= 4) {
+          yield Log.dialog("死ね！"); // あまり悪い言葉を使ってはいけないので、HPが低いときだけ
+        } else {
+          yield Log.dialog("消えて！");
+        }
         break;
       case "smart":
         yield Log.dialog("僕はスマートに勝利する");
