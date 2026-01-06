@@ -111,7 +111,11 @@ export const LogUtil = {
     if (g.trophies.map((t) => t.name).includes(trophyName)) {
       return;
     }
-    const { firstTime } = Trophy.earn(trophyName);
+    let firstTime = false;
+    if (!g.replayMode) {
+      // リプレイではトロフィーを獲得できない
+      firstTime = Trophy.earn(trophyName).firstTime;
+    }
     g.trophies.push({ name: trophyName, firstTime });
     const firstTimeText = firstTime ? " (new)" : "";
     yield Log.system(`[トロフィー獲得] ${trophyName}${firstTimeText}`);

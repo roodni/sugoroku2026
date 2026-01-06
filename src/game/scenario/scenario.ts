@@ -269,6 +269,12 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
           `・${detail.name}: ${detail.description}${firstTimeText}`
         );
       }
+      if (g.replayMode) {
+        yield Log.system(
+          "これはリプレイです。トロフィーは保存されません。",
+          "negative"
+        );
+      }
     }
     if (youGoaled) {
       const attrs = [
