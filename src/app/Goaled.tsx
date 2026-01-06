@@ -1,5 +1,3 @@
-import type { GameState } from "../game/gameState";
-
 const HASHTAG = "新春ログすごろく";
 const INTENT_BASE = "https://twitter.com/intent/tweet";
 const HERE_URL = location.href;
@@ -11,15 +9,10 @@ function tweetUrl(text: string) {
 }
 
 export const Goaled: React.FC<{
-  getGameState: () => GameState;
+  gameOverMessage: string;
   restartGame: () => void;
-}> = ({ getGameState, restartGame }) => {
-  const gameState = getGameState();
-  if (gameState.gameOverMessage === null) {
-    return undefined;
-  }
-
-  const text = `${gameState.gameOverMessage}\n${HERE_URL} #${HASHTAG}`;
+}> = ({ gameOverMessage, restartGame }) => {
+  const text = `${gameOverMessage}\n${HERE_URL} #${HASHTAG}`;
   return (
     <div className="goaled">
       <textarea className="goaled-textarea" readOnly value={text} />

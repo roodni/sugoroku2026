@@ -14,7 +14,7 @@ const WAIT = 80;
 type PlayingState = Readonly<
   | { type: "beforeStart" }
   | { type: "playing"; isWaitingButton: boolean }
-  | { type: "goaled" }
+  | { type: "goaled"; message: string }
 >;
 
 function App() {
@@ -164,8 +164,8 @@ function App() {
       const logIndex = scenario.history.length;
 
       const log = scenario.next();
-      if (log === undefined) {
-        setPlayingState({ type: "goaled" });
+      if (log.type === "gameOver") {
+        setPlayingState({ type: "goaled", message: log.message });
         return;
       }
 
@@ -285,7 +285,10 @@ function App() {
           )}
           <Logs logs={allLogs} offset={logOffsetActual} />
           {playingState.type === "goaled" && (
-            <Goaled getGameState={getGameState} restartGame={restartGame} />
+            <Goaled
+              gameOverMessage={playingState.message}
+              restartGame={restartGame}
+            />
           )}
         </div>
       </main>

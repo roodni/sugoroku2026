@@ -119,7 +119,6 @@ export type GameState = {
   players: Player[];
   cameraStart: number; // 地図で省略せず表示するマスの開始位置
   cameraPlayerIndex: number; // 地図で注目している駒
-  gameOverMessage: string | null; // null でなくなったときゲーム終了と判定される
   futureDice: number[]; // デバッグ用だったが、リプレイにも流用できる
   diceHistory: number[]; // リプレイ用
   replayMode: boolean;
@@ -132,7 +131,6 @@ export type GameStateJson = {
   players: PlayerJson[];
   cameraStart: number;
   cameraPlayerIndex: number;
-  gameOverMessage: string | null;
   futureDice: number[];
   diceHistory: number[];
   replayMode: boolean;
@@ -154,7 +152,6 @@ export const GameState = {
       players,
       cameraStart: 0,
       cameraPlayerIndex: 0,
-      gameOverMessage: null,
       futureDice: [],
       diceHistory: [],
       replayMode: false,
@@ -173,7 +170,6 @@ export const GameState = {
       players: g.players.map((p) => Player.save(p)),
       cameraStart: g.cameraStart,
       trophies: g.trophies,
-      gameOverMessage: g.gameOverMessage,
       zeusHp: g.zeusHp,
       diceHistory: g.diceHistory, // これがインデントされるのは不本意だが……
     };

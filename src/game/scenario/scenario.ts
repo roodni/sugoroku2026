@@ -14,7 +14,8 @@ import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./sharing";
 
 type TurnResult = {
-  skipped: boolean;
+  skipped: boolean; // ゴールした人のターン飛ばしに使われている
+  gameOver?: string; // 共有用のメッセージが入る。入ったらゲーム終了
 };
 
 export class Scenario {
@@ -28,7 +29,7 @@ export class Scenario {
   constructor() {
     this.gameState = GameState.initial();
     this.history = [];
-    this.loadable = true;
+    this.loadable = true; // 最初はロード可能
   }
 
   // デバッグ用
@@ -45,34 +46,32 @@ export class Scenario {
     return JSON.stringify(obj, undefined, 2);
   }
 
-  private *generate(): Generator<Log> {
+  private *generate(): Generator<Log, string> {
     this.loadable = false;
     while (true) {
       const g = this.gameState;
       const turnResult = yield* generateTurn(g);
-      if (g.gameOverMessage) {
+      if (turnResult.gameOver !== undefined) {
         // ゲーム終了
-        // メッセージはgameStateじゃなくて返値で返すべきかも
-        return;
+        return turnResult.gameOver;
       }
       g.currentPlayerIndex += 1;
       g.currentPlayerIndex %= g.players.length;
       if (!turnResult.skipped) {
         this.loadable = true;
-        yield Log.turnEnd();
-        // <- このタイミングでgameStateがデバッグ機能により書き変わる可能性がある
+        yield Log.turnEnd(); // <- このタイミングでgameStateがデバッグ機能により書き変わる可能性がある
         this.loadable = false;
       }
     }
   }
 
-  next(): Log | undefined {
+  next(): Log | { type: "gameOver"; message: string } {
     if (!this.generator) {
       this.generator = this.generate();
     }
     const result = this.generator.next();
     if (result.done) {
-      return undefined;
+      return { type: "gameOver", message: result.value };
     } else {
       this.history.push(result.value);
       return result.value;
@@ -277,6 +276,7 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
       }
     }
     if (youGoaled) {
+      // 共有用のメッセージを返してゲーム終了
       const attrs = [
         PlayerAttr.turn,
         ...PlayerAttr.attrsShownInTurnStart.filter(
@@ -285,13 +285,13 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
       ];
       const attrsText = stringifyPlayerAttrs(you, attrs);
       const dialog = goaledDialog(you, rank);
-      g.gameOverMessage = `${you.name}は${rank}位でゴールした。「${dialog}」`;
-      g.gameOverMessage += `\n[状態] ${attrsText}`;
+      let gameOver = `${you.name}は${rank}位でゴールした。「${dialog}」`;
+      gameOver += `\n[状態] ${attrsText}`;
       if (g.trophies.length > 0) {
         const trophiesText = g.trophies.map((t) => t.name).join(", ");
-        g.gameOverMessage += `\n[トロフィー] ${trophiesText}`;
+        gameOver += `\n[トロフィー] ${trophiesText}`;
       }
-      return { skipped: true }; // ゲーム終了
+      return { skipped: true, gameOver }; // ここのskippedは意味をなさない
     }
   }
 
