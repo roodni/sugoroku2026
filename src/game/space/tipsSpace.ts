@@ -34,7 +34,8 @@ export const personalityTipsSpace: Space = {
   name: "本屋",
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
-    yield Log.description(`${player.name}は心理テストの本を立ち読みした。`);
+    yield Log.description("本屋がある。");
+    yield Log.description(`${player.name}は心理テストの本を手に取った。`);
     yield Log.dialog("人々の性格は4種類に分類されます");
     switch (player.personality) {
       case "gentle":

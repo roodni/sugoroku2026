@@ -218,7 +218,7 @@ export const weaponShopSpace: Space = {
     ] as const;
     for (let i = 1; i <= 6; i++) {
       const weapon = weaponList[i - 1][0];
-      yield Log.system(`・${i}: ${weapon.name}`);
+      yield Log.system(`(${i}) ${weapon.name}`);
     }
 
     yield Log.newSection();

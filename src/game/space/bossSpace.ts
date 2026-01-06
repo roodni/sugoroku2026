@@ -735,7 +735,7 @@ export const godZeusSpace: Space = {
       yield Log.dialog(
         {
           violent: "あ!?　何だてめえ！　姿を見せろ！",
-          phobic: "は、話しかけないでください！",
+          phobic: "ひいっ！　誰!?　どこ!?",
           smart: "いきなりマウントとは驚いたね。まず名前を教えてくれないかな？",
         }[player.personality]
       );
@@ -772,7 +772,7 @@ export const godZeusSpace: Space = {
       );
       yield Log.dialog(
         {
-          violent: "ハハハハ！　俺が最強だぜ！",
+          violent: "ハハハハ！　これで俺が最強神！",
           phobic: "こんなのいらない……",
           smart: "確かに人間は愚かさ。だからこそ僕たちはスマートを追求するんだ",
         }[player.personality]

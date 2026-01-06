@@ -173,6 +173,7 @@ export class Weapon {
     *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}に発砲した！`);
       const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 10);
+      yield Log.description("紙吹雪が舞う。", "positive");
       return { power };
     },
     expected: diceExpected(2, 10),
