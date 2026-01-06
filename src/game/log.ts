@@ -16,7 +16,12 @@ export type Log =
   | { type: "system"; text: string; emotion: Emotion }
   | { type: "newSection" }
   | { type: "diceRollBefore"; expression: string; isBot: boolean }
-  | { type: "diceRollAfter"; expression: string; result: number }
+  | {
+      type: "diceRollAfter";
+      expression: string;
+      result: number;
+      details: number[];
+    }
   | { type: "turnEnd" };
 
 export const Log = {
@@ -32,8 +37,8 @@ export const Log = {
   diceRollBefore(expression: string, isBot: boolean): Log {
     return { type: "diceRollBefore", expression, isBot };
   },
-  diceRollAfter(expression: string, result: number): Log {
-    return { type: "diceRollAfter", expression, result };
+  diceRollAfter(expression: string, result: number, details: number[]): Log {
+    return { type: "diceRollAfter", expression, result, details };
   },
   newSection(): Log {
     return { type: "newSection" };
@@ -44,6 +49,8 @@ export const Log = {
 };
 
 export const LogUtil = {
+  // ダイスロールは全てここを通す
+  // (times)d(sides)+(cnst)
   *generateDiceRoll(
     g: GameState,
     isBot: boolean,
@@ -51,20 +58,29 @@ export const LogUtil = {
     sides: number,
     cnst: number = 0
   ): Generator<Log, number> {
+    // 式の作成
     let expression = `${times}d${sides}`;
     if (cnst > 0) {
       expression += `+${cnst}`;
     } else if (cnst < 0) {
       expression += `${cnst}`;
     }
+
+    // before
     yield Log.diceRollBefore(expression, isBot);
-    let result;
-    if (g.futureDice.length > 0) {
-      result = g.futureDice.shift()!;
-    } else {
-      result = dice(times, sides) + cnst;
+
+    // 振る
+    let result = cnst;
+    const details = [];
+    for (let i = 0; i < times; i++) {
+      const x = g.futureDice.shift() ?? dice(sides); // 綺麗に書けるもんだな
+      result += x;
+      details.push(x);
+      g.diceHistory.push(x);
     }
-    yield Log.diceRollAfter(expression, result);
+
+    // after
+    yield Log.diceRollAfter(expression, result, details);
     return result;
   },
 

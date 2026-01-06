@@ -78,7 +78,11 @@ function logsToElements(logs: Log[], offset: number): JSX.Element[] {
         break;
       case "diceRollAfter":
         logElement = (
-          <span className="log-system-dice">{`${log.result}\n`}</span>
+          <span className="log-system-dice">
+            {log.result}
+            {log.details.length > 1 && ` (${log.details.join(",")})`}
+            {"\n"}
+          </span>
         );
         isReturned = true;
         break;
