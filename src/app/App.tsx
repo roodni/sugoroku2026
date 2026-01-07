@@ -8,13 +8,14 @@ import { Goaled } from "./Goaled";
 import { Logs } from "./Logs";
 import { Start } from "./Start";
 import "./misc";
+import { encodeReplay } from "./replay";
 
 const WAIT = 80;
 
 type PlayingState = Readonly<
   | { type: "beforeStart" }
   | { type: "playing"; isWaitingButton: boolean }
-  | { type: "goaled"; message: string }
+  | { type: "goaled"; message: string; replay: string }
 >;
 
 function App() {
@@ -165,7 +166,8 @@ function App() {
 
       const log = scenario.next();
       if (log.type === "gameOver") {
-        setPlayingState({ type: "goaled", message: log.message });
+        const replay = await encodeReplay(scenario.gameState.diceHistory);
+        setPlayingState({ type: "goaled", message: log.message, replay });
         return;
       }
 
@@ -287,6 +289,7 @@ function App() {
           {playingState.type === "goaled" && (
             <Goaled
               gameOverMessage={playingState.message}
+              replayCode={playingState.replay}
               restartGame={restartGame}
             />
           )}

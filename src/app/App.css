@@ -86,7 +86,8 @@
   & > textarea {
     width: 100%;
     resize: vertical;
-    height: 5em;
+    line-height: 1.2;
+    height: calc(5em * 1.2);
   }
 }
 
