@@ -7,6 +7,7 @@ import { GameMap } from "./GameMap";
 import { Goaled } from "./Goaled";
 import { Logs } from "./Logs";
 import { Start } from "./Start";
+import "./misc";
 
 const WAIT = 80;
 
