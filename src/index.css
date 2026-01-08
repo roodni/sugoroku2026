@@ -10,6 +10,9 @@
   line-height: 1.4;
 
   background-color: #666;
+
+  /* スマホでの誤リロードを防止 */
+  overscroll-behavior: contain;
 }
 
 body {
