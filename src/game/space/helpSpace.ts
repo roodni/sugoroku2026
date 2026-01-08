@@ -213,7 +213,7 @@ export const weaponShopSpace: Space = {
         Weapon.hammer,
         `そいつは1d100の超兵器！　ただし重すぎてゾロ目じゃないと外れるぜ`,
       ],
-      [Weapon.darkSword, "そいつは4d6の魔剣だな。掘り出し物だぜ"],
+      [Weapon.darkSword, "そいつは3d6+2の魔剣だな。掘り出し物だぜ"],
       [Weapon.beam, "固定20ダメージの最強装備だ。ちなみに違法だぜ"],
     ] as const;
     for (let i = 1; i <= 6; i++) {
