@@ -1,5 +1,5 @@
 import { Fragment, useState, type JSX } from "react";
-import { MAJOR_VERSION, MINOR_VERSION } from "../game/config";
+import { VERSION } from "../game/config";
 import { Trophy } from "../game/trophy";
 
 export const Start = (): JSX.Element => {
@@ -7,8 +7,7 @@ export const Start = (): JSX.Element => {
 
   return (
     <div className="turn-logs">
-      <span className="log-system-neutral">新春ログすごろく</span>{" "}
-      {`v${MAJOR_VERSION}.${MINOR_VERSION}`}
+      <span className="log-system-neutral">新春ログすごろく</span> {VERSION}
       {"\n\n"}
       <span className="log-system-neutral">{"<これは何>\n"}</span>
       {"　"}

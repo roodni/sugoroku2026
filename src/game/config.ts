@@ -1,5 +1,4 @@
-export const MAJOR_VERSION = "1";
-export const MINOR_VERSION = "1";
+export const VERSION = "v1.1.1";
 
 export const GOAL_POSITION = 50;
 export const INITIAL_HP = 20;
