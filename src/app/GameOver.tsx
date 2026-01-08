@@ -10,7 +10,7 @@ function tweetUrl(text: string) {
   return `${INTENT_BASE}?${params.toString()}`;
 }
 
-export const Goaled: React.FC<{
+export const GameOver: React.FC<{
   gameOverMessage: string;
   replayCode: string;
   restartGame: () => void;
@@ -21,6 +21,8 @@ export const Goaled: React.FC<{
     const url = new URL(location.href);
     if (sharingReplay) {
       url.search = `?${REPLAY_KEY}=${replayCode}`;
+    } else {
+      url.search = "";
     }
     return url.href;
   }, [sharingReplay, replayCode]);

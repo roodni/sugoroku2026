@@ -3,34 +3,41 @@ import type { Log } from "../game/log";
 import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
+import { REPLAY_KEY } from "./appConfig";
+import { ConfirmReplay } from "./ConfirmReplay";
 import { GameMap } from "./GameMap";
-import { Goaled } from "./Goaled";
+import { GameOver } from "./GameOver";
 import { Logs } from "./Logs";
-import { Start } from "./Start";
 import "./misc";
-import { encodeReplay } from "./replay";
+import { decodeReplay, encodeReplay } from "./replay";
+import { Title } from "./Title";
 
 const WAIT = 80;
 
-type PlayingState = Readonly<
-  | { type: "beforeStart" }
+type Scene = Readonly<
+  | { type: "loading" }
+  | { type: "confirmReplay"; replayData: number[] }
+  | { type: "title" }
   | { type: "playing"; isWaitingButton: boolean }
-  | { type: "goaled"; message: string; replay: string }
+  | { type: "gameOver"; message: string; replay: string }
 >;
 
 function App() {
+  // ゲームオブジェクト
+  // Scenarioという命名はよくないのだが、v2.0で直すのではないか
   const scenarioRef = useRef<Scenario>(undefined);
-  if (scenarioRef.current === undefined) {
-    scenarioRef.current = new Scenario();
-  }
+  const [isReplay, setIsReplay] = useState(false);
 
-  const [playingState, setPlayingState] = useState<PlayingState>({
-    type: "beforeStart",
+  // Scene
+  const [scene, setScene] = useState<Scene>({
+    type: "loading",
   });
+  const isGameScene = scene.type === "playing" || scene.type === "gameOver"; // ゲーム画面を表示しているかどうか
   const isWaitingButton =
-    playingState.type === "beforeStart" ||
-    (playingState.type === "playing" && playingState.isWaitingButton);
+    scene.type === "title" ||
+    (scene.type === "playing" && scene.isWaitingButton);
 
+  // 地図系
   const [mapRenderObserver] = useState(() => new Observer<void>());
   const [mapShowAll, setMapShowAll] = useState(false);
 
@@ -58,13 +65,6 @@ function App() {
   }>({ undo: [], current: "", redo: [] }); // currentはゲームとほぼ同期させる
   const isLoadableNow = lastLog === undefined || lastLog.type === "turnEnd";
 
-  // デバッグ盤をゲーム初期化に合わせて初期化する
-  useEffect(() => {
-    const json = scenarioRef.current!.save();
-    setDebugJsonHistory({ undo: [], current: json, redo: [] });
-    setDebugJson(json);
-  }, []);
-
   // デバッグ盤の内容をゲームにロードする
   const loadDebugJson = useCallback(
     (json: string) => {
@@ -86,7 +86,7 @@ function App() {
   );
 
   // ゲームの状態をUndo / Redoする
-  const undoDebugJson = () => {
+  const undoDebugJson = useCallback(() => {
     const { undo, current, redo } = debugJsonHistory;
     if (undo.length === 0) {
       return;
@@ -98,8 +98,8 @@ function App() {
     });
     loadDebugJson(undo[0]);
     setDebugJson(undo[0]);
-  };
-  const redoDebugJson = () => {
+  }, [debugJsonHistory, loadDebugJson]);
+  const redoDebugJson = useCallback(() => {
     const { undo, current, redo } = debugJsonHistory;
     if (redo.length === 0) {
       return;
@@ -111,7 +111,7 @@ function App() {
     });
     loadDebugJson(redo[0]);
     setDebugJson(redo[0]);
-  };
+  }, [debugJsonHistory, loadDebugJson]);
 
   // @ を押すとデバッグ盤が開く
   useEffect(() => {
@@ -141,21 +141,71 @@ function App() {
   const scrollerElementRef = useRef<HTMLElement>(null);
   const debugTextareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // はじめから
-  const restartGame = useCallback(() => {
-    scenarioRef.current = new Scenario();
-    setPlayingState({ type: "beforeStart" });
-    setAllLogs([]);
-    setLogOffset(0);
+  // ゲーム初期化
+  // 冪等な操作だし、依存配列が空なので、useEffectで呼んでもなんとかなる
+  const initializeGame = useCallback(
+    (options: { initializeJson: boolean; replayData?: number[] }) => {
+      // ゲームオブジェクト
+      const scenario = new Scenario();
+      if (options.replayData !== undefined) {
+        // こんなことが許されると思っているのか!?
+        // コンストラクタの引数で受け取るべきだろ！
+        scenario.gameState.futureDice = options.replayData;
+        scenario.gameState.replayMode = true;
+      }
+      setIsReplay(scenario.gameState.replayMode);
+      scenarioRef.current = scenario;
 
-    setDebugJsonHistory({
-      undo: [],
-      current: scenarioRef.current.save(),
-      redo: [],
-    });
-    // デバッグ盤は変えなくていい。前ゲームのゴール直前の状態を使いたいことがある
-    mapRenderObserver.notify();
-  }, [mapRenderObserver]);
+      // ログ系
+      setAllLogs([]);
+      setLogOffset(0);
+      // デバッグ系
+      const initialJson = scenario.save();
+      setDebugJsonHistory({
+        undo: [],
+        current: initialJson,
+        redo: [],
+      });
+      if (options.initializeJson) {
+        setDebugJson(initialJson);
+      }
+    },
+    []
+  );
+
+  // ゲーム読み込み時の処理
+  useEffect(() => {
+    if (scene.type !== "loading") {
+      return; // 開発中のhot reloadで最初に戻らないように
+    }
+    (async () => {
+      // リプレイがあるかどうか見る
+      const replayQuery = new URL(location.href).searchParams.get(REPLAY_KEY);
+      let replayData = undefined;
+      if (replayQuery) {
+        try {
+          replayData = await decodeReplay(replayQuery);
+        } catch (e) {
+          console.log("リプレイ読み込み失敗", e);
+        }
+      }
+      // シーン遷移
+      if (replayData === undefined) {
+        // リプレイがなければ普通にタイトルへ
+        initializeGame({ initializeJson: true });
+        setScene({ type: "title" });
+      } else {
+        // リプレイがあれば再生するか確認を取る
+        setScene({ type: "confirmReplay", replayData });
+      }
+    })();
+  }, [initializeGame, scene]);
+
+  // ゲームやりなおしの処理
+  const restartGame = useCallback(() => {
+    setScene({ type: "title" });
+    initializeGame({ initializeJson: false }); // クリア直前の状態をロードできるようにしておく
+  }, [initializeGame]);
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
@@ -167,7 +217,7 @@ function App() {
       const log = scenario.next();
       if (log.type === "gameOver") {
         const replay = await encodeReplay(scenario.gameState.diceHistory);
-        setPlayingState({ type: "goaled", message: log.message, replay });
+        setScene({ type: "gameOver", message: log.message, replay });
         return;
       }
 
@@ -221,11 +271,25 @@ function App() {
         await new Promise((resolve) => setTimeout(resolve, WAIT));
       } else if (waitType === "button") {
         mapRenderObserver.notify();
-        setPlayingState({ type: "playing", isWaitingButton: true });
+        setScene({ type: "playing", isWaitingButton: true });
         break;
       }
     }
   }, [mapRenderObserver]); // 注意: 非同期関数なので古い状態しか参照できない
+
+  // リプレイ確認画面の応答
+  const replayYes = useCallback(() => {
+    if (scene.type !== "confirmReplay") {
+      return;
+    }
+    initializeGame({ initializeJson: true, replayData: scene.replayData });
+    setScene({ type: "playing", isWaitingButton: false });
+    stepGame();
+  }, [scene, initializeGame, stepGame]);
+  const replayNo = useCallback(() => {
+    initializeGame({ initializeJson: true });
+    setScene({ type: "title" });
+  }, [initializeGame]);
 
   useEffect(() => {
     // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
@@ -239,23 +303,23 @@ function App() {
     const element = scrollerElementRef.current!;
     element.scroll({ top: element.scrollHeight, behavior: "instant" });
     // console.log("scroll", element.scrollTop, element.scrollHeight);
-  }, [allLogs, logOffsetActual, playingState]);
+  }, [allLogs, logOffsetActual, scene]);
 
   const mainButtonHandler = useCallback(() => {
-    if (playingState.type === "beforeStart") {
-      setPlayingState({ type: "playing", isWaitingButton: false });
+    if (scene.type === "title") {
+      setScene({ type: "playing", isWaitingButton: false });
       stepGame();
-    } else if (playingState.type === "playing") {
-      setPlayingState({ type: "playing", isWaitingButton: false });
+    } else if (scene.type === "playing") {
+      setScene({ type: "playing", isWaitingButton: false });
       stepGame();
     }
-  }, [stepGame, playingState]);
+  }, [stepGame, scene]);
 
   const mainButtonLabel = (() => {
-    if (playingState.type === "beforeStart") {
+    if (scene.type === "title") {
       return "始める";
-    } else if (playingState.type === "playing") {
-      if (!playingState.isWaitingButton) {
+    } else if (scene.type === "playing") {
+      if (!scene.isWaitingButton) {
         return "進行中……";
       }
       switch (lastLog?.type) {
@@ -266,7 +330,7 @@ function App() {
         default:
           return "次へ";
       }
-    } else if (playingState.type === "goaled") {
+    } else if (scene.type === "gameOver") {
       return "終わり";
     }
   })();
@@ -277,19 +341,31 @@ function App() {
     <div className="app">
       <main className="main" ref={scrollerElementRef}>
         <div className="main-scrollee">
-          {playingState.type === "beforeStart" && <Start></Start>}
-          {playingState.type !== "beforeStart" && (
-            <GameMap
-              getGameState={getGameState}
-              renderObserver={mapRenderObserver}
-              showAll={mapShowAll}
-            ></GameMap>
+          {scene.type === "confirmReplay" && (
+            <ConfirmReplay yes={replayYes} no={replayNo} />
           )}
-          <Logs logs={allLogs} offset={logOffsetActual} />
-          {playingState.type === "goaled" && (
-            <Goaled
-              gameOverMessage={playingState.message}
-              replayCode={playingState.replay}
+          {scene.type === "title" && <Title></Title>}
+          {isGameScene && (
+            <>
+              {isReplay && (
+                <>
+                  <span className="log-system-negative">
+                    これはリプレイです。トロフィーは保存されません。
+                  </span>
+                </>
+              )}
+              <GameMap
+                getGameState={getGameState}
+                renderObserver={mapRenderObserver}
+                showAll={mapShowAll}
+              ></GameMap>
+              <Logs logs={allLogs} offset={logOffsetActual} />
+            </>
+          )}
+          {scene.type === "gameOver" && (
+            <GameOver
+              gameOverMessage={scene.message}
+              replayCode={scene.replay}
               restartGame={restartGame}
             />
           )}
@@ -344,9 +420,7 @@ function App() {
             </button>
             <label
               className={
-                isAuto &&
-                playingState.type === "playing" &&
-                !playingState.isWaitingButton
+                isAuto && scene.type === "playing" && !scene.isWaitingButton
                   ? "auto-stepping"
                   : ""
               }

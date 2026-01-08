@@ -1,8 +1,8 @@
-import { Fragment, useState, type JSX } from "react";
+import React, { Fragment, useState } from "react";
 import { VERSION } from "../game/config";
 import { Trophy } from "../game/trophy";
 
-export const Start = (): JSX.Element => {
+export const Title: React.FC = () => {
   const [trophies] = useState(() => Trophy.load());
 
   return (
