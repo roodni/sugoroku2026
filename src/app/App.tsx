@@ -307,9 +307,11 @@ function App() {
 
   useEffect(() => {
     // ログの自動スクロール
+    if (scene.type !== "playing" && scene.type !== "gameOver") {
+      return;
+    }
     const element = scrollerElementRef.current!;
     element.scroll({ top: element.scrollHeight, behavior: "instant" });
-    // console.log("scroll", element.scrollTop, element.scrollHeight);
   }, [allLogs, logOffsetActual, scene]);
 
   // メインボタンに関すること
