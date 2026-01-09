@@ -316,22 +316,29 @@ function App() {
   }, [stepGame, scene]);
 
   const mainButtonLabel = (() => {
-    if (scene.type === "title") {
-      return "始める";
-    } else if (scene.type === "playing") {
-      if (!scene.isWaitingButton) {
-        return "進行中……";
-      }
-      switch (lastLog?.type) {
-        case "diceRollBefore":
-          return `サイコロを振る (${lastLog.expression})`;
-        case "turnEnd":
-          return "次のターンへ";
-        default:
-          return "次へ";
-      }
-    } else if (scene.type === "gameOver") {
-      return "終わり";
+    switch (scene.type) {
+      case "loading":
+        return "禁"; // 一瞬
+      case "confirmReplay":
+        return "禁";
+      case "title":
+        return "始める";
+      case "playing":
+        if (!scene.isWaitingButton) {
+          return "進行中……";
+        }
+        switch (lastLog?.type) {
+          case "diceRollBefore":
+            return `サイコロを振る (${lastLog.expression})`;
+          case "turnEnd":
+            return "次のターンへ";
+          default:
+            return "次へ"; // ここを踏むことはないはず
+        }
+      case "gameOver":
+        return "終わり";
+      default:
+        throw new ExhaustiveError(scene);
     }
   })();
 

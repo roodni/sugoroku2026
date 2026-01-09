@@ -60,7 +60,7 @@ export const GameOver: React.FC<{
         value={sharingMode}
         onChange={(e) => setSharingMode(e.target.value as SharingMode)}
       >
-        <option value="replay">リプレイを共有する</option>
+        <option value="replay">リプレイをURLに含める</option>
         <option value="no-replay">リプレイを共有しない</option>
         <option value="replay-only">URLのみ</option>
       </select>
@@ -72,10 +72,10 @@ export const GameOver: React.FC<{
           </a>{" "}
         </div>
         <button onClick={copy} disabled={copied}>
-          コピー
+          コピーする
         </button>
         <button onClick={restartGame} className="game-over-restart">
-          はじめから
+          タイトルへ
         </button>
       </div>
     </div>
