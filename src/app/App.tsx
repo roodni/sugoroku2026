@@ -156,9 +156,16 @@ function App() {
       setIsReplay(scenario.gameState.replayMode);
       scenarioRef.current = scenario;
 
+      if (options.replayData === undefined) {
+        // リプレイモードではないなら、URLからクエリを消しておく
+        const url = createReplayUrl(location.href, undefined);
+        window.history.replaceState(null, "", url);
+      }
+
       // ログ系
       setAllLogs([]);
       setLogOffset(0);
+
       // デバッグ系
       const initialJson = scenario.save();
       setDebugJsonHistory({
@@ -219,9 +226,10 @@ function App() {
       // ゴール処理
       if (log.type === "gameOver") {
         const replay = await encodeReplay(scenario.gameState.diceHistory);
+        setScene({ type: "gameOver", message: log.message, replay });
+        // ゴールしたらURLにリプレイ情報を含める
         const url = createReplayUrl(location.href, replay);
         window.history.replaceState(null, "", url);
-        setScene({ type: "gameOver", message: log.message, replay });
         return;
       }
 
@@ -315,9 +323,6 @@ function App() {
     if (scene.type === "title") {
       setScene({ type: "playing", isWaitingButton: false });
       stepGame();
-      // タイトルからボタンが押されたら、リプレイではなくなるので、URLからリプレイ情報を消す
-      const url = createReplayUrl(location.href, undefined);
-      window.history.replaceState(null, "", url);
     } else if (scene.type === "playing") {
       setScene({ type: "playing", isWaitingButton: false });
       stepGame();
