@@ -368,7 +368,12 @@ function App() {
                   <div className="log-system-negative">
                     これはリプレイです。トロフィーは保存されません。
                   </div>
-                  <button onClick={restartGame}>タイトルへ</button>
+                  <button
+                    onClick={restartGame}
+                    disabled={!isWaitingButton && scene.type !== "gameOver"}
+                  >
+                    タイトルへ
+                  </button>
                 </div>
               )}
               <GameMap
