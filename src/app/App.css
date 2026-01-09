@@ -31,6 +31,41 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+
+  /* これがあることで、confirm-replay を上下中央に設置できる */
+  min-height: 100%;
+}
+
+/* リプレイ確認画面 */
+.confirm-replay {
+  flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  /* 上下中央 */
+  justify-content: center;
+  /* 水平中央 */
+  align-items: center;
+
+  .confirm-replay-buttons {
+    min-width: 70%;
+    max-width: 90%;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--gap);
+
+    align-items: center;
+
+    & > button {
+      flex-grow: 1;
+      height: 40px;
+      min-width: 40%;
+    }
+  }
 }
 
 /* リプレイであること */
@@ -44,7 +79,7 @@
 
   gap: var(--gap);
 
-  button {
+  & > button {
     flex-shrink: 0;
   }
 }
@@ -109,6 +144,8 @@
 
 .goaled-buttons {
   width: 100%;
+  /* メインボタンと近すぎると見づらくなるので */
+  margin-bottom: 16px;
 
   display: flex;
   flex-direction: row;

@@ -3,13 +3,14 @@ export const ConfirmReplay: React.FC<{
   no: () => void;
 }> = ({ yes, no }) => {
   return (
-    <div className="turn-logs">
-      <span className="log-system-neutral">
-        [質問] 共有されたリプレイを再生しますか？
-      </span>
-      {"\n\n"}
-      <button onClick={no}>いいえ（はじめから）</button>
-      <button onClick={yes}>はい（リプレイ再生）</button>
+    <div className="confirm-replay">
+      <div className="log-system-neutral">
+        [質問] 共有されたリプレイを見ますか？
+      </div>
+      <div className="confirm-replay-buttons">
+        <button onClick={yes}>はい（リプレイを見る）</button>
+        <button onClick={no}>いいえ（タイトルへ）</button>
+      </div>
     </div>
   );
 };
