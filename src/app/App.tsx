@@ -355,11 +355,12 @@ function App() {
           {isGameScene && (
             <>
               {isReplay && (
-                <>
-                  <span className="log-system-negative">
+                <div className="replay-notice">
+                  <div className="log-system-negative">
                     これはリプレイです。トロフィーは保存されません。
-                  </span>
-                </>
+                  </div>
+                  <button onClick={restartGame}>タイトルへ</button>
+                </div>
               )}
               <GameMap
                 getGameState={getGameState}

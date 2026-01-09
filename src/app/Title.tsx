@@ -13,10 +13,6 @@ export const Title: React.FC = () => {
       {"　"}
       お正月をお祝いするために作ったすごろくゲームです。サイコロを振ってゴールを目指しましょう。
       {"\n\n"}
-      <span className="log-system-neutral">{"<遊び方>\n"}</span>
-      {"　"}
-      左下のボタンを押し続けてください。
-      {"\n\n"}
       <span className="log-system-neutral">{"<トロフィー>\n"}</span>
       {"　"}
       {Trophy.all.length}個中の{trophies.length}個が獲得されました。

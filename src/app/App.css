@@ -33,6 +33,22 @@
   gap: 24px;
 }
 
+/* リプレイであること */
+.replay-notice {
+  display: flex;
+  flex-direction: row;
+  /* flex-wrap: wrap; */
+
+  align-items: center;
+  justify-content: center;
+
+  gap: var(--gap);
+
+  button {
+    flex-shrink: 0;
+  }
+}
+
 /* 地図 */
 .game-map {
   border: 2px solid #ccc;
