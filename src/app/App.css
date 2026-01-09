@@ -77,7 +77,7 @@
   opacity: 0.7;
 }
 
-/* ゴール後 */
+/* ゲームオーバー */
 .goaled {
   display: flex;
   flex-direction: column;
@@ -110,6 +110,9 @@
   }
   button {
     height: 40px;
+  }
+  .game-over-restart {
+    min-width: 50%;
   }
 }
 
