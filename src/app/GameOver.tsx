@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { REPLAY_KEY } from "./appConfig";
+import { createReplayUrl } from "./replay";
 
 const HASHTAG = "新春ログすごろく";
 const INTENT_BASE = "https://twitter.com/intent/tweet";
@@ -20,15 +20,10 @@ export const GameOver: React.FC<{
   const [sharingMode, _setSharingMode] = useState<SharingMode>("replay");
   const [copied, setCopied] = useState(false);
 
-  const hereUrl = useMemo(() => {
-    const url = new URL(location.href);
-    if (sharingMode === "replay" || sharingMode === "replay-only") {
-      url.search = `?${REPLAY_KEY}=${replayCode}`;
-    } else {
-      url.search = "";
-    }
-    return url.href;
-  }, [sharingMode, replayCode]);
+  const hereUrl = createReplayUrl(
+    location.href,
+    sharingMode === "no-replay" ? undefined : replayCode
+  );
 
   const text = useMemo(() => {
     if (sharingMode === "replay-only") {

@@ -9,7 +9,7 @@ import { GameMap } from "./GameMap";
 import { GameOver } from "./GameOver";
 import { Logs } from "./Logs";
 import "./misc";
-import { decodeReplay, encodeReplay } from "./replay";
+import { createReplayUrl, decodeReplay, encodeReplay } from "./replay";
 import { Title } from "./Title";
 
 const WAIT = 80;
@@ -215,12 +215,17 @@ function App() {
       const logIndex = scenario.history.length;
 
       const log = scenario.next();
+
+      // ゴール処理
       if (log.type === "gameOver") {
         const replay = await encodeReplay(scenario.gameState.diceHistory);
+        const url = createReplayUrl(location.href, replay);
+        window.history.replaceState(null, "", url);
         setScene({ type: "gameOver", message: log.message, replay });
         return;
       }
 
+      // ログ追加。新ターンならログクリアも行う
       setAllLogs((prev) => [...prev, log]);
       if (lastLog?.type === "turnEnd") {
         setLogOffset(logIndex);
@@ -305,10 +310,14 @@ function App() {
     // console.log("scroll", element.scrollTop, element.scrollHeight);
   }, [allLogs, logOffsetActual, scene]);
 
+  // メインボタンに関すること
   const mainButtonHandler = useCallback(() => {
     if (scene.type === "title") {
       setScene({ type: "playing", isWaitingButton: false });
       stepGame();
+      // タイトルからボタンが押されたら、リプレイではなくなるので、URLからリプレイ情報を消す
+      const url = createReplayUrl(location.href, undefined);
+      window.history.replaceState(null, "", url);
     } else if (scene.type === "playing") {
       setScene({ type: "playing", isWaitingButton: false });
       stepGame();
@@ -445,6 +454,7 @@ function App() {
                 type="checkbox"
                 checked={isAllLogsShown}
                 onChange={(e) => setIsAllLogsShown(e.target.checked)}
+                disabled={!isGameScene}
               ></input>
               全ログ表示
             </label>
@@ -453,6 +463,7 @@ function App() {
                 type="checkbox"
                 checked={mapShowAll}
                 onChange={(e) => setMapShowAll(e.target.checked)}
+                disabled={!isGameScene}
               ></input>
               全マス表示
             </label>

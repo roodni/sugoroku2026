@@ -1,6 +1,6 @@
-// リプレイURLの符号化
-// ブラウザURLに依存するのでそういうこと
+import { REPLAY_KEY } from "./appConfig";
 
+// リプレイURLの符号化
 // 仕様
 // ?replay={base64}
 // base64: Uint8Array [major_version, ...diceHistory] を圧縮してbase64化した文字列
@@ -50,6 +50,21 @@ export async function decodeReplay(code: string): Promise<number[]> {
     throw new Error("バージョンが違う");
   }
   return [...data.slice(1)];
+}
+
+// URLを作るユーティリティ
+// エンコードしてくれるわけではない
+export function createReplayUrl(
+  baseUrl: string,
+  replayCode: string | undefined
+): string {
+  const url = new URL(baseUrl);
+  if (replayCode) {
+    url.search = `${REPLAY_KEY}=${replayCode}`;
+  } else {
+    url.search = "";
+  }
+  return url.href;
 }
 
 // declare global {
