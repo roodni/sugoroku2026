@@ -118,7 +118,12 @@ export const LogUtil = {
     }
     g.trophies.push({ name: trophyName, firstTime });
 
-    const firstTimeText = firstTime ? " (new)" : "";
+    let firstTimeText = "";
+    if (firstTime) {
+      firstTimeText = " (new)";
+    } else if (g.replayMode) {
+      firstTimeText = "（保存されません）";
+    }
     yield Log.system(`[トロフィー獲得] ${trophyName}${firstTimeText}`);
   },
 };
