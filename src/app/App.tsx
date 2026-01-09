@@ -118,7 +118,7 @@ function App() {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "@" && !e.repeat) {
         setIsDebug((v) => !v);
-        setTimeout(() => debugTextareaRef.current?.focus(), 10);
+        requestAnimationFrame(() => debugTextareaRef.current?.focus());
       }
     };
     window.addEventListener("keydown", handler);
@@ -285,6 +285,7 @@ function App() {
       } else if (waitType === "button") {
         mapRenderObserver.notify();
         setScene({ type: "playing", isWaitingButton: true });
+        requestAnimationFrame(() => mainButtonRef.current?.focus());
         break;
       }
     }
@@ -303,13 +304,6 @@ function App() {
     initializeGame({ initializeJson: true });
     setScene({ type: "title" });
   }, [initializeGame]);
-
-  useEffect(() => {
-    // ボタンをdisabledにするとフォーカスが外れるので、再度フォーカスを当てる
-    if (isWaitingButton) {
-      mainButtonRef.current?.focus();
-    }
-  }, [isWaitingButton]);
 
   useEffect(() => {
     // ログの自動スクロール
