@@ -48,6 +48,9 @@ export class Scenario {
 
   private *generate(): Generator<Log, string> {
     this.loadable = false;
+    if (this.gameState.replayMode) {
+      yield Log.description("リプレイの再生を開始した。");
+    }
     while (true) {
       const g = this.gameState;
       const turnResult = yield* generateTurn(g);
@@ -268,14 +271,15 @@ function* generateTurn(g: GameState): Generator<Log, TurnResult> {
           `・${detail.name}: ${detail.description}${firstTimeText}`
         );
       }
+    }
+    if (youGoaled) {
       if (g.replayMode) {
         yield Log.system(
           "これはリプレイです。トロフィーは保存されません。",
           "negative"
         );
       }
-    }
-    if (youGoaled) {
+
       // 共有用のメッセージを返してゲーム終了
       const attrs = [
         PlayerAttr.turn,

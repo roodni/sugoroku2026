@@ -109,14 +109,15 @@ export const LogUtil = {
 
   *generateEarnTrophy(g: GameState, trophyName: TrophyName): Generator<Log> {
     if (g.trophies.map((t) => t.name).includes(trophyName)) {
-      return;
+      return; // 既に周回内で獲得していたらスルー
     }
-    let firstTime = false;
+
+    let firstTime = false; // リプレイではトロフィーを獲得できない
     if (!g.replayMode) {
-      // リプレイではトロフィーを獲得できない
       firstTime = Trophy.earn(trophyName).firstTime;
     }
     g.trophies.push({ name: trophyName, firstTime });
+
     const firstTimeText = firstTime ? " (new)" : "";
     yield Log.system(`[トロフィー獲得] ${trophyName}${firstTimeText}`);
   },
