@@ -10,34 +10,43 @@ function tweetUrl(text: string) {
   return `${INTENT_BASE}?${params.toString()}`;
 }
 
+type SharingMode = "replay" | "no-replay" | "replay-only";
+
 export const GameOver: React.FC<{
   gameOverMessage: string;
   replayCode: string;
   restartGame: () => void;
 }> = ({ gameOverMessage, replayCode, restartGame }) => {
-  const [sharingReplay, setSharingReplay] = useState(true);
+  const [sharingMode, setSharingMode] = useState<SharingMode>("replay");
 
   const hereUrl = useMemo(() => {
     const url = new URL(location.href);
-    if (sharingReplay) {
+    if (sharingMode === "replay" || sharingMode === "replay-only") {
       url.search = `?${REPLAY_KEY}=${replayCode}`;
     } else {
       url.search = "";
     }
     return url.href;
-  }, [sharingReplay, replayCode]);
-  const text = `${gameOverMessage}\n${hereUrl} #${HASHTAG}`;
+  }, [sharingMode, replayCode]);
+
+  const text = (() => {
+    if (sharingMode === "replay-only") {
+      return hereUrl;
+    } else {
+      return `${gameOverMessage}\n${hereUrl}\n#${HASHTAG}`;
+    }
+  })();
 
   return (
     <div className="goaled">
-      <label>
-        <input
-          type="checkbox"
-          checked={sharingReplay}
-          onChange={(e) => setSharingReplay(e.target.checked)}
-        />
-        URLにリプレイを含める
-      </label>
+      <select
+        value={sharingMode}
+        onChange={(e) => setSharingMode(e.target.value as SharingMode)}
+      >
+        <option value="replay">リプレイをURLに含める</option>
+        <option value="no-replay">リプレイをURLに含めない</option>
+        <option value="replay-only">URLのみ</option>
+      </select>
       <textarea className="goaled-textarea" readOnly value={text} />
       <div className="goaled-buttons">
         <div>
