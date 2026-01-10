@@ -119,15 +119,20 @@ export const releaseNoteV1Space: Space = {
     yield Log.description("石碑に何かが刻まれている。");
     yield Log.system("v1.0 (2026-01-04) 初公開");
     yield Log.system("v1.1 (2026-01-05) トロフィー追加・台詞修正");
+    yield Log.system("v1.2 (2026-01-10) リプレイ機能追加");
     switch (player.personality) {
       case "gentle":
-        yield Log.dialog("v1.2ではUI改善が予定されてるらしいよ");
+        yield Log.dialog("v1.3も出るかも");
         break;
       case "violent":
-        yield Log.dialog("どうでもいいぜ");
+        yield Log.dialog(
+          "リプレイURLはクソ長くなるが、Xじゃあ11.5文字扱いだから問題ないぜ"
+        );
         break;
       case "phobic":
-        yield Log.dialog("興味ありません");
+        yield Log.dialog(
+          "既に嫌なマスばかりなのに、これ以上イベントが増えたら、私は……"
+        );
         break;
       case "smart":
         yield Log.dialog(

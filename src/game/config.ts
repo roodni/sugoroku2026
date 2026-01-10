@@ -1,4 +1,4 @@
-export const VERSION = "v1.1.1";
+export const VERSION = "v1.2.0";
 
 export const GOAL_POSITION = 50;
 export const INITIAL_HP = 20;
