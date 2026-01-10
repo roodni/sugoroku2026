@@ -318,12 +318,15 @@ function App() {
   // ログの自動スクロール
   useEffect(() => {
     if (!isGameScene) {
-      return; // ゲーム画面以外では自動スクロールしない
+      // ゲーム画面以外では自動スクロールしない
+      return;
     }
     const observer = new ResizeObserver(() => {
       const scroller = scrollerElementRef.current!;
-      scroller.scroll({ top: scroller.scrollHeight, behavior: "instant" });
-      console.log("scroll", scroller.scrollTop, scroller.scrollHeight);
+      scroller.scroll({
+        top: scroller.scrollHeight - scroller.clientHeight,
+        behavior: "instant",
+      });
     });
     const scrollee = scrolleeElementRef.current!;
     observer.observe(scrollee);
