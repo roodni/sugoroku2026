@@ -285,11 +285,19 @@ function App() {
       } else if (waitType === "button") {
         mapRenderObserver.notify();
         setScene({ type: "playing", isWaitingButton: true });
-        requestAnimationFrame(() => mainButtonRef.current?.focus());
         break;
       }
     }
   }, [mapRenderObserver]); // 注意: 非同期関数なので古い状態しか参照できない
+
+  // メインボタンが有効なら、とりあえずフォーカスする
+  // (disabledでフォーカスが消える対策)
+  // タイトル画面でもとりあえずフォーカスしておきたい
+  useEffect(() => {
+    if (isWaitingButton) {
+      mainButtonRef.current?.focus();
+    }
+  }, [isWaitingButton]);
 
   // リプレイ確認画面の応答
   const replayYes = useCallback(() => {
@@ -305,8 +313,8 @@ function App() {
     setScene({ type: "title" });
   }, [initializeGame]);
 
+  // ログの自動スクロール
   useEffect(() => {
-    // ログの自動スクロール
     if (scene.type !== "playing" && scene.type !== "gameOver") {
       return;
     }
