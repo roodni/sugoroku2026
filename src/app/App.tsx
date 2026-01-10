@@ -137,8 +137,10 @@ function App() {
     [loadDebugJson, debugJson]
   );
 
+  // element系
   const mainButtonRef = useRef<HTMLButtonElement>(null);
   const scrollerElementRef = useRef<HTMLElement>(null);
+  const scrolleeElementRef = useRef<HTMLDivElement>(null);
   const debugTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // ゲーム初期化
@@ -315,12 +317,20 @@ function App() {
 
   // ログの自動スクロール
   useEffect(() => {
-    if (scene.type !== "playing" && scene.type !== "gameOver") {
-      return;
+    if (!isGameScene) {
+      return; // ゲーム画面以外では自動スクロールしない
     }
-    const element = scrollerElementRef.current!;
-    element.scroll({ top: element.scrollHeight, behavior: "instant" });
-  }, [allLogs, logOffsetActual, scene]);
+    const observer = new ResizeObserver(() => {
+      const scroller = scrollerElementRef.current!;
+      scroller.scroll({ top: scroller.scrollHeight, behavior: "instant" });
+      console.log("scroll", scroller.scrollTop, scroller.scrollHeight);
+    });
+    const scrollee = scrolleeElementRef.current!;
+    observer.observe(scrollee);
+    return () => {
+      observer.disconnect();
+    };
+  }, [isGameScene]);
 
   // メインボタンに関すること
   const mainButtonHandler = useCallback(() => {
@@ -365,7 +375,7 @@ function App() {
   return (
     <div className="app">
       <main className="main" ref={scrollerElementRef}>
-        <div className="main-scrollee">
+        <div className="main-scrollee" ref={scrolleeElementRef}>
           {scene.type === "confirmReplay" && (
             <ConfirmReplay yes={replayYes} no={replayNo} />
           )}
