@@ -11,20 +11,27 @@ export const spikyFloorSpace: Space = {
     const player = g.players[g.currentPlayerIndex];
     yield Log.description("床がトゲトゲになっている。", "negative");
     yield Log.description(`${player.name}は踏んでしまった。`);
-    yield* PlayerBattler.generateHitPlayer(g, 4, player, {});
-    switch (player.personality) {
-      case "gentle":
-        yield Log.dialog("どうして……");
-        break;
-      case "violent":
-        yield Log.dialog("ふざけんな！");
-        break;
-      case "phobic":
-        yield Log.dialog("痛い……痛い……");
-        break;
-      case "smart":
-        yield Log.dialog("フッ……痛いよ");
-        break;
+    const { knockedOut } = yield* PlayerBattler.generateHitPlayer(
+      g,
+      4,
+      player,
+      {}
+    );
+    if (!knockedOut) {
+      switch (player.personality) {
+        case "gentle":
+          yield Log.dialog("どうして……");
+          break;
+        case "violent":
+          yield Log.dialog("ふざけんな！");
+          break;
+        case "phobic":
+          yield Log.dialog("痛い……痛い……");
+          break;
+        case "smart":
+          yield Log.dialog("フッ……痛いよ");
+          break;
+      }
     }
   },
 };
