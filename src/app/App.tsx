@@ -57,6 +57,10 @@ function App() {
   const logOffsetActual = isAllLogsShown ? 0 : logOffset;
   const lastLog = allLogs.at(-1);
 
+  // 高速ログ送り
+  const [highSpeed, setHighSpeed] = useState(false);
+  const highSpeedLatest = useLatest(highSpeed);
+
   // 読み上げ系
   const [speechEnabled, _setSpeechEnabled] = useState(false);
   const setSpeechEnabled = useCallback((v: boolean) => {
@@ -299,13 +303,13 @@ function App() {
           throw new ExhaustiveError(log);
       }
 
-      // 自動進行
-      // if (isAutoRef.current && waitType === "button") {
-      //   waitType = "timer";
-      // }
-
-      // 読み上げ
+      let highSpeedAndNoSpeech = highSpeedLatest.current;
       if (speechEnabledLatest.current && voiceLatest.current) {
+        // 読み上げ
+        highSpeedAndNoSpeech = false; // 読み上げ中は高速送りしない
+        if (waitType === "button") {
+          waitType = "timer"; // 読み上げ中は自動で進み続ける
+        }
         const text = logToSpeechText(log);
         if (text !== undefined) {
           const utterance = new SpeechSynthesisUtterance(text);
@@ -315,19 +319,32 @@ function App() {
         }
       }
 
+      // const highSpeed = highSpeedLatest.current && !speechEnabled;
+
       // 待機方法に応じて待機する
       if (waitType === "immediate") {
         continue;
       } else if (waitType === "timer") {
         mapRenderObserver.notify();
-        await new Promise((resolve) => setTimeout(resolve, WAIT));
+        if (highSpeedAndNoSpeech) {
+          // これを immediate にすると流石に速すぎて微妙だった
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, WAIT));
+        }
       } else if (waitType === "button") {
         mapRenderObserver.notify();
         setScene({ type: "playing", isWaitingButton: true });
         break;
       }
     }
-  }, [mapRenderObserver, speechEnabledLatest, voiceLatest, speechRateLatest]); // 注意: 非同期関数なので古い状態しか参照できない
+  }, [
+    mapRenderObserver,
+    speechEnabledLatest,
+    voiceLatest,
+    speechRateLatest,
+    highSpeedLatest,
+  ]); // 注意: 非同期関数なので古い状態しか参照できない
 
   // メインボタンが有効なら、とりあえずフォーカスする
   // (disabledでフォーカスが消える対策)
@@ -526,7 +543,7 @@ function App() {
               <input
                 type="range"
                 min="1"
-                max="10.0"
+                max="5.0"
                 step="0.5"
                 value={speechRate}
                 onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
@@ -555,7 +572,12 @@ function App() {
               </span>
             </label>
             <label>
-              <input type="checkbox" disabled={speechEnabled}></input>
+              <input
+                type="checkbox"
+                checked={highSpeed}
+                onChange={(e) => setHighSpeed(e.target.checked)}
+                disabled={speechEnabled}
+              ></input>
               高速
             </label>
             <label>
