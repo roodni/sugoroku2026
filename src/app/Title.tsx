@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
-import { VERSION } from "../game/config";
 import { Trophy } from "../game/trophy";
+import { VERSION } from "./appConfig";
 
 export const Title: React.FC = () => {
   const [trophies] = useState(() => Trophy.load());

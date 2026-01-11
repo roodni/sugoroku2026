@@ -1,5 +1,3 @@
-export const VERSION = "v1.2.0";
-
 export const GOAL_POSITION = 50;
 export const INITIAL_HP = 20;
 export const YOUR_NAME = "あなた";
