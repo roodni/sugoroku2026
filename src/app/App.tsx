@@ -10,6 +10,7 @@ import { GameOver } from "./GameOver";
 import { Logs } from "./Logs";
 import "./misc";
 import { createReplayUrl, decodeReplay, encodeReplay } from "./replay";
+import { logToSpeechText, speakAsync, useVoices } from "./speech";
 import { Title } from "./Title";
 
 const WAIT = 80;
@@ -21,6 +22,14 @@ type Scene = Readonly<
   | { type: "playing"; isWaitingButton: boolean }
   | { type: "gameOver"; message: string; replay: string }
 >;
+
+function useLatest<T>(value: T): React.RefObject<T> {
+  const ref = useRef(value);
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref;
+}
 
 function App() {
   // ゲームオブジェクト
@@ -54,6 +63,28 @@ function App() {
   useEffect(() => {
     isAutoRef.current = isAuto; // 非同期関数から最新値を取得するため
   }, [isAuto]);
+
+  // 読み上げ系
+  const [speechEnabled, _setSpeechEnabled] = useState(true);
+  const setSpeechEnabled = useCallback((v: boolean) => {
+    if (!v) {
+      speechSynthesis.cancel();
+    }
+    _setSpeechEnabled(v);
+  }, []);
+  const speechEnabledLatest = useLatest(speechEnabled);
+
+  const voices = useVoices();
+  const [voiceNameUserSelected, setVoiceNameUserSelected] = useState<
+    string | undefined
+  >(undefined);
+  const voiceName =
+    voiceNameUserSelected ?? voices.find((v) => v.default)?.name;
+  const voice = voices.find((v) => v.name === voiceName);
+  const voiceLatest = useLatest(voice);
+
+  const [speechRate, setSpeechRate] = useState(1.0);
+  const speechRateLatest = useLatest(speechRate);
 
   // デバッグ系
   const [isDebug, setIsDebug] = useState(false);
@@ -274,8 +305,20 @@ function App() {
           throw new ExhaustiveError(log);
       }
 
+      // 自動進行
       if (isAutoRef.current && waitType === "button") {
         waitType = "timer";
+      }
+
+      // 読み上げ
+      if (speechEnabledLatest.current && voiceLatest.current) {
+        const text = logToSpeechText(log);
+        if (text !== undefined) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.voice = voiceLatest.current;
+          utterance.rate = speechRateLatest.current;
+          await speakAsync(utterance);
+        }
       }
 
       // 待機方法に応じて待機する
@@ -290,7 +333,7 @@ function App() {
         break;
       }
     }
-  }, [mapRenderObserver]); // 注意: 非同期関数なので古い状態しか参照できない
+  }, [mapRenderObserver, speechEnabledLatest, voiceLatest, speechRateLatest]); // 注意: 非同期関数なので古い状態しか参照できない
 
   // メインボタンが有効なら、とりあえずフォーカスする
   // (disabledでフォーカスが消える対策)
@@ -451,6 +494,47 @@ function App() {
             ></textarea>
           </div>
         )}
+        <div className="footer-row">
+          <div className="footer-row-scrollee">
+            {/* 一時的に読み上げ系のUIをここに置く */}
+            <label>
+              <input
+                type="checkbox"
+                checked={speechEnabled}
+                onChange={(e) => setSpeechEnabled(e.target.checked)}
+              ></input>
+              読み上げ
+            </label>
+
+            <select
+              value={voiceName}
+              onChange={(e) => setVoiceNameUserSelected(e.target.value)}
+              disabled={voices.length === 0}
+            >
+              {voices.length === 0 && (
+                <option value="">（読み上げを利用できません）</option>
+              )}
+              {voices.map((v) => (
+                <option key={v.name} value={v.name}>
+                  {v.name}
+                </option>
+              ))}
+            </select>
+
+            <label>
+              速度:
+              <input
+                type="range"
+                min="1"
+                max="10.0"
+                step="0.1"
+                value={speechRate}
+                onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
+              ></input>
+              {speechRate.toFixed(1)}x
+            </label>
+          </div>
+        </div>
         <div className="footer-row">
           <div className="footer-row-scrollee">
             <button
