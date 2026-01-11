@@ -4,7 +4,7 @@ import { useLayoutEffect, useState } from "react";
 import type { Log } from "../game/log";
 import { ExhaustiveError } from "../util";
 
-export function useVoices(lang: string = "ja-JP"): SpeechSynthesisVoice[] {
+export function useVoices(): SpeechSynthesisVoice[] {
   const [voices, setVoices] = useState(() => speechSynthesis.getVoices());
   useLayoutEffect(() => {
     const handleVoicesChanged = () => {
@@ -15,7 +15,13 @@ export function useVoices(lang: string = "ja-JP"): SpeechSynthesisVoice[] {
       speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
     };
   }, []);
-  return voices.filter((voice) => voice.lang === lang);
+
+  // なんかモバイル版Chromeだと日本語が ja_JP (ハイフンが正しいのにアンスコ) になっているので対応
+  const jpVoices = voices.filter((v) => v.lang.replace("_", "-") === "ja-JP");
+  if (jpVoices.length > 0) {
+    return jpVoices;
+  }
+  return voices;
 }
 
 export function logToSpeechText(log: Log): string | undefined {

@@ -74,7 +74,7 @@ function App() {
   const voice =
     voices.find((v) => v.voiceURI === voiceURIUserSelected) ??
     voices.find((v) => v.default) ??
-    voices.at(0); // こちらが常にselect要素に反映される
+    voices.at(0);
   const voiceLatest = useLatest(voice);
 
   const [speechRate, setSpeechRate] = useState(1.0);
@@ -505,18 +505,15 @@ function App() {
         </div>
 
         {/* 読み上げ系 */}
-        {speechEnabled && (
+        {speechEnabled && voice !== undefined && (
           <div className="footer-row-speech-settings">
             <label>
               声{" "}
               <select
-                value={voice?.voiceURI}
+                value={voice.voiceURI}
                 onChange={(e) => setVoiceURIUserSelected(e.target.value)}
                 disabled={voices.length === 0}
               >
-                {voices.length === 0 && (
-                  <option value="">（読み上げを利用できません）</option>
-                )}
                 {voices.map((v) => (
                   <option key={v.voiceURI} value={v.voiceURI}>
                     {v.name}
@@ -525,7 +522,7 @@ function App() {
               </select>
             </label>
             <label>
-              読む速さ{" "}
+              速さ{" "}
               <input
                 type="range"
                 min="1"
@@ -546,6 +543,7 @@ function App() {
               <input
                 type="checkbox"
                 checked={speechEnabled}
+                disabled={voice === undefined}
                 onChange={(e) => setSpeechEnabled(e.target.checked)}
               ></input>
               <span
