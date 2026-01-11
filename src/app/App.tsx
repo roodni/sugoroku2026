@@ -57,13 +57,6 @@ function App() {
   const logOffsetActual = isAllLogsShown ? 0 : logOffset;
   const lastLog = allLogs.at(-1);
 
-  // 自動進行系
-  const [isAuto, setIsAuto] = useState(false);
-  const isAutoRef = useRef(isAuto);
-  useEffect(() => {
-    isAutoRef.current = isAuto; // 非同期関数から最新値を取得するため
-  }, [isAuto]);
-
   // 読み上げ系
   const [speechEnabled, _setSpeechEnabled] = useState(true);
   const setSpeechEnabled = useCallback((v: boolean) => {
@@ -306,9 +299,9 @@ function App() {
       }
 
       // 自動進行
-      if (isAutoRef.current && waitType === "button") {
-        waitType = "timer";
-      }
+      // if (isAutoRef.current && waitType === "button") {
+      //   waitType = "timer";
+      // }
 
       // 読み上げ
       if (speechEnabledLatest.current && voiceLatest.current) {
@@ -469,8 +462,8 @@ function App() {
                 !isLoadableNow || debugJson === debugJsonHistory.current
               }
             >
-              ロード
-              {!isLoadableNow && " (禁止)"}
+              Load
+              {!isLoadableNow && " (wait)"}
             </button>
             <button
               onClick={undoDebugJson}
@@ -494,48 +487,9 @@ function App() {
             ></textarea>
           </div>
         )}
-        <div className="footer-row">
-          <div className="footer-row-scrollee">
-            {/* 一時的に読み上げ系のUIをここに置く */}
-            <label>
-              <input
-                type="checkbox"
-                checked={speechEnabled}
-                onChange={(e) => setSpeechEnabled(e.target.checked)}
-              ></input>
-              読み上げ
-            </label>
 
-            <select
-              value={voiceName}
-              onChange={(e) => setVoiceNameUserSelected(e.target.value)}
-              disabled={voices.length === 0}
-            >
-              {voices.length === 0 && (
-                <option value="">（読み上げを利用できません）</option>
-              )}
-              {voices.map((v) => (
-                <option key={v.name} value={v.name}>
-                  {v.name}
-                </option>
-              ))}
-            </select>
-
-            <label>
-              速度:
-              <input
-                type="range"
-                min="1"
-                max="10.0"
-                step="0.1"
-                value={speechRate}
-                onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
-              ></input>
-              {speechRate.toFixed(1)}x
-            </label>
-          </div>
-        </div>
-        <div className="footer-row">
+        {/* メインボタン */}
+        <div className="footer-row-scroller">
           <div className="footer-row-scrollee">
             <button
               ref={mainButtonRef}
@@ -546,26 +500,70 @@ function App() {
             >
               {mainButtonLabel}
             </button>
-            <label
-              className={
-                isAuto && scene.type === "playing" && !scene.isWaitingButton
-                  ? "auto-stepping"
-                  : ""
-              }
-            >
+          </div>
+        </div>
+
+        {/* 読み上げ系 */}
+        {speechEnabled && (
+          <div className="footer-row-speech-settings">
+            <label>
+              声{" "}
+              <select
+                value={voiceName}
+                onChange={(e) => setVoiceNameUserSelected(e.target.value)}
+                disabled={voices.length === 0}
+              >
+                {voices.length === 0 && (
+                  <option value="">（読み上げを利用できません）</option>
+                )}
+                {voices.map((v) => (
+                  <option key={v.name} value={v.name}>
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              読む速さ{" "}
+              <input
+                type="range"
+                min="1"
+                max="10.0"
+                step="0.5"
+                value={speechRate}
+                onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
+              ></input>
+              ({speechRate.toFixed(1)}x)
+            </label>
+          </div>
+        )}
+
+        {/* 設定系はこの行 */}
+        <div className="footer-row-scroller">
+          <div className="footer-row-scrollee">
+            <label>
               <input
                 type="checkbox"
-                checked={isAuto}
-                onChange={(e) => setIsAuto(e.target.checked)}
+                checked={speechEnabled}
+                onChange={(e) => setSpeechEnabled(e.target.checked)}
               ></input>
-              自動進行
+              <span
+                className={
+                  speechEnabled && !isWaitingButton ? "auto-stepping" : ""
+                }
+              >
+                読み上げ
+              </span>
+            </label>
+            <label>
+              <input type="checkbox" disabled={speechEnabled}></input>
+              高速
             </label>
             <label>
               <input
                 type="checkbox"
                 checked={isAllLogsShown}
                 onChange={(e) => setIsAllLogsShown(e.target.checked)}
-                disabled={!isGameScene}
               ></input>
               全ログ表示
             </label>
@@ -574,7 +572,6 @@ function App() {
                 type="checkbox"
                 checked={mapShowAll}
                 onChange={(e) => setMapShowAll(e.target.checked)}
-                disabled={!isGameScene}
               ></input>
               全マス表示
             </label>

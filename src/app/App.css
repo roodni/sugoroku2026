@@ -189,26 +189,50 @@
 }
 
 /* フッターのUI */
-.footer-row {
+.footer-row-scroller {
   width: 100%;
   overflow-x: auto;
 }
 .footer-row-scrollee {
   padding: 0 var(--gap);
+  min-height: 34px;
+
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--gap);
+  column-gap: var(--gap);
 
   word-break: keep-all;
   white-space: nowrap;
 }
 
+.footer-row-speech-settings {
+  width: 100%;
+  overflow-x: auto;
+  padding: 0 var(--gap);
+  min-height: 34px;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+
+  column-gap: 1em;
+  row-gap: var(--gap);
+
+  select {
+    height: 28px;
+  }
+  input[type="range"] {
+    vertical-align: middle;
+  }
+}
+
 .main-button {
   flex-grow: 1;
   height: 40px;
-  min-width: 60%;
+  /* min-width: 60%; */
 }
 
 @keyframes notice {
