@@ -58,7 +58,7 @@ function App() {
   const lastLog = allLogs.at(-1);
 
   // 読み上げ系
-  const [speechEnabled, _setSpeechEnabled] = useState(true);
+  const [speechEnabled, _setSpeechEnabled] = useState(false);
   const setSpeechEnabled = useCallback((v: boolean) => {
     if (!v) {
       speechSynthesis.cancel();
@@ -68,12 +68,13 @@ function App() {
   const speechEnabledLatest = useLatest(speechEnabled);
 
   const voices = useVoices();
-  const [voiceNameUserSelected, setVoiceNameUserSelected] = useState<
+  const [voiceURIUserSelected, setVoiceURIUserSelected] = useState<
     string | undefined
-  >(undefined);
-  const voiceName =
-    voiceNameUserSelected ?? voices.find((v) => v.default)?.name;
-  const voice = voices.find((v) => v.name === voiceName);
+  >(undefined); // ユーザーが選択した声。最初はselect要素と必ずしも一致しない
+  const voice =
+    voices.find((v) => v.voiceURI === voiceURIUserSelected) ??
+    voices.find((v) => v.default) ??
+    voices.at(0); // こちらが常にselect要素に反映される
   const voiceLatest = useLatest(voice);
 
   const [speechRate, setSpeechRate] = useState(1.0);
@@ -509,15 +510,15 @@ function App() {
             <label>
               声{" "}
               <select
-                value={voiceName}
-                onChange={(e) => setVoiceNameUserSelected(e.target.value)}
+                value={voice?.voiceURI}
+                onChange={(e) => setVoiceURIUserSelected(e.target.value)}
                 disabled={voices.length === 0}
               >
                 {voices.length === 0 && (
                   <option value="">（読み上げを利用できません）</option>
                 )}
                 {voices.map((v) => (
-                  <option key={v.name} value={v.name}>
+                  <option key={v.voiceURI} value={v.voiceURI}>
                     {v.name}
                   </option>
                 ))}
