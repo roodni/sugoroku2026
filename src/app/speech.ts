@@ -16,6 +16,7 @@ export function useVoices(): SpeechSynthesisVoice[] {
     };
   }, []);
 
+  // return [];
   // なんかモバイル版Chromeだと日本語が ja_JP (ハイフンが正しいのにアンスコ) になっているので対応
   const jpVoices = voices.filter((v) => v.lang.replace("_", "-") === "ja-JP");
   if (jpVoices.length > 0) {

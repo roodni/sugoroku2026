@@ -556,7 +556,7 @@ function App() {
         {/* 設定系はこの行 */}
         <div className="footer-row-scroller">
           <div className="footer-row-scrollee">
-            <label>
+            <label className={voice === undefined ? "disabled-label" : ""}>
               <input
                 type="checkbox"
                 checked={speechEnabled}
@@ -571,7 +571,7 @@ function App() {
                 読み上げ
               </span>
             </label>
-            <label>
+            <label className={speechEnabled ? "disabled-label" : ""}>
               <input
                 type="checkbox"
                 checked={highSpeed}

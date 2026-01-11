@@ -207,6 +207,10 @@
   white-space: nowrap;
 }
 
+.disabled-label {
+  opacity: 0.5;
+}
+
 .footer-row-speech-settings {
   width: 100%;
   overflow-x: auto;
