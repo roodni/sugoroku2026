@@ -3,17 +3,22 @@ import type { Log } from "../game/log";
 import { Scenario } from "../game/scenario/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
-import { REPLAY_KEY } from "./appConfig";
+import { REPLAY_KEY, WAIT } from "./appConfig";
 import { ConfirmReplay } from "./ConfirmReplay";
 import { GameMap } from "./GameMap";
 import { GameOver } from "./GameOver";
+import {
+  LocalStorageKey,
+  useLatest,
+  useLocalStorageBoolean,
+  useLocalStorageFloat,
+  useLocalStorageString,
+} from "./hook";
 import { Logs } from "./Logs";
 import "./misc";
 import { createReplayUrl, decodeReplay, encodeReplay } from "./replay";
 import { logToSpeechText, speakAsync, useVoices } from "./speech";
 import { Title } from "./Title";
-
-const WAIT = 80;
 
 type Scene = Readonly<
   | { type: "loading" }
@@ -22,14 +27,6 @@ type Scene = Readonly<
   | { type: "playing"; isWaitingButton: boolean }
   | { type: "gameOver"; message: string; replay: string }
 >;
-
-function useLatest<T>(value: T): React.RefObject<T> {
-  const ref = useRef(value);
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref;
-}
 
 function App() {
   // ゲームオブジェクト
@@ -58,11 +55,14 @@ function App() {
   const lastLog = allLogs.at(-1);
 
   // 高速ログ送り
-  const [highSpeed, setHighSpeed] = useState(false);
+  const [highSpeed, setHighSpeed] = useLocalStorageBoolean(
+    new LocalStorageKey("highSpeed"),
+    false
+  );
   const highSpeedLatest = useLatest(highSpeed);
 
   // 読み上げ系
-  const [speechEnabled, _setSpeechEnabled] = useState(false);
+  const [speechEnabled, _setSpeechEnabled] = useState(false); //  音が鳴るので永続化せずfalse
   const setSpeechEnabled = useCallback((v: boolean) => {
     if (!v) {
       speechSynthesis.cancel();
@@ -72,16 +72,21 @@ function App() {
   const speechEnabledLatest = useLatest(speechEnabled);
 
   const voices = useVoices();
-  const [voiceURIUserSelected, setVoiceURIUserSelected] = useState<
-    string | undefined
-  >(undefined); // ユーザーが選択した声。最初はselect要素と必ずしも一致しない
+  // ユーザーが選択した声。最初はselect要素と必ずしも一致しない
+  const [voiceURIUserSelected, setVoiceURIUserSelected] = useLocalStorageString(
+    new LocalStorageKey("voiceURI"),
+    ""
+  );
   const voice =
     voices.find((v) => v.voiceURI === voiceURIUserSelected) ??
     voices.find((v) => v.default) ??
     voices.at(0);
   const voiceLatest = useLatest(voice);
 
-  const [speechRate, setSpeechRate] = useState(1.0);
+  const [speechRate, setSpeechRate] = useLocalStorageFloat(
+    new LocalStorageKey("speechRate"),
+    1.0
+  );
   const speechRateLatest = useLatest(speechRate);
 
   // デバッグ系
