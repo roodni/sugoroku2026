@@ -512,18 +512,16 @@ function App() {
         )}
 
         {/* メインボタン */}
-        <div className="footer-row-scroller">
-          <div className="footer-row-scrollee">
-            <button
-              ref={mainButtonRef}
-              type="button"
-              onClick={mainButtonHandler}
-              disabled={!isWaitingButton}
-              className="main-button"
-            >
-              {mainButtonLabel}
-            </button>
-          </div>
+        <div className="footer-row-scroll">
+          <button
+            ref={mainButtonRef}
+            type="button"
+            onClick={mainButtonHandler}
+            disabled={!isWaitingButton}
+            className="main-button"
+          >
+            {mainButtonLabel}
+          </button>
         </div>
 
         {/* 読み上げ系 */}
@@ -559,53 +557,51 @@ function App() {
         )}
 
         {/* 設定系はこの行 */}
-        <div className="footer-row-scroller">
-          <div className="footer-row-scrollee">
-            <label className={voice === undefined ? "disabled-label" : ""}>
-              <input
-                type="checkbox"
-                checked={speechEnabled}
-                disabled={voice === undefined}
-                onChange={(e) => setSpeechEnabled(e.target.checked)}
-              ></input>
-              <span
-                className={
-                  speechEnabled &&
-                  scene.type === "playing" &&
-                  !scene.isWaitingButton
-                    ? "auto-stepping"
-                    : ""
-                }
-              >
-                読み上げ
-              </span>
-            </label>
-            <label className={speechEnabled ? "disabled-label" : ""}>
-              <input
-                type="checkbox"
-                checked={highSpeed}
-                onChange={(e) => setHighSpeed(e.target.checked)}
-                disabled={speechEnabled}
-              ></input>
-              高速
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={isAllLogsShown}
-                onChange={(e) => setIsAllLogsShown(e.target.checked)}
-              ></input>
-              全ログ表示
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={mapShowAll}
-                onChange={(e) => setMapShowAll(e.target.checked)}
-              ></input>
-              全マス表示
-            </label>
-          </div>
+        <div className="footer-row-scroll">
+          <label className={voice === undefined ? "disabled-label" : ""}>
+            <input
+              type="checkbox"
+              checked={speechEnabled}
+              disabled={voice === undefined}
+              onChange={(e) => setSpeechEnabled(e.target.checked)}
+            ></input>
+            <span
+              className={
+                speechEnabled &&
+                scene.type === "playing" &&
+                !scene.isWaitingButton
+                  ? "auto-stepping"
+                  : ""
+              }
+            >
+              読み上げ
+            </span>
+          </label>
+          <label className={speechEnabled ? "disabled-label" : ""}>
+            <input
+              type="checkbox"
+              checked={highSpeed}
+              onChange={(e) => setHighSpeed(e.target.checked)}
+              disabled={speechEnabled}
+            ></input>
+            高速
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={isAllLogsShown}
+              onChange={(e) => setIsAllLogsShown(e.target.checked)}
+            ></input>
+            全ログ表示
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={mapShowAll}
+              onChange={(e) => setMapShowAll(e.target.checked)}
+            ></input>
+            全マス表示
+          </label>
         </div>
       </footer>
     </div>

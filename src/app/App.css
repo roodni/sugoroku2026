@@ -189,11 +189,9 @@
 }
 
 /* フッターのUI */
-.footer-row-scroller {
+.footer-row-scroll {
   width: 100%;
   overflow-x: auto;
-}
-.footer-row-scrollee {
   padding: 0 var(--gap);
   min-height: 34px;
 
@@ -225,6 +223,9 @@
   column-gap: 1em;
   row-gap: var(--gap);
 
+  label {
+    white-space: nowrap;
+  }
   select {
     height: 28px;
   }
