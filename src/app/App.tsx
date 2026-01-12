@@ -269,10 +269,13 @@ function App() {
         return;
       }
 
-      // ログ追加。新ターンならログクリアも行う
-      setAllLogs((prev) => [...prev, log]);
-      if (lastLog?.type === "turnEnd") {
-        setLogOffset(logIndex);
+      // ログ描画
+      // 全ログ描画は重いのでバックグラウンドでは省略する
+      if (!document.hidden) {
+        setAllLogs([...scenario.history]);
+        if (lastLog?.type === "turnEnd") {
+          setLogOffset(logIndex);
+        }
       }
 
       if (log.type === "turnEnd") {
@@ -299,9 +302,14 @@ function App() {
 
         if (utterance) {
           // 読み上げる内容があるならば、それをwait処理とする
-          // （何らかの要因で一瞬で終わるとキングクリムゾンするので後で対策する）
+          // setTimeoutを使わないのでバックグラウンドでも動作が遅くなりにくい
           mapRenderObserver.notify();
-          await speakAsync(utterance);
+          const { complete } = await speakAsync(utterance);
+          if (!complete) {
+            // Android版Chromeだと、ホーム画面に戻ったとき読み上げが一瞬でエラーになるためキングクリムゾンする
+            // なのでエラーが起きたらフォアグラウンドに戻るまで待機する
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          }
         } else {
           // 読み上げる内容がなければ全く待たない
           // noop
