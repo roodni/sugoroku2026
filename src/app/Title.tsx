@@ -11,7 +11,7 @@ export const Title: React.FC = () => {
       {"\n\n"}
       <span className="log-system-neutral">{"<これは何>\n"}</span>
       {"　"}
-      お正月をお祝いするために作ったすごろくゲームです。サイコロを振ってゴールを目指しましょう。
+      お正月をお祝いするために作ったすごろくゲームです。
       {"\n\n"}
       <span className="log-system-neutral">{"<トロフィー>\n"}</span>
       {"　"}
