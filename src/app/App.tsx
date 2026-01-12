@@ -259,10 +259,25 @@ function App() {
   const stepGame = useCallback(async () => {
     const scenario = scenarioRef.current!;
     while (true) {
-      const lastLog = scenario.history.at(-1);
-      const logIndex = scenario.history.length;
-
       const log = scenario.next();
+
+      // ログ描画
+      // 全ログ描画は重いのでバックグラウンドでは省略する
+      // ただしシーン遷移直前には描画する
+      if (!document.hidden || log.type === "gameOver") {
+        setAllLogs([...scenario.history]);
+        // オフセットを探す
+        let offset = 0;
+        for (let i = scenario.history.length - 2; i >= 0; i--) {
+          // 1個前のログから調べて、最後のターンの切れ目を探す
+          const l = scenario.history[i];
+          if (l.type === "turnEnd") {
+            offset = i + 1;
+            break;
+          }
+        }
+        setLogOffset(offset);
+      }
 
       // ゴール処理
       if (log.type === "gameOver") {
@@ -272,15 +287,6 @@ function App() {
         const url = createReplayUrl(location.href, replay);
         window.history.replaceState(null, "", url);
         return;
-      }
-
-      // ログ描画
-      // 全ログ描画は重いのでバックグラウンドでは省略する
-      if (!document.hidden) {
-        setAllLogs([...scenario.history]);
-        if (lastLog?.type === "turnEnd") {
-          setLogOffset(logIndex);
-        }
       }
 
       if (log.type === "turnEnd") {

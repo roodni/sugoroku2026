@@ -1,4 +1,4 @@
-export const VERSION = "v1.3.0 Listenable";
+export const VERSION = "v1.3.1 Listenable";
 export const WAIT = 80;
 
 export const STORAGE_PREFIX = "sugoroku2026/";
