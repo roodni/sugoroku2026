@@ -16,13 +16,30 @@ export function useVoices(): SpeechSynthesisVoice[] {
     };
   }, []);
 
-  // return [];
   // なんかモバイル版Chromeだと日本語が ja_JP (ハイフンが正しいのにアンスコ) になっているので対応
-  const jpVoices = voices.filter((v) => v.lang.replace("_", "-") === "ja-JP");
+  // ついでにカタコト日本語も入れておく (Google Chrome限定)
+  const jpVoices = voices.filter(
+    (v) =>
+      v.lang.replace("_", "-") === "ja-JP" || v.name === "Google US English"
+  );
   if (jpVoices.length > 0) {
     return jpVoices;
   }
   return voices;
+}
+
+export function createUtterance(
+  text: string,
+  voice: SpeechSynthesisVoice,
+  rate: number
+): SpeechSynthesisUtterance {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.voice = voice;
+  if (voice.name.includes("Google")) {
+    rate = Math.min(rate, 1.5); // Google系は早口すぎるとタイムアウトする
+  }
+  utterance.rate = rate;
+  return utterance;
 }
 
 export function logToSpeechText(log: Log): string | undefined {

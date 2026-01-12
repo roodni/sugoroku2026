@@ -17,7 +17,12 @@ import {
 import { Logs } from "./Logs";
 import "./misc";
 import { createReplayUrl, decodeReplay, encodeReplay } from "./replay";
-import { logToSpeechText, speakAsync, useVoices } from "./speech";
+import {
+  createUtterance,
+  logToSpeechText,
+  speakAsync,
+  useVoices,
+} from "./speech";
 import { Title } from "./Title";
 
 type Scene = Readonly<
@@ -295,9 +300,11 @@ function App() {
         let utterance: SpeechSynthesisUtterance | undefined = undefined;
         const speechText = logToSpeechText(log);
         if (speechText) {
-          utterance = new SpeechSynthesisUtterance(speechText);
-          utterance.voice = voiceLatest.current;
-          utterance.rate = speechRateLatest.current;
+          utterance = createUtterance(
+            speechText,
+            voiceLatest.current,
+            speechRateLatest.current
+          );
         }
 
         if (utterance) {
