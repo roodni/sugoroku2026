@@ -117,29 +117,35 @@ export const releaseNoteV1Space: Space = {
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
     yield Log.description("石碑に何かが刻まれている。");
-    yield Log.system("v1.0 (2026-01-04) 初公開");
-    yield Log.system("v1.1 (2026-01-05) トロフィー追加・台詞修正");
-    yield Log.system("v1.2 (2026-01-10) リプレイ機能追加");
-    switch (player.personality) {
-      case "gentle":
-        yield Log.dialog("v1.3も出るかも");
-        break;
-      case "violent":
-        yield Log.dialog(
-          "リプレイURLはクソ長くなるが、Xじゃあ11.5文字扱いだから問題ないぜ"
-        );
-        break;
-      case "phobic":
-        yield Log.dialog(
-          "既に嫌なマスばかりなのに、これ以上イベントが増えたら、私は……"
-        );
-        break;
-      case "smart":
-        yield Log.dialog(
-          "マイナーバージョンの更新ではゲームバランスが変わらないのさ"
-        );
-        break;
-    }
+    yield Log.system("(2026-01-04) v1.0 初公開");
+    yield Log.system("(2026-01-05) v1.1 トロフィー追加");
+    yield Log.system("(2026-01-10) v1.2 リプレイ機能");
+    yield Log.system("(2026-01-12) v1.3 ログ読み上げ機能");
+    const comments = (() => {
+      switch (player.personality) {
+        case "gentle":
+          return [
+            "v2.0は出るのかな？",
+            "読み上げがONだと自動でゲームが進むんだ",
+          ];
+        case "violent":
+          return [
+            "リプレイURLはクソ長くなるが、Xじゃあ11.5文字扱いだから問題ないぜ",
+            "スマホだと読み上げ中にスリープになっちまう。気が利かねえな",
+          ];
+        case "phobic":
+          return [
+            "既に嫌なマスばかりなのに、これ以上イベントが増えたら、私は……",
+            "読み上げ機能は音が鳴ります。注意してくださいね……",
+          ];
+        case "smart":
+          return [
+            "マイナーバージョンの更新ではゲームバランスが変わらないのさ",
+            "フッ……ログ読み上げをBGMにカフェで作業、なんてワークスタイルはどうかな",
+          ];
+      }
+    })();
+    yield Log.dialog(comments[player.turn % comments.length]);
     yield Log.description(`${player.name}は石碑を後にした。`);
   },
 };
