@@ -570,7 +570,11 @@ function App() {
               ></input>
               <span
                 className={
-                  speechEnabled && !isWaitingButton ? "auto-stepping" : ""
+                  speechEnabled &&
+                  scene.type === "playing" &&
+                  !scene.isWaitingButton
+                    ? "auto-stepping"
+                    : ""
                 }
               >
                 読み上げ

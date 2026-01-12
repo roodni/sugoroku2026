@@ -30,12 +30,12 @@ export function logToSpeechText(log: Log): string | undefined {
     case "description":
       return log.text;
     case "dialog":
-      return log.text.replace("……", "、");
+      return log.text.replaceAll("……", "、");
     case "system":
       return log.text
-        .replace("->", "から")
-        .replace(" / ", "、")
-        .replace("[トロフィー獲得]", "トロフィー獲得。");
+        .replaceAll("->", "から")
+        .replaceAll(" / ", "、")
+        .replaceAll("[トロフィー獲得]", "トロフィー獲得。");
     case "newSection":
       return undefined;
     case "diceRollBefore":
