@@ -286,61 +286,66 @@ function App() {
         setDebugJson(next);
       }
 
-      // 待機の仕方を決める
-      let waitType: "immediate" | "timer" | "button";
-      switch (log.type) {
-        case "description":
-        case "dialog":
-        case "system":
-        case "diceRollAfter":
-          waitType = "timer";
-          break;
-        case "newSection":
-          waitType = "immediate";
-          break;
-        case "diceRollBefore":
-          waitType = log.isBot ? "timer" : "button";
-          break;
-        case "turnEnd":
-          waitType = "button";
-          break;
-        default:
-          throw new ExhaustiveError(log);
-      }
-
-      let highSpeedAndNoSpeech = highSpeedLatest.current;
+      // wait処理
       if (speechEnabledLatest.current && voiceLatest.current) {
-        // 読み上げ
-        highSpeedAndNoSpeech = false; // 読み上げ中は高速送りしない
-        if (waitType === "button") {
-          waitType = "timer"; // 読み上げ中は自動で進み続ける
-        }
-        const text = logToSpeechText(log);
-        if (text !== undefined) {
-          const utterance = new SpeechSynthesisUtterance(text);
+        // 読み上げする場合
+        let utterance: SpeechSynthesisUtterance | undefined = undefined;
+        const speechText = logToSpeechText(log);
+        if (speechText) {
+          utterance = new SpeechSynthesisUtterance(speechText);
           utterance.voice = voiceLatest.current;
           utterance.rate = speechRateLatest.current;
+        }
+
+        if (utterance) {
+          // 読み上げる内容があるならば、それをwait処理とする
+          // （何らかの要因で一瞬で終わるとキングクリムゾンするので後で対策する）
+          mapRenderObserver.notify();
           await speakAsync(utterance);
-        }
-      }
-
-      // const highSpeed = highSpeedLatest.current && !speechEnabled;
-
-      // 待機方法に応じて待機する
-      if (waitType === "immediate") {
-        continue;
-      } else if (waitType === "timer") {
-        mapRenderObserver.notify();
-        if (highSpeedAndNoSpeech) {
-          // これを immediate にすると流石に速すぎて微妙だった
-          await new Promise((resolve) => requestAnimationFrame(resolve));
         } else {
-          await new Promise((resolve) => setTimeout(resolve, WAIT));
+          // 読み上げる内容がなければ全く待たない
+          // noop
         }
-      } else if (waitType === "button") {
-        mapRenderObserver.notify();
-        setScene({ type: "playing", isWaitingButton: true });
-        break;
+      } else {
+        // 読み上げしない場合
+        let waitType: "immediate" | "wait" | "button";
+        switch (log.type) {
+          case "description":
+          case "dialog":
+          case "system":
+          case "diceRollAfter":
+            waitType = "wait";
+            break;
+          case "newSection":
+            waitType = "immediate";
+            break;
+          case "diceRollBefore":
+            waitType = log.isBot ? "wait" : "button";
+            break;
+          case "turnEnd":
+            waitType = "button";
+            break;
+          default:
+            throw new ExhaustiveError(log);
+        }
+
+        if (waitType === "immediate") {
+          // noop
+        } else if (waitType === "wait") {
+          mapRenderObserver.notify();
+          if (highSpeedLatest.current) {
+            // これを immediate にすると流石に速すぎて微妙だった
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+          } else {
+            await new Promise((resolve) => setTimeout(resolve, WAIT));
+          }
+        } else if (waitType === "button") {
+          mapRenderObserver.notify();
+          setScene({ type: "playing", isWaitingButton: true });
+          return; // ループを脱出
+        } else {
+          throw new ExhaustiveError(waitType);
+        }
       }
     }
   }, [
