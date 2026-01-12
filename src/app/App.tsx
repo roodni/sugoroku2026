@@ -69,10 +69,10 @@ function App() {
   // 読み上げ系
   const [speechEnabled, _setSpeechEnabled] = useState(false); //  音が鳴るので永続化せずfalse
   const setSpeechEnabled = useCallback((v: boolean) => {
-    if (!v) {
-      speechSynthesis.cancel();
-    }
     _setSpeechEnabled(v);
+    if (!v) {
+      window.speechSynthesis?.cancel();
+    }
   }, []);
   const speechEnabledLatest = useLatest(speechEnabled);
 

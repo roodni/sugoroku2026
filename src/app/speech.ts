@@ -5,8 +5,17 @@ import type { Log } from "../game/log";
 import { ExhaustiveError } from "../util";
 
 export function useVoices(): SpeechSynthesisVoice[] {
-  const [voices, setVoices] = useState(() => speechSynthesis.getVoices());
+  // 一部環境（lineの内部ブラウザ）だと使えないらしい
+  const speechSynthesis = window?.speechSynthesis as
+    | SpeechSynthesis
+    | undefined;
+  const [voices, setVoices] = useState(
+    () => speechSynthesis?.getVoices() ?? []
+  );
   useLayoutEffect(() => {
+    if (!speechSynthesis) {
+      return;
+    }
     const handleVoicesChanged = () => {
       setVoices(speechSynthesis.getVoices());
     };
@@ -14,7 +23,7 @@ export function useVoices(): SpeechSynthesisVoice[] {
     return () => {
       speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
     };
-  }, []);
+  }, [speechSynthesis]);
 
   // なんかモバイル版Chromeだと日本語が ja_JP (ハイフンが正しいのにアンスコ) になっているので対応
   // ついでにカタコト日本語も入れておく (Google Chrome限定)
