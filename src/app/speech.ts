@@ -42,11 +42,15 @@ export function createUtterance(
   voice: SpeechSynthesisVoice,
   rate: number
 ): SpeechSynthesisUtterance {
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.voice = voice;
+  // 声ごとの調整
   if (voice.name.includes("Google")) {
     rate = Math.min(rate, 1.5); // Google系は早口すぎるとタイムアウトする
+  } else if (voice.name.includes("Kyoko")) {
+    text = text.replaceAll("ターン", "たーん"); // Kyokoさんは「ターン」を「トーン」と発音する
   }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.voice = voice;
   utterance.rate = rate;
   return utterance;
 }
