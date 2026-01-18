@@ -1,73 +1,56 @@
-# React + TypeScript + Vite
+# sugoroku2022
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## これは何
 
-Currently, two official plugins are available:
+すごろく
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 開発
 
-## React Compiler
+React + TypeScript + Vite
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+package.json の scripts を読んでください
 
-## Expanding the ESLint configuration
+## 日記
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### (2026-1-18) v1.3.3
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+- 読み上げの微調整（Kyokoボイスで「ターン」が「トーン」と読まれる問題を解決するなど）
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### (2026-1-12) v1.3.2
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+- 読み上げに関する致命的バグ2件を修正
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### (2026-1-12) v1.3.0
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+- **ログ読み上げ機能を実装**
+- faviconを作った
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+---
+
+### (2026-1-10) v1.2.0
+
+- **リプレイ共有機能を実装**
+- 武器屋の誇大広告を是正
+
+---
+
+### (2026-1-8) v1.1.1
+
+- サイコロを複数振るとき、結果に各サイコロの詳細が出るようになった
+- やはりテキストを少し修正
+  - テキストはアプデのたびにこっそり修正されるので一々ここに書かなくてもいいか
+- スマホのスワイプによる誤リロードに対策を講じたが、だめかもしれない
+
+### (2026-1-5) v1.1.0
+
+- **トロフィーを増やした**
+- テキストを加筆修正
+- 石碑マスを作成
+- 意外と好評だったので、ゲームバランスを変えず互換性を保つことを決定
+
+---
+
+### (2026-1-4) v1.0.0
+
+- 午前0時20分くらいに初公開
+- 正月に間に合わなかった
