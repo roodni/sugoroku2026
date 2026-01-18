@@ -244,7 +244,8 @@ export const Battle = {
     yield* blocker.generateDamageVoice(g, { beforeHp, damage });
     yield Log.system(
       `(${blocker.name}) ${PlayerAttr.hp.label}: ${beforeHp} -> ${afterHp}`,
-      "negative"
+      "negative",
+      (s) => s.replaceAll("->", "から")
     );
     if (afterHp <= 0) {
       yield* blocker.generateKnockedOut(g);

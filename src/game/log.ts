@@ -1,6 +1,7 @@
 import { dice } from "../util";
 import type { GameState, Player } from "./gameState";
 import {
+  attrSeparator,
   PlayerAttr,
   PlayerAttrChanger,
   stringifyPlayerAttrs,
@@ -13,7 +14,7 @@ export type Emotion = "positive" | "neutral" | "negative";
 export type Log =
   | { type: "description"; text: string; emotion: Emotion } // 地の文
   | { type: "dialog"; text: string } // 台詞
-  | { type: "system"; text: string; emotion: Emotion }
+  | { type: "system"; text: string; emotion: Emotion; speech?: string }
   | { type: "newSection" }
   | { type: "diceRollBefore"; expression: string; isBot: boolean }
   | {
@@ -31,8 +32,16 @@ export const Log = {
   dialog(text: string): Log {
     return { type: "dialog", text };
   },
-  system(text: string, emotion: Emotion = "neutral"): Log {
-    return { type: "system", text, emotion };
+  system(
+    text: string,
+    emotion: Emotion = "neutral",
+    ruby?: (s: string) => string
+  ): Log {
+    // システムメッセージは text が読み上げに適した形になってない場合があるので rubyで調整する
+    // ただし「音声合成が漢字を読み間違える」ようなケースは ruby の対象外。
+    // そういうのは logToSpeechText で対処する
+    const speech = ruby?.(text);
+    return { type: "system", text, emotion, speech };
   },
   diceRollBefore(expression: string, isBot: boolean): Log {
     return { type: "diceRollBefore", expression, isBot };
@@ -86,7 +95,9 @@ export const LogUtil = {
 
   *generatePlayerAttrs(player: Player, attrs: PlayerAttr[]): Generator<Log> {
     const text = stringifyPlayerAttrs(player, attrs);
-    yield Log.system(`(${player.name}) ${text}`);
+    yield Log.system(`(${player.name}) ${text}`, "neutral", (s) =>
+      s.replaceAll(attrSeparator, "、")
+    );
   },
 
   *generatePlayerAttrsChange(
@@ -96,7 +107,8 @@ export const LogUtil = {
   ): Generator<Log> {
     yield Log.system(
       `(${player.name}) ${stringifyPlayerAttrsChange(player, attrs)}`,
-      emotion
+      emotion,
+      (s) => s.replaceAll("->", "から").replaceAll(attrSeparator, "、")
     );
   },
   *generatePlayerAttrChange(
@@ -124,6 +136,10 @@ export const LogUtil = {
     } else if (g.replayMode) {
       firstTimeText = "（保存されません）";
     }
-    yield Log.system(`[トロフィー獲得] ${trophyName}${firstTimeText}`);
+    yield Log.system(
+      `[トロフィー獲得] ${trophyName}${firstTimeText}`,
+      "neutral",
+      (s) => s.replaceAll("[トロフィー獲得] ", "トロフィー獲得。")
+    );
   },
 };

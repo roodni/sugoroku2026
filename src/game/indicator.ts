@@ -63,7 +63,7 @@ export class PlayerAttr {
 }
 
 // プレイヤーの属性をほぼ全てログ出力用に文字列化する
-const attrSeparator = " / ";
+export const attrSeparator = " / ";
 export function stringifyPlayerAttrs(
   player: Player,
   attrs: PlayerAttr[]

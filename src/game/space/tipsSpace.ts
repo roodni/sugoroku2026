@@ -112,15 +112,25 @@ export const illegalWeaponTipsSpace: Space = {
   },
 };
 
+function rubyRemovingDate(s: string): string {
+  // 読み上げだと石碑が長すぎるので日付を削る
+  return s.replace(/^\([^)]+\) /, "");
+}
+
 export const releaseNoteV1Space: Space = {
   name: "石碑",
   *generate(g) {
     const player = g.players[g.currentPlayerIndex];
     yield Log.description("石碑に何かが刻まれている。");
-    yield Log.system("(2026-01-04) v1.0 初公開");
-    yield Log.system("(2026-01-05) v1.1 トロフィー追加");
-    yield Log.system("(2026-01-10) v1.2 リプレイ機能");
-    yield Log.system("(2026-01-12) v1.3 ログ読み上げ機能");
+    const notes = [
+      "(2026-01-04) v1.0 初公開",
+      "(2026-01-05) v1.1 トロフィー追加",
+      "(2026-01-10) v1.2 リプレイ機能",
+      "(2026-01-12) v1.3 ログ読み上げ機能",
+    ];
+    for (const note of notes) {
+      yield Log.system(note, "neutral", rubyRemovingDate);
+    }
     const comments = (() => {
       switch (player.personality) {
         case "gentle":

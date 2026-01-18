@@ -37,6 +37,15 @@ export function useVoices(): SpeechSynthesisVoice[] {
   return voices;
 }
 
+function normalizeSpeechText(s: string): string {
+  // 気づいたら追加するが、そんなに頑張らない
+  return s
+    .replaceAll("……", "、")
+    .replaceAll("頭脳戦", "頭脳せん")
+    .replaceAll("後にした", "あとにした")
+    .replaceAll("池の主", "池のぬし");
+}
+
 export function createUtterance(
   text: string,
   voice: SpeechSynthesisVoice,
@@ -48,6 +57,7 @@ export function createUtterance(
   } else if (voice.name.includes("Kyoko")) {
     text = text.replaceAll("ターン", "たーん"); // Kyokoさんは「ターン」を「トーン」と発音する
   }
+  text = normalizeSpeechText(text);
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.voice = voice;
@@ -60,12 +70,9 @@ export function logToSpeechText(log: Log): string | undefined {
     case "description":
       return log.text;
     case "dialog":
-      return log.text.replaceAll("……", "、");
+      return log.text;
     case "system":
-      return log.text
-        .replaceAll("->", "から")
-        .replaceAll(" / ", "、")
-        .replaceAll("[トロフィー獲得]", "トロフィー獲得。");
+      return log.speech ?? log.text;
     case "newSection":
       return undefined;
     case "diceRollBefore":

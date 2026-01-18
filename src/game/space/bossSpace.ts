@@ -89,12 +89,12 @@ export const fishingSpace: Space = {
             "positive"
           );
           yield Log.dialog("うまいぜ");
-          yield* LogUtil.generateEarnTrophy(g, "池の主釣り");
           yield* LogUtil.generatePlayerAttrChange(
             player,
             PlayerAttrChanger.hp(player.hp + 5),
             "positive"
           );
+          yield* LogUtil.generateEarnTrophy(g, "池の主釣り");
         }
         break;
       }
