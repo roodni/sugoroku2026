@@ -46,7 +46,7 @@ export const konbiniSpace: Space = {
         break;
       case "smart":
         yield Log.dialog("スマートに酒を嗜むとしよう");
-        yield Log.description(`${player.name}は高級ワインを購入した。`);
+        yield Log.description(`${player.name}はワインを購入した。`);
         yield Log.description("飲みすぎた！", "negative");
         yield* PlayerBattler.generateHitPlayer(g, 3, player, {
           unblockable: true,
@@ -207,13 +207,13 @@ export const weaponShopSpace: Space = {
       [Weapon.knuckle, "素手より3ダメージ強くなるぜ"],
       [
         Weapon.magicalStaff,
-        "そいつは1d10+3のマジカルアイテムだ。敵をどんどん呪っていけ！",
+        "そいつは 1d10+3 のマジカルアイテムだ。敵をどんどん呪っていけ！",
       ],
       [
         Weapon.hammer,
-        `そいつは1d100の超兵器！　ただし重すぎてゾロ目じゃないと外れるぜ`,
+        `そいつは 1d100 の超兵器！　ただし重すぎてゾロ目じゃないと外れるぜ`,
       ],
-      [Weapon.darkSword, "そいつは3d6+2の魔剣だな。掘り出し物だぜ"],
+      [Weapon.darkSword, "そいつは 3d6+2 の魔剣だな。掘り出し物だぜ"],
       [Weapon.beam, "固定20ダメージの最強装備だ。ちなみに違法だぜ"],
     ] as const;
     for (let i = 1; i <= 6; i++) {

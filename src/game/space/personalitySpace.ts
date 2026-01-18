@@ -38,8 +38,11 @@ export const librarySpace: Space = {
       yield Log.description(`${player.name}は図書館を素通りした。`);
     } else {
       yield Log.dialog("たまには本でも読むか");
-      yield Log.description(`${player.name}は読書を始めた。`, "positive");
-      yield Log.description(`${player.name}は読書により頭がスマートになった。`);
+      yield Log.description(`${player.name}は読書を始めた。`);
+      yield Log.description(
+        `${player.name}は読書により頭がスマートになった。`,
+        "positive"
+      );
       yield* LogUtil.generatePlayerAttrChange(
         player,
         PlayerAttrChanger.personality("smart"),
@@ -88,7 +91,7 @@ export const newYearBellSpace: Space = {
     yield Log.description("除夜の鐘が鳴り響く。");
     const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, 100, 8);
     yield Log.description(
-      `${player.name}の煩悩が${dice}浄化された。`,
+      `${player.name}の煩悩が${dice}個浄化された。`,
       "positive"
     );
     yield* LogUtil.generatePlayerAttrChange(
