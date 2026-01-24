@@ -1,11 +1,11 @@
 // ボス系マス
 
-import { diceExpected } from "../../util";
-import { Battle, PlayerBattler, Weapon, type Battler } from "../battle";
-import { GOAL_POSITION } from "../config";
-import { Player, type GameState } from "../gameState";
-import { PlayerAttrChanger } from "../indicator";
-import { Log, LogUtil } from "../log";
+import { diceExpected } from "../../../../util";
+import { Battle, PlayerBattler, Weapon, type Battler } from "../../../battle";
+import { GOAL_POSITION } from "../../../config";
+import { Player, type GameState } from "../../../gameState";
+import { PlayerAttrChanger } from "../../../indicator";
+import { Log, LogUtil } from "../../../log";
 import type { Space } from "./space";
 
 class BigFishBattler implements Battler {

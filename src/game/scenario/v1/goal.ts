@@ -1,4 +1,4 @@
-import type { Player } from "../gameState";
+import type { Player } from "../../gameState";
 
 export function goaledDialog(player: Player, rank: number): string {
   const dialogs = (() => {

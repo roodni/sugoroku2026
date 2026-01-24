@@ -1,6 +1,6 @@
 // vite-node で実行できる
 
-import { Scenario } from "./scenario/scenario";
+import { Scenario } from "./scenario/v1/scenario";
 import { Trophy } from "./trophy";
 
 globalThis.localStorage = {

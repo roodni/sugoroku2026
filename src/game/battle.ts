@@ -3,7 +3,7 @@ import { INITIAL_HP } from "./config";
 import { GameState, Player } from "./gameState";
 import { PlayerAttr, PlayerAttrChanger } from "./indicator";
 import { Log, LogUtil } from "./log";
-import { SPACE_MAP } from "./space/space";
+import { SPACE_MAP } from "./scenario/v1/space/space";
 
 // 攻撃するもの
 export interface Attacker {

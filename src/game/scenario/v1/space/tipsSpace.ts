@@ -1,5 +1,5 @@
-import { Battle, PlayerBattler, Weapon, type Blocker } from "../battle";
-import { Log, LogUtil } from "../log";
+import { Battle, PlayerBattler, Weapon, type Blocker } from "../../../battle";
+import { Log, LogUtil } from "../../../log";
 import type { Space } from "./space";
 
 export const destinyTipsSpace: Space = {

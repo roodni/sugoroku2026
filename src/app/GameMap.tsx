@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState, type JSX } from "react";
 import { GOAL_POSITION } from "../game/config";
 import type { GameState } from "../game/gameState";
-import { SPACE_MAP } from "../game/space/space";
+import { SPACE_MAP } from "../game/scenario/v1/space/space";
 import type { Observer } from "../util";
 
 function drawMapElements(

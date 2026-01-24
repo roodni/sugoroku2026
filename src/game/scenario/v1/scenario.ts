@@ -1,17 +1,17 @@
-import { PlayerBattler } from "../battle";
-import { GOAL_POSITION } from "../config";
-import { GameState } from "../gameState";
+import { PlayerBattler } from "../../battle";
+import { GOAL_POSITION } from "../../config";
+import { GameState } from "../../gameState";
 import {
   PlayerAttr,
   PlayerAttrChanger,
   stringifyPlayerAttrs,
-} from "../indicator";
-import { Log, LogUtil } from "../log";
-import { SPACE_MAP } from "../space/space";
-import { Trophy } from "../trophy";
+} from "../../indicator";
+import { Log, LogUtil } from "../../log";
+import { Trophy } from "../../trophy";
 import { goaledDialog } from "./goal";
 import { generateHello } from "./hello";
-import { generateSharingPositionEvent } from "./sharing";
+import { generateSharingPositionEvent } from "./sharingSpace";
+import { SPACE_MAP } from "./space/space";
 
 type TurnResult = {
   skipped: boolean; // ゴールした人のターン飛ばしに使われている

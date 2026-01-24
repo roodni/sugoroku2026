@@ -1,6 +1,6 @@
-import { GOAL_POSITION } from "../config";
-import type { GameState } from "../gameState";
-import { Log } from "../log";
+import { GOAL_POSITION } from "../../config";
+import type { GameState } from "../../gameState";
+import { Log } from "../../log";
 
 // ターン開始時の独り言
 export function* generateHello(g: GameState): Generator<Log> {

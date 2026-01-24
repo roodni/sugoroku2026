@@ -1,6 +1,6 @@
-import { GOAL_POSITION } from "../config";
-import { type GameState } from "../gameState";
-import { Log } from "../log";
+import { GOAL_POSITION } from "../../../config";
+import { type GameState } from "../../../gameState";
+import { Log } from "../../../log";
 import * as BossSpace from "./bossSpace";
 import * as HelpSpace from "./helpSpace";
 import * as PersonalitySpace from "./personalitySpace";

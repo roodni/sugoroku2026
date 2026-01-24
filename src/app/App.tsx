@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { Log } from "../game/log";
-import { Scenario } from "../game/scenario/scenario";
+import { Scenario } from "../game/scenario/v1/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { REPLAY_KEY, WAIT } from "./appConfig";

@@ -1,8 +1,8 @@
-import { Battle, PlayerBattler } from "../battle";
-import { GOAL_POSITION } from "../config";
-import type { GameState, Player } from "../gameState";
-import { PlayerAttrChanger } from "../indicator";
-import { Log, LogUtil } from "../log";
+import { Battle, PlayerBattler } from "../../battle";
+import { GOAL_POSITION } from "../../config";
+import type { GameState, Player } from "../../gameState";
+import { PlayerAttrChanger } from "../../indicator";
+import { Log, LogUtil } from "../../log";
 
 // 相席イベント
 export function* generateSharingPositionEvent(

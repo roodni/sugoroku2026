@@ -1,8 +1,8 @@
 // 罠系のマス
 
-import { PlayerBattler } from "../battle";
-import { PlayerAttrChanger } from "../indicator";
-import { Log, LogUtil } from "../log";
+import { PlayerBattler } from "../../../battle";
+import { PlayerAttrChanger } from "../../../indicator";
+import { Log, LogUtil } from "../../../log";
 import type { Space } from "./space";
 
 export const spikyFloorSpace: Space = {
