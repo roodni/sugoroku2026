@@ -1,4 +1,3 @@
-import { ExhaustiveError } from "../util";
 import { Weapon } from "./battle";
 import {
   COMPUTER_NAME_TABLE,
@@ -10,18 +9,6 @@ import type { TrophyName } from "./trophy";
 
 export type Personality = "gentle" | "violent" | "phobic" | "smart";
 export const Personality = {
-  // JSONでtypoするので
-  validate(p: Personality): void {
-    switch (p) {
-      case "gentle":
-      case "violent":
-      case "phobic":
-      case "smart":
-        return;
-      default:
-        throw new ExhaustiveError(p);
-    }
-  },
   toLabel(p: Personality): string {
     switch (p) {
       case "gentle":
@@ -54,21 +41,6 @@ export type Player = {
   turnSkip: number;
 };
 
-type PlayerJson = {
-  name: string;
-  isBot: boolean;
-  turn: number;
-  position: number;
-  goaled: boolean;
-  personality: Personality;
-  personalityChanged: boolean;
-  hp: number;
-  weapon: string;
-  dice: DiceKind;
-  desire: number;
-  turnSkip: number;
-};
-
 export const Player = {
   initial(name: string, isBot: boolean): Player {
     return {
@@ -86,32 +58,6 @@ export const Player = {
       turnSkip: 0,
     };
   },
-
-  save(p: Player): PlayerJson {
-    // 順番を制御するため全部列挙
-    return {
-      name: p.name,
-      personality: p.personality,
-      position: p.position,
-      weapon: p.weapon.name,
-      hp: p.hp,
-      turn: p.turn,
-      dice: p.dice,
-      desire: p.desire,
-      turnSkip: p.turnSkip,
-      personalityChanged: p.personalityChanged,
-      goaled: p.goaled,
-      isBot: p.isBot,
-    };
-  },
-  load(json: PlayerJson): Player {
-    const weapon = Weapon.list.find((w) => w.name === json.weapon);
-    if (!weapon) {
-      throw new Error(`weapon: ${json.weapon}`);
-    }
-    Personality.validate(json.personality);
-    return { ...json, weapon };
-  },
 };
 
 export type GameState = {
@@ -124,18 +70,6 @@ export type GameState = {
   replayMode: boolean;
   trophies: { name: TrophyName; firstTime: boolean }[];
   zeusHp: number; // ゼウスのHPは永続
-};
-
-export type GameStateJson = {
-  currentPlayerIndex: number;
-  players: PlayerJson[];
-  cameraStart: number;
-  cameraPlayerIndex: number;
-  futureDice: number[];
-  diceHistory: number[];
-  replayMode: boolean;
-  trophies: { name: TrophyName; firstTime: boolean }[];
-  zeusHp: number;
 };
 
 export const GameState = {
@@ -157,27 +91,6 @@ export const GameState = {
       replayMode: false,
       trophies: [],
       zeusHp: 100,
-    };
-  },
-
-  save(g: GameState): GameStateJson {
-    // 順番を制御するため全部列挙
-    return {
-      futureDice: g.futureDice,
-      replayMode: g.replayMode,
-      currentPlayerIndex: g.currentPlayerIndex,
-      cameraPlayerIndex: g.cameraPlayerIndex,
-      players: g.players.map((p) => Player.save(p)),
-      cameraStart: g.cameraStart,
-      trophies: g.trophies,
-      zeusHp: g.zeusHp,
-      diceHistory: g.diceHistory, // これがインデントされるのは不本意だが……
-    };
-  },
-  load(json: GameStateJson): GameState {
-    return {
-      ...json,
-      players: json.players.map((p) => Player.load(p)),
     };
   },
 };

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Game } from "../game/game";
 import type { Log } from "../game/log";
-import { Scenario } from "../game/scenario/v1/scenario";
 import { ExhaustiveError, Observer } from "../util";
 import "./App.css";
 import { REPLAY_KEY, WAIT } from "./appConfig";
@@ -35,8 +35,7 @@ type Scene = Readonly<
 
 function App() {
   // ゲームオブジェクト
-  // Scenarioという命名はよくないのだが、v2.0で直すのではないか
-  const scenarioRef = useRef<Scenario>(undefined);
+  const gameRef = useRef<Game>(undefined);
   const [isReplay, setIsReplay] = useState(false);
 
   // Scene
@@ -108,7 +107,7 @@ function App() {
   const loadDebugJson = useCallback(
     (json: string) => {
       try {
-        scenarioRef.current!.load(json);
+        gameRef.current!.load(json);
       } catch (e) {
         console.error("ロード失敗", e);
         alert(e);
@@ -187,15 +186,15 @@ function App() {
   const initializeGame = useCallback(
     (options: { initializeJson: boolean; replayData?: number[] }) => {
       // ゲームオブジェクト
-      const scenario = new Scenario();
+      const game = new Game();
       if (options.replayData !== undefined) {
         // こんなことが許されると思っているのか!?
         // コンストラクタの引数で受け取るべきだろ！
-        scenario.gameState.futureDice = options.replayData;
-        scenario.gameState.replayMode = true;
+        game.gameState.futureDice = options.replayData;
+        game.gameState.replayMode = true;
       }
-      setIsReplay(scenario.gameState.replayMode);
-      scenarioRef.current = scenario;
+      setIsReplay(game.gameState.replayMode);
+      gameRef.current = game;
 
       if (options.replayData === undefined) {
         // リプレイモードではないなら、URLからクエリを消しておく
@@ -208,7 +207,7 @@ function App() {
       setLogOffset(0);
 
       // デバッグ系
-      const initialJson = scenario.save();
+      const initialJson = game.save();
       setDebugJsonHistory({
         undo: [],
         current: initialJson,
@@ -257,20 +256,20 @@ function App() {
 
   // ゲーム進行
   const stepGame = useCallback(async () => {
-    const scenario = scenarioRef.current!;
+    const game = gameRef.current!;
     while (true) {
-      const log = scenario.next();
+      const log = game.next();
 
       // ログ描画
       // 全ログ描画は重いのでバックグラウンドでは省略する
       // ただしシーン遷移直前には描画する
       if (!document.hidden || log.type === "gameOver") {
-        setAllLogs([...scenario.history]);
+        setAllLogs([...game.history]);
         // オフセットを探す
         let offset = 0;
-        for (let i = scenario.history.length - 2; i >= 0; i--) {
+        for (let i = game.history.length - 2; i >= 0; i--) {
           // 1個前のログから調べて、最後のターンの切れ目を探す
-          const l = scenario.history[i];
+          const l = game.history[i];
           if (l.type === "turnEnd") {
             offset = i + 1;
             break;
@@ -281,7 +280,7 @@ function App() {
 
       // ゴール処理
       if (log.type === "gameOver") {
-        const replay = await encodeReplay(scenario.gameState.diceHistory);
+        const replay = await encodeReplay(game.gameState.diceHistory);
         setScene({ type: "gameOver", message: log.message, replay });
         // ゴールしたらURLにリプレイ情報を含める
         const url = createReplayUrl(location.href, replay);
@@ -291,7 +290,7 @@ function App() {
 
       if (log.type === "turnEnd") {
         // ターンの切れ目でデバッグ盤に反映する
-        const next = scenario.save();
+        const next = game.save();
         setDebugJsonHistory(({ undo, current }) => ({
           undo: [current, ...undo],
           current: next,
@@ -458,7 +457,7 @@ function App() {
     }
   })();
 
-  const getGameState = useCallback(() => scenarioRef.current!.gameState, []);
+  const getGameState = useCallback(() => gameRef.current!.gameState, []);
 
   return (
     <div className="app">

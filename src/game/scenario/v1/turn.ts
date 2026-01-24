@@ -1,5 +1,6 @@
 import { PlayerBattler } from "../../battle";
 import { GOAL_POSITION } from "../../config";
+import type { TurnResult } from "../../game";
 import { GameState } from "../../gameState";
 import {
   PlayerAttr,
@@ -13,79 +14,10 @@ import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./sharingSpace";
 import { SPACE_MAP } from "./space/space";
 
-type TurnResult = {
-  skipped: boolean; // ゴールした人のターン飛ばしに使われている
-  gameOver?: string; // 共有用のメッセージが入る。入ったらゲーム終了
-};
-
-export class Scenario {
-  // 描画に使うのでpublic
-  gameState: GameState;
-
-  private generator: Generator<Log> | undefined;
-  history: Log[];
-  loadable: boolean;
-
-  constructor() {
-    this.gameState = GameState.initial();
-    this.history = [];
-    this.loadable = true; // 最初はロード可能
-  }
-
-  // デバッグ用
-  load(json: string) {
-    if (this.loadable) {
-      const obj = JSON.parse(json);
-      this.gameState = GameState.load(obj);
-    } else {
-      throw new Error("ターン途中ではロード禁止");
-    }
-  }
-  save(): string {
-    const obj = GameState.save(this.gameState);
-    return JSON.stringify(obj, undefined, 2);
-  }
-
-  private *generate(): Generator<Log, string> {
-    this.loadable = false;
-    if (this.gameState.replayMode) {
-      yield Log.description("リプレイの再生を開始した。");
-    }
-    while (true) {
-      const g = this.gameState;
-      const turnResult = yield* generateTurn(g);
-      if (turnResult.gameOver !== undefined) {
-        // ゲーム終了
-        return turnResult.gameOver;
-      }
-      g.currentPlayerIndex += 1;
-      g.currentPlayerIndex %= g.players.length;
-      if (!turnResult.skipped) {
-        this.loadable = true;
-        yield Log.turnEnd(); // <- このタイミングでgameStateがデバッグ機能により書き変わる可能性がある
-        this.loadable = false;
-      }
-    }
-  }
-
-  next(): Log | { type: "gameOver"; message: string } {
-    if (!this.generator) {
-      this.generator = this.generate();
-    }
-    const result = this.generator.next();
-    if (result.done) {
-      return { type: "gameOver", message: result.value };
-    } else {
-      this.history.push(result.value);
-      return result.value;
-    }
-  }
-}
-
 // 1ターンを経過させる。
 // ターンの切れ目に安全にセーブ&ロード（デバッグ用）できるように、
 // 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
-function* generateTurn(g: GameState): Generator<Log, TurnResult> {
+export function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   const player = g.players[g.currentPlayerIndex];
   if (player.goaled) {
     return { skipped: true };

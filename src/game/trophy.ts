@@ -1,5 +1,4 @@
 import { TROPHY_KEY, YOUR_NAME } from "./config";
-import { Personality } from "./gameState";
 
 // ゲームロジックは独立しているのにトロフィーだけLocalStorageに依存しているのが良くないと思いましたか？
 
@@ -8,16 +7,12 @@ export type Trophy = {
   description: string;
 };
 
-const gentle = Personality.toLabel("gentle");
-const violent = Personality.toLabel("violent");
-const phobic = Personality.toLabel("phobic");
-const smart = Personality.toLabel("smart");
 const trophies = [
   // 1位
-  { name: "聖人君子", description: `${YOUR_NAME}が${gentle}で1位になる` },
-  { name: "世紀末", description: `${YOUR_NAME}が${violent}で1位になる` },
-  { name: "戦々恐々", description: `${YOUR_NAME}が${phobic}で1位になる` },
-  { name: "超スマート", description: `${YOUR_NAME}が${smart}で1位になる` },
+  { name: "聖人君子", description: `${YOUR_NAME}が温厚で1位になる` },
+  { name: "世紀末", description: `${YOUR_NAME}が凶暴で1位になる` },
+  { name: "戦々恐々", description: `${YOUR_NAME}が恐怖症で1位になる` },
+  { name: "超スマート", description: `${YOUR_NAME}がスマートで1位になる` },
   // 性格
   { name: "情緒安定", description: `性格を変えずにゴールする` },
   {
