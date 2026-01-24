@@ -186,13 +186,7 @@ function App() {
   const initializeGame = useCallback(
     (options: { initializeJson: boolean; replayData?: number[] }) => {
       // ゲームオブジェクト
-      const game = new Game();
-      if (options.replayData !== undefined) {
-        // こんなことが許されると思っているのか!?
-        // コンストラクタの引数で受け取るべきだろ！
-        game.gameState.futureDice = options.replayData;
-        game.gameState.replayMode = true;
-      }
+      const game = new Game({ replay: options.replayData });
       setIsReplay(game.gameState.replayMode);
       gameRef.current = game;
 

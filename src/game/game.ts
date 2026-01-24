@@ -16,8 +16,12 @@ export class Game {
   history: Log[];
   loadable: boolean;
 
-  constructor() {
+  constructor(options: { replay?: number[] }) {
     this.gameState = GameState.initial();
+    if (options.replay) {
+      this.gameState.replayMode = true;
+      this.gameState.futureDice = options.replay;
+    }
     this.history = [];
     this.loadable = true; // 最初はロード可能
   }
