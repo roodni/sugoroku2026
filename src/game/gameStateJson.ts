@@ -94,9 +94,9 @@ export namespace GameStateJson {
   }
 
   export function load(json: GameStateJson): GameState {
-    return {
+    return new GameState({
       ...json,
       players: json.players.map((p) => PlayerJson.load(p)),
-    };
+    });
   }
 }

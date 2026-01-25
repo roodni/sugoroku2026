@@ -1,3 +1,4 @@
+import { Struct } from "../util";
 import { Weapon } from "./battle";
 import {
   COMPUTER_NAME_TABLE,
@@ -60,7 +61,7 @@ export const Player = {
   },
 };
 
-export type GameState = {
+export class GameState extends Struct<{
   currentPlayerIndex: number;
   players: Player[];
   cameraStart: number; // 地図で省略せず表示するマスの開始位置
@@ -70,10 +71,12 @@ export type GameState = {
   replayMode: boolean;
   trophies: { name: TrophyName; firstTime: boolean }[];
   zeusHp: number; // ゼウスのHPは永続
-};
+}> {
+  currentPlayer(): Player {
+    return this.players[this.currentPlayerIndex];
+  }
 
-export const GameState = {
-  initial(): GameState {
+  static initial(): GameState {
     const players = [];
     players.push(Player.initial(YOUR_NAME, false));
     for (let i = 1; i <= COMPUTER_PLAYER_NUMBER; i++) {
@@ -81,7 +84,7 @@ export const GameState = {
       players.push(Player.initial(name, true));
     }
 
-    return {
+    return new GameState({
       currentPlayerIndex: 0,
       players,
       cameraStart: 0,
@@ -91,6 +94,6 @@ export const GameState = {
       replayMode: false,
       trophies: [],
       zeusHp: 100,
-    };
-  },
-};
+    });
+  }
+}

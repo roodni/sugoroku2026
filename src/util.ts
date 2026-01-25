@@ -31,3 +31,14 @@ export class Observer<T> {
     this.listeners.forEach((listener) => listener(arg));
   }
 }
+
+abstract class _Struct {
+  constructor(properties: unknown) {
+    Object.assign(this, properties);
+  }
+}
+export const Struct = _Struct as abstract new <
+  P extends Record<string, unknown>,
+>(
+  properties: P
+) => P;
