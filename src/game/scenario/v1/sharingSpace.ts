@@ -2,7 +2,7 @@ import { Battle, PlayerBattler } from "../../battle";
 import { GOAL_POSITION } from "../../config";
 import type { GameContext } from "../../game";
 import type { Player } from "../../gameState";
-import { PlayerAttrChanger } from "../../indicator";
+import { generatePlayerAttrChange, PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
 
 // 相席イベント
@@ -67,7 +67,7 @@ function* generatePhobicEscape(
     "negative"
   );
   yield Log.dialog("近い！");
-  yield* LogUtil.generatePlayerAttrChange(
+  yield* generatePlayerAttrChange(
     phobic,
     PlayerAttrChanger.position(phobic.position + 1),
     "positive"
@@ -182,7 +182,7 @@ function* generateSharingPositionPhobic(
       `${player.name}は先客を避けて1マス進んだ。`,
       "negative"
     );
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.position(player.position + 1),
       "positive"

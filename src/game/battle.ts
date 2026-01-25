@@ -2,7 +2,11 @@ import { INITIAL_HP } from "./config";
 import { diceExpected, generateDiceRoll } from "./dice";
 import type { GameContext } from "./game";
 import { Player } from "./gameState";
-import { PlayerAttr, PlayerAttrChanger } from "./indicator";
+import {
+  generatePlayerAttrsChange,
+  PlayerAttr,
+  PlayerAttrChanger,
+} from "./indicator";
 import { Log, LogUtil } from "./log";
 
 // 攻撃するもの
@@ -349,7 +353,7 @@ export class PlayerBattler implements Battler {
       PlayerAttrChanger.position(hospitalPosition),
       PlayerAttrChanger.hp(INITIAL_HP),
     ];
-    yield* LogUtil.generatePlayerAttrsChange(player, attrs, "neutral");
+    yield* generatePlayerAttrsChange(player, attrs, "neutral");
   }
 
   *generateKnockedOut(g: GameContext): Generator<Log> {

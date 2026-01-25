@@ -3,6 +3,8 @@ import { GOAL_POSITION } from "../../config";
 import { generateDiceRoll } from "../../dice";
 import type { GameContext, TurnResult } from "../../game";
 import {
+  generatePlayerAttrChange,
+  generatePlayerAttrs,
   PlayerAttr,
   PlayerAttrChanger,
   stringifyPlayerAttrs,
@@ -25,12 +27,12 @@ export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
 
   // ターン開始
   yield Log.description(`${player.name}のターン${player.turn}。`);
-  yield* LogUtil.generatePlayerAttrs(player, PlayerAttr.attrsShownInTurnStart);
+  yield* generatePlayerAttrs(player, PlayerAttr.attrsShownInTurnStart);
 
   if (player.turnSkip > 0) {
     yield Log.newSection();
     yield Log.description(`${player.name}は動けない。`, "negative");
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.turnSkip(player.turnSkip - 1),
       "negative"
@@ -98,7 +100,7 @@ export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
     }
   }
 
-  yield* LogUtil.generatePlayerAttrChange(
+  yield* generatePlayerAttrChange(
     player,
     PlayerAttrChanger.position(nextPos),
     nextPos > player.position ? "positive" : "negative"

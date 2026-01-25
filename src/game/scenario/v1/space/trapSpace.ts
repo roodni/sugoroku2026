@@ -1,7 +1,10 @@
 // 罠系のマス
 
 import { PlayerBattler } from "../../../battle";
-import { PlayerAttrChanger } from "../../../indicator";
+import {
+  generatePlayerAttrChange,
+  PlayerAttrChanger,
+} from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
 import type { Space } from "../../../scenario";
 
@@ -63,7 +66,7 @@ export const LaboratorySpace: Space = {
           `${player.name}にジェットエンジンが取り付けられた。`,
           "negative"
         );
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.dice("1d100"),
           "negative"
@@ -100,7 +103,7 @@ export const LaboratorySpace: Space = {
           `${player.name}の脳はスマートになった。`,
           "positive"
         );
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.personality("smart"),
           "positive"

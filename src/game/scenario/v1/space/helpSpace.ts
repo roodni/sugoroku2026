@@ -1,8 +1,11 @@
 import { PlayerBattler, Weapon } from "../../../battle";
 import { INITIAL_HP } from "../../../config";
 import { generateDiceRoll } from "../../../dice";
-import { PlayerAttrChanger } from "../../../indicator";
-import { Log, LogUtil } from "../../../log";
+import {
+  generatePlayerAttrChange,
+  PlayerAttrChanger,
+} from "../../../indicator";
+import { Log } from "../../../log";
 import type { Space } from "../../../scenario";
 
 // お助け系マス
@@ -19,7 +22,7 @@ export const konbiniSpace: Space = {
           `${player.name}はお弁当を食べて元気になった。`,
           "positive"
         );
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.hp(player.hp + 5),
           "positive"
@@ -28,7 +31,7 @@ export const konbiniSpace: Space = {
       case "violent":
         yield Log.dialog("装備を買っていくか");
         yield Log.description(`${player.name}はこん棒を購入した。`, "positive");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.weapon(Weapon.stick),
           "positive"
@@ -39,7 +42,7 @@ export const konbiniSpace: Space = {
         yield Log.dialog("胃薬……");
         yield Log.description(`${player.name}は胃薬を買って飲んだ。`);
         yield Log.description("胃が少し楽になった。", "positive");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.hp(player.hp + 1),
           "positive"
@@ -107,7 +110,7 @@ export const hospitalSpace: Space = {
       }[player.personality]
     );
     yield Log.description(`${player.name}は治療を受けた。`, "positive");
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.hp(threshold),
       "positive"
@@ -128,7 +131,7 @@ export const shortCutSpace: Space = {
           `${player.name}は近道を通って2マス進んだ。`,
           "positive"
         );
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.position(player.position + 2),
           "positive"
@@ -153,7 +156,7 @@ export const shortCutSpace: Space = {
             `${player.name}はどうにか路地裏を抜けて3マス進んだ。`,
             "positive"
           );
-          yield* LogUtil.generatePlayerAttrChange(
+          yield* generatePlayerAttrChange(
             player,
             PlayerAttrChanger.position(player.position + 3),
             "positive"
@@ -169,7 +172,7 @@ export const shortCutSpace: Space = {
         yield Log.dialog("ふむ……急がば回れとも言うね");
         yield Log.description(`${player.name}は全然違う道を通った。`);
         yield Log.description(`${player.name}は1マス戻った。`, "negative");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.position(player.position - 1),
           "negative"
@@ -230,13 +233,13 @@ export const weaponShopSpace: Space = {
       yield Log.dialog(description);
       yield Log.dialog("食べ物だよね");
       yield Log.description(`${player.name}はちくわを食べた。`, "positive");
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.hp(player.hp + 5),
         "positive"
       );
     } else {
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.weapon(weapon),
         "neutral"

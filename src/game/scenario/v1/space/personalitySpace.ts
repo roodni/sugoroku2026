@@ -1,7 +1,11 @@
 import { GOAL_POSITION } from "../../../config";
 import { generateDiceRoll } from "../../../dice";
 import type { GameContext } from "../../../game";
-import { PlayerAttrChanger } from "../../../indicator";
+import {
+  generatePlayerAttrChange,
+  generatePlayerAttrsChange,
+  PlayerAttrChanger,
+} from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
 import type { Space } from "../../../scenario";
 
@@ -20,7 +24,7 @@ export const liveSpace: Space = {
     yield Log.description(
       `暗黒デスボイスが${player.name}の心に眠る破壊衝動を呼び覚ました。`
     );
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.personality("violent"),
       "neutral"
@@ -44,7 +48,7 @@ export const librarySpace: Space = {
         `${player.name}は読書により頭がスマートになった。`,
         "positive"
       );
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.personality("smart"),
         "neutral"
@@ -75,7 +79,7 @@ export const hauntedHouseSpace: Space = {
         `恐怖体験がトラウマとして${player.name}の心に刻み込まれた。`,
         "negative"
       );
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.personality("phobic"),
         "neutral"
@@ -95,7 +99,7 @@ export const newYearBellSpace: Space = {
       `${player.name}の煩悩が${dice}個浄化された。`,
       "positive"
     );
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.desire(player.desire - dice),
       "positive"
@@ -114,12 +118,12 @@ export const newYearBellSpace: Space = {
       if (player.personality !== "gentle") {
         changers.push(PlayerAttrChanger.personality("gentle"));
       }
-      yield* LogUtil.generatePlayerAttrsChange(player, changers, "positive");
+      yield* generatePlayerAttrsChange(player, changers, "positive");
       yield* LogUtil.generateEarnTrophy(g, "境地");
     } else {
       if (player.personality !== "gentle") {
         yield Log.description(`${player.name}は心が洗われた。`);
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.personality("gentle"),
           "neutral"
@@ -140,14 +144,14 @@ export const seminarSpace: Space = {
     );
     yield Log.dialog("なるほど……");
     yield Log.description(`${player.name}は意識が高まった。`);
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.personality("smart"),
       "neutral"
     );
     yield Log.dialog("さあ、皆で歩いて一体感を高めましょう！");
     yield Log.description("無駄に一駅分行進させられた。", "negative");
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.position(player.position + 3),
       "positive"
@@ -167,7 +171,7 @@ export const onlineGameSpace: Space = {
       `${player.name}はゲームと現実の区別がつかなくなった。`,
       "negative"
     );
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.personality("violent"),
       "neutral"
@@ -189,7 +193,7 @@ export const hygieneSpace: Space = {
       `衛生講習会は${player.name}のトラウマになった。`,
       "negative"
     );
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.personality("phobic"),
       "neutral"

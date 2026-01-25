@@ -1,6 +1,7 @@
 import { Weapon } from "./battle";
 import { INITIAL_HP } from "./config";
 import { Personality, type DiceKind, type Player } from "./gameState";
+import { Log, type Emotion } from "./log";
 
 // プレイヤーの属性を文字列化するための仕組み
 export class PlayerAttr {
@@ -63,7 +64,7 @@ export class PlayerAttr {
 }
 
 // プレイヤーの属性をほぼ全てログ出力用に文字列化する
-export const attrSeparator = " / ";
+const attrSeparator = " / ";
 export function stringifyPlayerAttrs(
   player: Player,
   attrs: PlayerAttr[]
@@ -144,4 +145,36 @@ export function stringifyPlayerAttrsChange(
     }
   }
   return attrTexts.join(attrSeparator);
+}
+
+// ログ生成ユーティリティ
+
+export function* generatePlayerAttrs(
+  player: Player,
+  attrs: PlayerAttr[]
+): Generator<Log> {
+  const text = stringifyPlayerAttrs(player, attrs);
+  yield Log.system(`(${player.name}) ${text}`, "neutral", (s) =>
+    s.replaceAll(attrSeparator, "、")
+  );
+}
+
+export function* generatePlayerAttrsChange(
+  player: Player,
+  attrs: PlayerAttrChanger[],
+  emotion: Emotion
+): Generator<Log> {
+  yield Log.system(
+    `(${player.name}) ${stringifyPlayerAttrsChange(player, attrs)}`,
+    emotion,
+    (s) => s.replaceAll("->", "から").replaceAll(attrSeparator, "、")
+  );
+}
+
+export function* generatePlayerAttrChange(
+  player: Player,
+  attr: PlayerAttrChanger,
+  emotion: Emotion
+): Generator<Log> {
+  yield* generatePlayerAttrsChange(player, [attr], emotion);
 }

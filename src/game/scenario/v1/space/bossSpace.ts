@@ -5,7 +5,10 @@ import { GOAL_POSITION } from "../../../config";
 import { diceExpected, generateDiceRoll } from "../../../dice";
 import type { GameContext } from "../../../game";
 import { Player } from "../../../gameState";
-import { PlayerAttrChanger } from "../../../indicator";
+import {
+  generatePlayerAttrChange,
+  PlayerAttrChanger,
+} from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
 import type { Space } from "../../../scenario";
 
@@ -54,7 +57,7 @@ export const fishingSpace: Space = {
           "positive"
         );
         yield Log.dialog("おいしい");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.hp(player.hp + 3),
           "positive"
@@ -90,7 +93,7 @@ export const fishingSpace: Space = {
             "positive"
           );
           yield Log.dialog("うまいぜ");
-          yield* LogUtil.generatePlayerAttrChange(
+          yield* generatePlayerAttrChange(
             player,
             PlayerAttrChanger.hp(player.hp + 5),
             "positive"
@@ -154,7 +157,7 @@ export const policeSpace: Space = {
     // 使いまわす処理
     function* generateBosshu() {
       yield Log.description(`${player.name}は装備を没収された。`, "negative");
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.weapon(Weapon.hand),
         "negative"
@@ -162,7 +165,7 @@ export const policeSpace: Space = {
     }
     function* generateKaishin() {
       yield Log.description(`${player.name}は更生した。`, "positive");
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.personality("gentle"),
         "positive"
@@ -225,7 +228,7 @@ export const policeSpace: Space = {
             `${player.name}は警察の装備を奪った。`,
             "negative"
           );
-          yield* LogUtil.generatePlayerAttrChange(
+          yield* generatePlayerAttrChange(
             player,
             PlayerAttrChanger.weapon(Weapon.gun),
             "positive"
@@ -397,7 +400,7 @@ export const goddessSpace: Space = {
       "negative"
     );
     const droppedWeapon = player.weapon;
-    yield* LogUtil.generatePlayerAttrChange(
+    yield* generatePlayerAttrChange(
       player,
       PlayerAttrChanger.weapon(Weapon.hand),
       "negative"
@@ -415,7 +418,7 @@ export const goddessSpace: Space = {
         yield Log.description("女神は微笑んだ。", "positive");
         yield Log.dialog("正直者の貴方には金の斧を与えましょう");
         // yield Log.description(`${player.name}は金の斧を貰った。`);
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.weapon(Weapon.goldenAxe),
           "neutral"
@@ -431,7 +434,7 @@ export const goddessSpace: Space = {
           yield Log.dialog(`じゃあ俺が落としたのは金の斧です`);
           yield Log.description("女神は微笑んだ。", "negative");
           yield Log.dialog(`……なら、金の斧をお渡しします`);
-          yield* LogUtil.generatePlayerAttrChange(
+          yield* generatePlayerAttrChange(
             player,
             PlayerAttrChanger.weapon(Weapon.goldenAxe),
             "positive"
@@ -456,7 +459,7 @@ export const goddessSpace: Space = {
               `${player.name}は女神の力の一片を得た。`,
               "positive"
             );
-            yield* LogUtil.generatePlayerAttrChange(
+            yield* generatePlayerAttrChange(
               player,
               PlayerAttrChanger.hp(player.hp + 100),
               "positive"
@@ -472,7 +475,7 @@ export const goddessSpace: Space = {
           yield Log.dialog(`じゃあ俺が落としたのは${droppedWeapon.name}です`);
           yield Log.description("女神は微笑んだ。", "negative");
           yield Log.dialog(`……正直物の貴方には金の斧を与えましょう`);
-          yield* LogUtil.generatePlayerAttrChange(
+          yield* generatePlayerAttrChange(
             player,
             PlayerAttrChanger.weapon(Weapon.goldenAxe),
             "positive"
@@ -507,7 +510,7 @@ export const goddessSpace: Space = {
           `女神の呪いで、斧が${player.name}の手から離れなくなった！`,
           "positive"
         );
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.weapon(Weapon.goldenAxe),
           "positive"
@@ -529,7 +532,7 @@ export const goddessSpace: Space = {
         });
         yield Log.description(`女神は湖の底に消えていった。`, "negative");
         yield Log.description(`${player.name}は金の斧を拾った。`, "positive");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.weapon(Weapon.goldenAxe),
           "positive"
@@ -581,7 +584,7 @@ export const ninjaSpace: Space = {
         yield Log.description("心が温かくなった。");
         yield Log.description("忍者は兵糧丸を分けてくれた。", "positive");
         yield Log.dialog("何とも言えない味だね");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.hp(player.hp + 3),
           "positive"
@@ -607,7 +610,7 @@ export const ninjaSpace: Space = {
             `${player.name}は忍者の武器を拾った。`,
             "positive"
           );
-          yield* LogUtil.generatePlayerAttrChange(
+          yield* generatePlayerAttrChange(
             player,
             PlayerAttrChanger.weapon(Weapon.ninjaStar),
             "positive"
@@ -623,7 +626,7 @@ export const ninjaSpace: Space = {
           `${player.name}は全力疾走で逃げて${add}マス進んだ。`,
           "positive"
         );
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.position(player.position + add),
           "positive"
@@ -633,7 +636,7 @@ export const ninjaSpace: Space = {
         yield Log.dialog("拙者、走力には自信がござるよ");
         yield Log.description("忍者は自慢げにドロンと消えた。");
         yield Log.description(`${player.name}は疲れ果てた。`, "negative");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.turnSkip(1),
           "negative"
@@ -646,7 +649,7 @@ export const ninjaSpace: Space = {
         yield Log.dialog("時代錯誤ではないかい？");
         yield Log.dialog("忍者も良いものでござるよ。お近づきの印にこれを");
         yield Log.description("忍者は手裏剣を分けてくれた。", "positive");
-        yield* LogUtil.generatePlayerAttrChange(
+        yield* generatePlayerAttrChange(
           player,
           PlayerAttrChanger.weapon(Weapon.ninjaStar),
           "positive"
@@ -724,7 +727,7 @@ export const godZeusSpace: Space = {
         }マス進んだ。`,
         "positive"
       );
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.position(GOAL_POSITION),
         "positive"
@@ -766,7 +769,7 @@ export const godZeusSpace: Space = {
     if (winner === "first") {
       yield Log.newSection();
       yield Log.description(`${player.name}は神の力の一片を得た。`, "positive");
-      yield* LogUtil.generatePlayerAttrChange(
+      yield* generatePlayerAttrChange(
         player,
         PlayerAttrChanger.weapon(Weapon.lightning),
         "positive"

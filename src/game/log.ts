@@ -1,12 +1,4 @@
 import type { GameContext } from "./game";
-import type { Player } from "./gameState";
-import {
-  attrSeparator,
-  PlayerAttr,
-  PlayerAttrChanger,
-  stringifyPlayerAttrs,
-  stringifyPlayerAttrsChange,
-} from "./indicator";
 import { Trophy, type TrophyName } from "./trophy";
 
 export type Emotion = "positive" | "neutral" | "negative";
@@ -58,32 +50,6 @@ export const Log = {
 };
 
 export const LogUtil = {
-  *generatePlayerAttrs(player: Player, attrs: PlayerAttr[]): Generator<Log> {
-    const text = stringifyPlayerAttrs(player, attrs);
-    yield Log.system(`(${player.name}) ${text}`, "neutral", (s) =>
-      s.replaceAll(attrSeparator, "、")
-    );
-  },
-
-  *generatePlayerAttrsChange(
-    player: Player,
-    attrs: PlayerAttrChanger[],
-    emotion: Emotion
-  ): Generator<Log> {
-    yield Log.system(
-      `(${player.name}) ${stringifyPlayerAttrsChange(player, attrs)}`,
-      emotion,
-      (s) => s.replaceAll("->", "から").replaceAll(attrSeparator, "、")
-    );
-  },
-  *generatePlayerAttrChange(
-    player: Player,
-    attr: PlayerAttrChanger,
-    emotion: Emotion
-  ): Generator<Log> {
-    yield* this.generatePlayerAttrsChange(player, [attr], emotion);
-  },
-
   *generateEarnTrophy(g: GameContext, trophyName: TrophyName): Generator<Log> {
     if (g.state.trophies.map((t) => t.name).includes(trophyName)) {
       return; // 既に周回内で獲得していたらスルー
