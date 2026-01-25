@@ -3,7 +3,7 @@
 import { PlayerBattler } from "../../../battle";
 import { PlayerAttrChanger } from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
-import type { Space } from "./space";
+import type { Space } from "../../../scenario";
 
 export const spikyFloorSpace: Space = {
   name: "トゲ床",

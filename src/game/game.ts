@@ -1,6 +1,8 @@
 import { GameState } from "./gameState";
 import { GameStateJson } from "./gameStateJson";
 import { Log } from "./log";
+import type { Scenario } from "./scenario";
+import { scenarioV1 } from "./scenario/v1/scenarioV1";
 import { generateTurn } from "./scenario/v1/turn";
 
 export type TurnResult = {
@@ -11,11 +13,12 @@ export type TurnResult = {
 // ターン生成関数でバケツリレーする
 export interface GameContext {
   get state(): GameState;
+  get scenario(): Scenario;
 }
 
 export class Game implements GameContext {
-  // 描画に使うのでpublic
   state: GameState;
+  scenario: Scenario;
 
   private generator: Generator<Log> | undefined;
   history: Log[];
@@ -27,6 +30,9 @@ export class Game implements GameContext {
       this.state.replayMode = true;
       this.state.futureDice = options.replay;
     }
+
+    this.scenario = scenarioV1;
+
     this.history = [];
     this.loadable = true; // 最初はロード可能
   }

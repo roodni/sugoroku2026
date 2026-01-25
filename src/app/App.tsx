@@ -451,7 +451,7 @@ function App() {
     }
   })();
 
-  const getGameState = useCallback(() => gameRef.current!.state, []);
+  const getGameContext = useCallback(() => gameRef.current!, []);
 
   return (
     <div className="app">
@@ -477,7 +477,7 @@ function App() {
                 </div>
               )}
               <GameMap
-                getGameState={getGameState}
+                getGameContext={getGameContext}
                 renderObserver={mapRenderObserver}
                 showAll={mapShowAll}
               ></GameMap>

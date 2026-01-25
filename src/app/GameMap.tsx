@@ -1,13 +1,9 @@
 import { Fragment, useEffect, useState, type JSX } from "react";
 import { GOAL_POSITION } from "../game/config";
-import type { GameState } from "../game/gameState";
-import { SPACE_MAP } from "../game/scenario/v1/space/space";
+import type { GameContext } from "../game/game";
 import type { Observer } from "../util";
 
-function drawMapElements(
-  gameState: GameState,
-  showAll: boolean
-): JSX.Element[] {
+function drawMapElements(g: GameContext, showAll: boolean): JSX.Element[] {
   // まず描画対象のマスを決める
   const positions: number[] = [];
   const isSpaceIncluded = (pos: number): boolean => {
@@ -18,14 +14,14 @@ function drawMapElements(
     if (pos === 0 || pos === GOAL_POSITION) {
       return true;
     }
-    for (const player of gameState.players) {
+    for (const player of g.state.players) {
       if (player.position === pos) {
         return true;
       }
     }
 
-    const max = gameState.cameraStart + 6;
-    let min = gameState.cameraStart;
+    const max = g.state.cameraStart + 6;
+    let min = g.state.cameraStart;
     if (max > GOAL_POSITION) {
       // 折り返す可能性があれば、最大折り返し地点まで表示する
       min = Math.min(min, GOAL_POSITION - (max - GOAL_POSITION));
@@ -54,13 +50,13 @@ function drawMapElements(
     lastPos = pos;
 
     let text = `${pos}`.padStart(2, "0");
-    const spaceName = SPACE_MAP[pos]?.name;
+    const spaceName = g.scenario.spaceMap[pos]?.name;
     if (spaceName) {
       text += ` ${spaceName}`;
     }
 
-    const players = gameState.players.filter((p) => p.position === pos);
-    const cameraPlayer = gameState.players[gameState.cameraPlayerIndex];
+    const players = g.state.players.filter((p) => p.position === pos);
+    const cameraPlayer = g.state.players[g.state.cameraPlayerIndex];
     if (players.length > 0) {
       text += " <-- ";
       text += players
@@ -83,29 +79,29 @@ function drawMapElements(
 
 // すごろくの地図を描画するコンポーネント
 export const GameMap: React.FC<{
-  getGameState: () => GameState;
+  getGameContext: () => GameContext;
   renderObserver: Observer<void>;
   showAll: boolean;
-}> = ({ getGameState, renderObserver, showAll }) => {
+}> = ({ getGameContext, renderObserver, showAll }) => {
   const [lines, setLines] = useState<JSX.Element[]>(
-    drawMapElements(getGameState(), showAll)
+    drawMapElements(getGameContext(), showAll)
   ); // こうしないと出現の瞬間に一瞬空になる
 
   // showAllが変わった時
   useEffect(() => {
-    setLines(drawMapElements(getGameState(), showAll));
-  }, [getGameState, showAll]);
+    setLines(drawMapElements(getGameContext(), showAll));
+  }, [getGameContext, showAll]);
 
   // イベント購読
   useEffect(() => {
     const unsubscribe = renderObserver.subscribe(() => {
       // console.log("マップ再描画");
-      setLines(drawMapElements(getGameState(), showAll));
+      setLines(drawMapElements(getGameContext(), showAll));
     });
     return () => {
       unsubscribe();
     };
-  }, [renderObserver, getGameState, showAll]); // showAllで作り直されるの気持ち悪いけどもういい
+  }, [renderObserver, getGameContext, showAll]); // showAllで作り直されるの気持ち悪いけどもういい
 
   if (lines.length === 0) {
     return undefined;

@@ -4,7 +4,6 @@ import type { GameContext } from "./game";
 import { Player } from "./gameState";
 import { PlayerAttr, PlayerAttrChanger } from "./indicator";
 import { Log, LogUtil } from "./log";
-import { SPACE_MAP } from "./scenario/v1/space/space";
 
 // 攻撃するもの
 export interface Attacker {
@@ -340,13 +339,13 @@ export class PlayerBattler implements Battler {
     }
   }
 
-  static *generateToHospital(player: Player) {
+  static *generateToHospital(g: GameContext, player: Player) {
     yield* Battle.generateDefaultKnockedOut(player.name);
 
     // 病院を探す
     let hospitalPosition = 0;
     for (let pos = player.position; pos >= 0; pos--) {
-      if (SPACE_MAP[pos]?.isHospital) {
+      if (g.scenario.spaceMap[pos]?.isHospital) {
         hospitalPosition = pos;
         break;
       }
@@ -359,7 +358,7 @@ export class PlayerBattler implements Battler {
     yield* LogUtil.generatePlayerAttrsChange(player, attrs, "neutral");
   }
 
-  *generateKnockedOut(): Generator<Log> {
+  *generateKnockedOut(g: GameContext): Generator<Log> {
     switch (this.p.personality) {
       case "gentle":
         yield Log.dialog("ひどい……");
@@ -374,7 +373,7 @@ export class PlayerBattler implements Battler {
         yield Log.dialog("バカな……この僕が……");
         break;
     }
-    yield* PlayerBattler.generateToHospital(this.p);
+    yield* PlayerBattler.generateToHospital(g, this.p);
   }
 
   get smart() {

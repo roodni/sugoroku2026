@@ -11,11 +11,7 @@ import { Trophy } from "../../trophy";
 import { goaledDialog } from "./goal";
 import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./sharingSpace";
-import { SPACE_MAP } from "./space/space";
 
-// 1ターンを経過させる。
-// ターンの切れ目に安全にセーブ&ロード（デバッグ用）できるように、
-// 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
 export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
   const player = g.state.currentPlayer();
   if (player.goaled) {
@@ -133,7 +129,7 @@ export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
       yield* LogUtil.generateEarnTrophy(g, "腰が重い");
     }
 
-    const space = SPACE_MAP[player.position];
+    const space = g.scenario.spaceMap[player.position];
     if (space?.generate) {
       yield Log.newSection();
       yield* space.generate(g);

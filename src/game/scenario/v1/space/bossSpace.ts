@@ -7,7 +7,7 @@ import type { GameContext } from "../../../game";
 import { Player } from "../../../gameState";
 import { PlayerAttrChanger } from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
-import type { Space } from "./space";
+import type { Space } from "../../../scenario";
 
 class BigFishBattler implements Battler {
   name = "巨大魚";

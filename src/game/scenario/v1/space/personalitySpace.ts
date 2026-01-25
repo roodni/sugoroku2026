@@ -2,7 +2,7 @@ import { GOAL_POSITION } from "../../../config";
 import type { GameContext } from "../../../game";
 import { PlayerAttrChanger } from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
-import type { Space } from "./space";
+import type { Space } from "../../../scenario";
 
 // 性格変更系マス
 

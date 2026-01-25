@@ -1,20 +1,12 @@
 import { GOAL_POSITION } from "../../../config";
-import type { GameContext } from "../../../game";
-import { Log } from "../../../log";
+import type { Space } from "../../../scenario";
 import * as BossSpace from "./bossSpace";
 import * as HelpSpace from "./helpSpace";
 import * as PersonalitySpace from "./personalitySpace";
 import * as TipsSpace from "./tipsSpace";
 import * as TrapSpace from "./trapSpace";
 
-// マス（で発生するイベント）の定義
-export interface Space {
-  name?: string; // 省略したらマップに表示されない
-  generate?: (g: GameContext) => Generator<Log>;
-  isHospital?: boolean; // 復帰地点
-}
-
-export const SPACE_MAP: Record<number, Space | undefined> = {
+export const spaceMap: Record<number, Space> = {
   0: {
     name: "スタート",
     isHospital: true,
