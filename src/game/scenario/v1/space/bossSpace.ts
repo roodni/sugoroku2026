@@ -1,8 +1,8 @@
 // ボス系マス
 
-import { diceExpected } from "../../../../util";
 import { Battle, PlayerBattler, Weapon, type Battler } from "../../../battle";
 import { GOAL_POSITION } from "../../../config";
+import { diceExpected, generateDiceRoll } from "../../../dice";
 import type { GameContext } from "../../../game";
 import { Player } from "../../../gameState";
 import { PlayerAttrChanger } from "../../../indicator";
@@ -18,7 +18,7 @@ class BigFishBattler implements Battler {
     name: "噛みつき",
     *generateAttack(g, attacker, blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}に噛みついた。`);
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 6);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 2, 6);
       return { power };
     },
     expected: diceExpected(2, 6),

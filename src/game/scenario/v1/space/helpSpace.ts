@@ -1,5 +1,6 @@
 import { PlayerBattler, Weapon } from "../../../battle";
 import { INITIAL_HP } from "../../../config";
+import { generateDiceRoll } from "../../../dice";
 import { PlayerAttrChanger } from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
 import type { Space } from "../../../scenario";
@@ -222,7 +223,7 @@ export const weaponShopSpace: Space = {
     }
 
     yield Log.newSection();
-    const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, 6);
+    const dice = yield* generateDiceRoll(g, player.isBot, 1, 6);
     const [weapon, description] = weaponList[dice - 1];
     yield Log.description(`${player.name}は${weapon.name}を購入した。`);
     if (weapon === Weapon.chikuwa && player.personality === "smart") {

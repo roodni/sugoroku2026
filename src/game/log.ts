@@ -1,4 +1,3 @@
-import { dice } from "../util";
 import type { GameContext } from "./game";
 import type { Player } from "./gameState";
 import {
@@ -59,41 +58,6 @@ export const Log = {
 };
 
 export const LogUtil = {
-  // ダイスロールは全てここを通す
-  // (times)d(sides)+(cnst)
-  *generateDiceRoll(
-    g: GameContext,
-    isBot: boolean,
-    times: number,
-    sides: number,
-    cnst: number = 0
-  ): Generator<Log, number> {
-    // 式の作成
-    let expression = `${times}d${sides}`;
-    if (cnst > 0) {
-      expression += `+${cnst}`;
-    } else if (cnst < 0) {
-      expression += `${cnst}`;
-    }
-
-    // before
-    yield Log.diceRollBefore(expression, isBot);
-
-    // 振る
-    let result = cnst;
-    const details = [];
-    for (let i = 0; i < times; i++) {
-      const x = g.state.futureDice.shift() ?? dice(sides); // 綺麗に書けるもんだな
-      result += x;
-      details.push(x);
-      g.state.diceHistory.push(x);
-    }
-
-    // after
-    yield Log.diceRollAfter(expression, result, details);
-    return result;
-  },
-
   *generatePlayerAttrs(player: Player, attrs: PlayerAttr[]): Generator<Log> {
     const text = stringifyPlayerAttrs(player, attrs);
     yield Log.system(`(${player.name}) ${text}`, "neutral", (s) =>

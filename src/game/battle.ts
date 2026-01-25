@@ -1,5 +1,5 @@
-import { diceExpected } from "../util";
 import { INITIAL_HP } from "./config";
+import { diceExpected, generateDiceRoll } from "./dice";
 import type { GameContext } from "./game";
 import { Player } from "./gameState";
 import { PlayerAttr, PlayerAttrChanger } from "./indicator";
@@ -59,7 +59,7 @@ export class Weapon {
     name: "素手",
     *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}を殴った。`);
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 6);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 1, 6);
       return { power };
     },
     expected: diceExpected(1, 6),
@@ -70,7 +70,7 @@ export class Weapon {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 10);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 1, 10);
       return { power };
     },
     expected: diceExpected(1, 10),
@@ -93,7 +93,7 @@ export class Weapon {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 6, 3);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 1, 6, 3);
       return { power };
     },
     expected: diceExpected(1, 6) + 3,
@@ -104,13 +104,7 @@ export class Weapon {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で呪った。`
       );
-      const power = yield* LogUtil.generateDiceRoll(
-        g,
-        attacker.isBot,
-        1,
-        10,
-        3
-      );
+      const power = yield* generateDiceRoll(g, attacker.isBot, 1, 10, 3);
       return { power };
     },
     expected: diceExpected(1, 10) + 3,
@@ -121,7 +115,7 @@ export class Weapon {
       yield Log.description(
         `${attacker.name}は${blocker.name}に向かって${this.name}を振りかぶった。`
       );
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 100);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 1, 100);
       // ぞろ目
       if (power % 11 === 0 || power === 100) {
         yield Log.description("ゾロ目だ！", "positive");
@@ -140,7 +134,7 @@ export class Weapon {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で斬った。`
       );
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 3, 6, 2);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 3, 6, 2);
       return { power };
     },
     expected: diceExpected(3, 6) + 2,
@@ -163,7 +157,7 @@ export class Weapon {
       yield Log.description(
         `${attacker.name}は${blocker.name}に${this.name}を投げた。`
       );
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 6);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 2, 6);
       return { power };
     },
     expected: diceExpected(2, 6),
@@ -172,7 +166,7 @@ export class Weapon {
     name: "クラッカー", // 警察の武器
     *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}に発砲した！`);
-      const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 10);
+      const power = yield* generateDiceRoll(g, attacker.isBot, 2, 10);
       yield Log.description("紙吹雪が舞う。", "positive");
       return { power };
     },
@@ -195,7 +189,7 @@ export class Weapon {
         `${attacker.name}は${blocker.name}に天罰を下した。`
       );
       yield Log.description(`裁きの雷が落ちる！`, "negative");
-      const power = yield* LogUtil.generateDiceRoll(_g, attacker.isBot, 1, 100);
+      const power = yield* generateDiceRoll(_g, attacker.isBot, 1, 100);
       return { power };
     },
     expected: diceExpected(1, 100),

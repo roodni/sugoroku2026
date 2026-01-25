@@ -1,4 +1,5 @@
 import { GOAL_POSITION } from "../../../config";
+import { generateDiceRoll } from "../../../dice";
 import type { GameContext } from "../../../game";
 import { PlayerAttrChanger } from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
@@ -89,7 +90,7 @@ export const newYearBellSpace: Space = {
   *generate(g: GameContext) {
     const player = g.state.currentPlayer();
     yield Log.description("除夜の鐘が鳴り響く。");
-    const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, 100, 8);
+    const dice = yield* generateDiceRoll(g, player.isBot, 1, 100, 8);
     yield Log.description(
       `${player.name}の煩悩が${dice}個浄化された。`,
       "positive"

@@ -1,5 +1,6 @@
 import { PlayerBattler } from "../../battle";
 import { GOAL_POSITION } from "../../config";
+import { generateDiceRoll } from "../../dice";
 import type { GameContext, TurnResult } from "../../game";
 import {
   PlayerAttr,
@@ -49,7 +50,7 @@ export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
         return 100;
     }
   })();
-  const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, diceSides);
+  const dice = yield* generateDiceRoll(g, player.isBot, 1, diceSides);
   yield Log.description(`${player.name}は${dice}マス進んだ。`, "positive");
 
   let nextPos = player.position + dice;
