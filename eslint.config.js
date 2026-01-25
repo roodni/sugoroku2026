@@ -24,8 +24,7 @@ export default defineConfig([
     rules: {
       'no-irregular-whitespace': ['error', {
         skipTemplates: true,
-      }],
-      '@typescript-eslint/no-namespace': 'off'
+      }]
     }
   },
 ])

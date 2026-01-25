@@ -48,8 +48,8 @@ function validatePersonality(p: Personality): void {
   }
 }
 
-namespace PlayerJson {
-  export function save(p: Player): PlayerJson {
+const PlayerJson = {
+  save(p: Player): PlayerJson {
     // 順番を制御するため全部列挙
     return {
       name: p.name,
@@ -65,20 +65,20 @@ namespace PlayerJson {
       goaled: p.goaled,
       isBot: p.isBot,
     };
-  }
+  },
 
-  export function load(json: PlayerJson): Player {
+  load(json: PlayerJson): Player {
     const weapon = Weapon.list.find((w) => w.name === json.weapon);
     if (!weapon) {
       throw new Error(`weapon: ${json.weapon}`);
     }
     validatePersonality(json.personality);
     return { ...json, weapon };
-  }
-}
+  },
+};
 
-export namespace GameStateJson {
-  export function save(g: GameState): GameStateJson {
+export const GameStateJson = {
+  save(g: GameState): GameStateJson {
     // 順番を制御するため全部列挙
     return {
       futureDice: g.futureDice,
@@ -91,12 +91,12 @@ export namespace GameStateJson {
       zeusHp: g.zeusHp,
       diceHistory: g.diceHistory, // これがインデントされるのは不本意だが……
     };
-  }
+  },
 
-  export function load(json: GameStateJson): GameState {
+  load(json: GameStateJson): GameState {
     return new GameState({
       ...json,
       players: json.players.map((p) => PlayerJson.load(p)),
     });
-  }
-}
+  },
+};
