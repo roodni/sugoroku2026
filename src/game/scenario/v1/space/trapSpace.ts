@@ -5,8 +5,9 @@ import {
   generatePlayerAttrChange,
   PlayerAttrChanger,
 } from "../../../indicator";
-import { Log, LogUtil } from "../../../log";
+import { Log } from "../../../log";
 import type { Space } from "../../../scenario";
+import { generateEarnTrophy } from "../../../trophy";
 
 export const spikyFloorSpace: Space = {
   name: "トゲ床",
@@ -109,7 +110,7 @@ export const LaboratorySpace: Space = {
           "positive"
         );
         yield Log.dialog("感謝します……ドクター……");
-        yield* LogUtil.generateEarnTrophy(g, "身も心も");
+        yield* generateEarnTrophy(g, "身も心も");
       }
     }
   },

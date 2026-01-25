@@ -6,8 +6,9 @@ import {
   generatePlayerAttrsChange,
   PlayerAttrChanger,
 } from "../../../indicator";
-import { Log, LogUtil } from "../../../log";
+import { Log } from "../../../log";
 import type { Space } from "../../../scenario";
+import { generateEarnTrophy } from "../../../trophy";
 
 // 性格変更系マス
 
@@ -119,7 +120,7 @@ export const newYearBellSpace: Space = {
         changers.push(PlayerAttrChanger.personality("gentle"));
       }
       yield* generatePlayerAttrsChange(player, changers, "positive");
-      yield* LogUtil.generateEarnTrophy(g, "境地");
+      yield* generateEarnTrophy(g, "境地");
     } else {
       if (player.personality !== "gentle") {
         yield Log.description(`${player.name}は心が洗われた。`);

@@ -3,7 +3,8 @@ import { GOAL_POSITION } from "../../config";
 import type { GameContext } from "../../game";
 import type { Player } from "../../gameState";
 import { generatePlayerAttrChange, PlayerAttrChanger } from "../../indicator";
-import { Log, LogUtil } from "../../log";
+import { Log } from "../../log";
+import { generateEarnTrophy } from "../../trophy";
 
 // 相席イベント
 export function* generateSharingPositionEvent(
@@ -58,7 +59,7 @@ function* generatePhobicEscape(
       `${phobic.name}は${coming.name}を避けようとしたが、前に${peopleInNextSpace[0].name}がいて進めなかった。`,
       "negative"
     );
-    yield* LogUtil.generateEarnTrophy(g, "挟み撃ち");
+    yield* generateEarnTrophy(g, "挟み撃ち");
     return { escaped: false };
   }
 
@@ -148,7 +149,7 @@ function* generateSharingPositionViolent(
       );
       if (attack2.knockedOut) {
         // 反撃で倒されたら後続の人を殴れない
-        yield* LogUtil.generateEarnTrophy(g, "因果応報");
+        yield* generateEarnTrophy(g, "因果応報");
         return { playerDead: true };
       }
     }
@@ -176,7 +177,7 @@ function* generateSharingPositionPhobic(
       `${player.name}は先客を避けようとしたが、前に${peopleInNextSpace[0].name}がいて進めなかった。`,
       "negative"
     );
-    yield* LogUtil.generateEarnTrophy(g, "挟み撃ち");
+    yield* generateEarnTrophy(g, "挟み撃ち");
   } else {
     yield Log.description(
       `${player.name}は先客を避けて1マス進んだ。`,

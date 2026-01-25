@@ -9,8 +9,8 @@ import {
   PlayerAttrChanger,
   stringifyPlayerAttrs,
 } from "../../indicator";
-import { Log, LogUtil } from "../../log";
-import { Trophy } from "../../trophy";
+import { Log } from "../../log";
+import { generateEarnTrophy, Trophy } from "../../trophy";
 import { goaledDialog } from "./goal";
 import { generateHello } from "./hello";
 import { generateSharingPositionEvent } from "./sharingSpace";
@@ -129,7 +129,7 @@ export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
       // spaceで実装すると余計なsectionが入る
       yield Log.newSection();
       yield Log.dialog("1マスしか進めなかった");
-      yield* LogUtil.generateEarnTrophy(g, "腰が重い");
+      yield* generateEarnTrophy(g, "腰が重い");
     }
 
     const space = g.scenario.spaceMap[player.position];
@@ -165,7 +165,7 @@ export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
     }
     // ゴール系の実績
     if (justGoaledPlayers.some((p) => !p.personalityChanged)) {
-      yield* LogUtil.generateEarnTrophy(g, "情緒安定");
+      yield* generateEarnTrophy(g, "情緒安定");
     }
     if (
       justGoaledPlayers.includes(player) &&
@@ -173,21 +173,21 @@ export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
       nextPos === GOAL_POSITION &&
       smartDamage === undefined
     ) {
-      yield* LogUtil.generateEarnTrophy(g, "ぴったり賞");
+      yield* generateEarnTrophy(g, "ぴったり賞");
     }
     if (youGoaled && rank === 1) {
       switch (you.personality) {
         case "gentle":
-          yield* LogUtil.generateEarnTrophy(g, "聖人君子");
+          yield* generateEarnTrophy(g, "聖人君子");
           break;
         case "violent":
-          yield* LogUtil.generateEarnTrophy(g, "世紀末");
+          yield* generateEarnTrophy(g, "世紀末");
           break;
         case "phobic":
-          yield* LogUtil.generateEarnTrophy(g, "戦々恐々");
+          yield* generateEarnTrophy(g, "戦々恐々");
           break;
         case "smart":
-          yield* LogUtil.generateEarnTrophy(g, "超スマート");
+          yield* generateEarnTrophy(g, "超スマート");
           break;
       }
     }

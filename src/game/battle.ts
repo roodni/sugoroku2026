@@ -7,7 +7,8 @@ import {
   PlayerAttr,
   PlayerAttrChanger,
 } from "./indicator";
-import { Log, LogUtil } from "./log";
+import { Log } from "./log";
+import { generateEarnTrophy } from "./trophy";
 
 // 攻撃するもの
 export interface Attacker {
@@ -271,7 +272,7 @@ export const Battle = {
     }
     const { knockedOut } = yield* this.generateHit(g, power, blocker);
     if (knockedOut && attacker.weapon === Weapon.hammer) {
-      yield* LogUtil.generateEarnTrophy(g, "一撃粉砕");
+      yield* generateEarnTrophy(g, "一撃粉砕");
     }
     return { knockedOut };
   },

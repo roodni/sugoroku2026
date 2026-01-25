@@ -1,6 +1,7 @@
 import { Battle, PlayerBattler, Weapon, type Blocker } from "../../../battle";
-import { Log, LogUtil } from "../../../log";
+import { Log } from "../../../log";
 import type { Space } from "../../../scenario";
+import { generateEarnTrophy } from "../../../trophy";
 
 export const destinyTipsSpace: Space = {
   name: "演説",
@@ -89,7 +90,7 @@ export const illegalWeaponTipsSpace: Space = {
       const { knockedOut } = yield* Battle.generateAttack(g, attacker, board);
       if (knockedOut) {
         yield Log.dialog("警察には気を付けねえとな");
-        yield* LogUtil.generateEarnTrophy(g, "違法チェック");
+        yield* generateEarnTrophy(g, "違法チェック");
       } else {
         yield Log.dialog("ちっ");
       }

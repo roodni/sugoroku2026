@@ -9,8 +9,9 @@ import {
   generatePlayerAttrChange,
   PlayerAttrChanger,
 } from "../../../indicator";
-import { Log, LogUtil } from "../../../log";
+import { Log } from "../../../log";
 import type { Space } from "../../../scenario";
+import { generateEarnTrophy } from "../../../trophy";
 
 class BigFishBattler implements Battler {
   name = "巨大魚";
@@ -98,7 +99,7 @@ export const fishingSpace: Space = {
             PlayerAttrChanger.hp(player.hp + 5),
             "positive"
           );
-          yield* LogUtil.generateEarnTrophy(g, "池の主釣り");
+          yield* generateEarnTrophy(g, "池の主釣り");
         }
         break;
       }
@@ -199,7 +200,7 @@ export const policeSpace: Space = {
         if (winner === "first") {
           // 1. 凶暴 & 違法 & 勝利
           yield Log.dialog("自由を勝ち取ったぜ");
-          yield* LogUtil.generateEarnTrophy(g, "凶悪犯");
+          yield* generateEarnTrophy(g, "凶悪犯");
         } else {
           // 2. 凶暴 & 違法 & 敗北
           yield* generateBosshu();
@@ -233,7 +234,7 @@ export const policeSpace: Space = {
             PlayerAttrChanger.weapon(Weapon.gun),
             "positive"
           );
-          yield* LogUtil.generateEarnTrophy(g, "凶悪犯");
+          yield* generateEarnTrophy(g, "凶悪犯");
         } else {
           // 4. 凶暴 & 合法 & 敗北
           yield* generateKaishin();
@@ -305,7 +306,7 @@ export const policeSpace: Space = {
                   "positive"
                 );
                 yield Log.dialog("はー、はー……");
-                yield* LogUtil.generateEarnTrophy(g, "凶悪犯");
+                yield* generateEarnTrophy(g, "凶悪犯");
               } else {
                 // 9. 凶暴ではない + 違法 + 恐怖症 + 敗北
                 yield* generateBosshu();
@@ -465,7 +466,7 @@ export const goddessSpace: Space = {
               "positive"
             );
             yield Log.dialog("オオオオ！　力が湧き出て止まらないぜ！");
-            yield* LogUtil.generateEarnTrophy(g, "湖の女神");
+            yield* generateEarnTrophy(g, "湖の女神");
           } else {
             // 凶暴 => 金の斧 => 敗北
             // noop
@@ -615,7 +616,7 @@ export const ninjaSpace: Space = {
             PlayerAttrChanger.weapon(Weapon.ninjaStar),
             "positive"
           );
-          yield* LogUtil.generateEarnTrophy(g, "曲者退治");
+          yield* generateEarnTrophy(g, "曲者退治");
         }
         break;
       }
@@ -781,7 +782,7 @@ export const godZeusSpace: Space = {
           smart: "確かに人間は愚かさ。だからこそ僕たちはスマートを追求するんだ",
         }[player.personality]
       );
-      yield* LogUtil.generateEarnTrophy(g, "最強神");
+      yield* generateEarnTrophy(g, "最強神");
     }
   },
 };

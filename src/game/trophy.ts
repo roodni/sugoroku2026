@@ -1,4 +1,6 @@
 import { TROPHY_KEY, YOUR_NAME } from "./config";
+import type { GameContext } from "./game";
+import { Log } from "./log";
 
 // ゲームロジックは独立しているのにトロフィーだけLocalStorageに依存しているのが良くないと思いましたか？
 
@@ -69,3 +71,30 @@ export const Trophy = {
     return { firstTime: true };
   },
 };
+
+export function* generateEarnTrophy(
+  g: GameContext,
+  trophyName: TrophyName
+): Generator<Log> {
+  if (g.state.trophies.map((t) => t.name).includes(trophyName)) {
+    return; // 既に周回内で獲得していたらスルー
+  }
+
+  let firstTime = false; // リプレイではトロフィーを獲得できない
+  if (!g.state.replayMode) {
+    firstTime = Trophy.earn(trophyName).firstTime;
+  }
+  g.state.trophies.push({ name: trophyName, firstTime });
+
+  let firstTimeText = "";
+  if (firstTime) {
+    firstTimeText = " (new)";
+  } else if (g.state.replayMode) {
+    firstTimeText = "（保存されません）";
+  }
+  yield Log.system(
+    `[トロフィー獲得] ${trophyName}${firstTimeText}`,
+    "neutral",
+    (s) => s.replaceAll("[トロフィー獲得] ", "トロフィー獲得。")
+  );
+}
