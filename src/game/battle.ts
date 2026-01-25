@@ -1,6 +1,7 @@
 import { diceExpected } from "../util";
 import { INITIAL_HP } from "./config";
-import { GameState, Player } from "./gameState";
+import type { GameContext } from "./game";
+import { Player } from "./gameState";
 import { PlayerAttr, PlayerAttrChanger } from "./indicator";
 import { Log, LogUtil } from "./log";
 import { SPACE_MAP } from "./scenario/v1/space/space";
@@ -10,7 +11,7 @@ export interface Attacker {
   name: string;
   isBot: boolean;
   weapon: Weapon;
-  generateAttackVoice(g: GameState): Generator<Log>;
+  generateAttackVoice(g: GameContext): Generator<Log>;
 }
 
 // 攻撃を受けるもの
@@ -20,17 +21,17 @@ export interface Blocker {
   setHp(hp: number): void;
   smart?: boolean;
   generateDamageVoice(
-    g: GameState,
+    g: GameContext,
     details: { beforeHp: number; damage: number }
   ): Generator<Log>;
-  generateKnockedOut(g: GameState): Generator<Log>;
+  generateKnockedOut(g: GameContext): Generator<Log>;
 }
 
 export type Battler = Blocker & Attacker;
 
 // 武器の処理
 type WeaponAttackGenerator = (
-  g: GameState,
+  g: GameContext,
   attacker: Attacker,
   blocker: Blocker
 ) => Generator<Log, { power: number }>;
@@ -57,7 +58,7 @@ export class Weapon {
 
   static hand = new this({
     name: "素手",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}を殴った。`);
       const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 1, 6);
       return { power };
@@ -66,7 +67,7 @@ export class Weapon {
   });
   static stick = new this({
     name: "こん棒",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
@@ -79,7 +80,7 @@ export class Weapon {
   // 武器屋のラインナップ
   static chikuwa = new this({
     name: "ちくわ",
-    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(_g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
@@ -89,7 +90,7 @@ export class Weapon {
   });
   static knuckle = new this({
     name: "ナックル",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で殴った。`
       );
@@ -100,7 +101,7 @@ export class Weapon {
   });
   static magicalStaff = new this({
     name: "魔法の杖",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で呪った。`
       );
@@ -117,7 +118,7 @@ export class Weapon {
   });
   static hammer = new this({
     name: "100tハンマー",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}に向かって${this.name}を振りかぶった。`
       );
@@ -136,7 +137,7 @@ export class Weapon {
   });
   static darkSword = new this({
     name: "暗黒破壊剣",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}を${this.name}で斬った。`
       );
@@ -147,7 +148,7 @@ export class Weapon {
   });
   static beam = new this({
     name: "ビーム砲",
-    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(_g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}にビーム砲を発射した。`
       );
@@ -159,7 +160,7 @@ export class Weapon {
   // ボス
   static ninjaStar = new this({
     name: "手裏剣",
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}に${this.name}を投げた。`
       );
@@ -170,7 +171,7 @@ export class Weapon {
   });
   static gun = new this({
     name: "クラッカー", // 警察の武器
-    *generateAttack(g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(`${attacker.name}は${blocker.name}に発砲した！`);
       const power = yield* LogUtil.generateDiceRoll(g, attacker.isBot, 2, 10);
       yield Log.description("紙吹雪が舞う。", "positive");
@@ -180,7 +181,7 @@ export class Weapon {
   });
   static goldenAxe = new this({
     name: "金の斧",
-    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(_g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}に${this.name}を投げつけた！`
       );
@@ -190,7 +191,7 @@ export class Weapon {
   });
   static lightning = new this({
     name: "天罰",
-    *generateAttack(_g: GameState, attacker: Attacker, blocker: Blocker) {
+    *generateAttack(_g: GameContext, attacker: Attacker, blocker: Blocker) {
       yield Log.description(
         `${attacker.name}は${blocker.name}に天罰を下した。`
       );
@@ -222,7 +223,7 @@ type BattleResult = { winner: "first" | "second" };
 
 export const Battle = {
   *generateHit(
-    g: GameState,
+    g: GameContext,
     power: number,
     blocker: Blocker
   ): Generator<Log, HitResult> {
@@ -255,7 +256,7 @@ export const Battle = {
   },
 
   *generateAttack(
-    g: GameState,
+    g: GameContext,
     attacker: Attacker,
     blocker: Blocker,
     options: { skipAttackVoice?: boolean } = {}
@@ -279,7 +280,7 @@ export const Battle = {
   },
 
   *generateBattle(
-    g: GameState,
+    g: GameContext,
     first: Battler,
     second: Battler
   ): Generator<Log, BattleResult> {
@@ -319,7 +320,7 @@ export class PlayerBattler implements Battler {
     this.p.hp = hp;
   }
   *generateDamageVoice(
-    _g: GameState,
+    _g: GameContext,
     details: { beforeHp: number; damage: number }
   ): Generator<Log> {
     const fatal = details.damage * 4 >= details.beforeHp;
@@ -414,7 +415,7 @@ export class PlayerBattler implements Battler {
   }
 
   static *generateHitPlayer(
-    g: GameState,
+    g: GameContext,
     power: number,
     player: Player,
     options: {
@@ -430,7 +431,7 @@ export class PlayerBattler implements Battler {
         return super.smart;
       }
       override *generateDamageVoice(
-        g: GameState,
+        g: GameContext,
         details: { beforeHp: number; damage: number }
       ): Generator<Log> {
         if (options.overrideDamageVoice) {

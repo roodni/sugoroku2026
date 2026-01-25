@@ -3,7 +3,8 @@
 import { diceExpected } from "../../../../util";
 import { Battle, PlayerBattler, Weapon, type Battler } from "../../../battle";
 import { GOAL_POSITION } from "../../../config";
-import { Player, type GameState } from "../../../gameState";
+import type { GameContext } from "../../../game";
+import { Player } from "../../../gameState";
 import { PlayerAttrChanger } from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
 import type { Space } from "./space";
@@ -43,8 +44,8 @@ class BigFishBattler implements Battler {
 
 export const fishingSpace: Space = {
   name: "釣り場",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description("釣りスポットの池がある。");
     switch (player.personality) {
       case "gentle":
@@ -149,7 +150,7 @@ class PoliceBattler implements Battler {
 }
 export const policeSpace: Space = {
   name: "職務質問",
-  *generate(g: GameState) {
+  *generate(g: GameContext) {
     // 使いまわす処理
     function* generateBosshu() {
       yield Log.description(`${player.name}は装備を没収された。`, "negative");
@@ -169,7 +170,7 @@ export const policeSpace: Space = {
       yield Log.dialog("これからは真面目に生きていきます");
     }
     // ここから
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("警察が話しかけてきた。");
     yield Log.dialog("君、ちょっと持ち物を見せてもらえるかな");
     if (player.personality === "violent") {
@@ -352,7 +353,7 @@ class GoddessBattler implements Battler {
   }
 
   *generateDamageVoice(
-    _g: GameState,
+    _g: GameContext,
     details: { beforeHp: number; damage: number }
   ): Generator<Log> {
     if (details.beforeHp === 100) {
@@ -370,8 +371,8 @@ class GoddessBattler implements Battler {
 
 export const goddessSpace: Space = {
   name: "湖",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description("湖がある。");
     if (player.weapon === Weapon.hand) {
       // 1. 素手
@@ -567,8 +568,8 @@ class NinjaBattler implements Battler {
 
 export const ninjaSpace: Space = {
   name: "和風庭園",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description("和風庭園がある。");
     yield Log.description("突然、忍者が現れた！", "negative");
     yield Log.dialog("ニンニン……");
@@ -660,22 +661,22 @@ export const ninjaSpace: Space = {
 class GodZeusBattler implements Battler {
   name = "ゴッドゼウス";
   isBot = true;
-  gameState: GameState;
+  g: GameContext;
 
-  constructor(gameState: GameState) {
-    this.gameState = gameState;
+  constructor(gameState: GameContext) {
+    this.g = gameState;
   }
 
   getHp() {
-    return this.gameState.zeusHp;
+    return this.g.state.zeusHp;
   }
   setHp(hp: number) {
-    this.gameState.zeusHp = hp;
+    this.g.state.zeusHp = hp;
   }
   weapon = Weapon.lightning;
 
   *generateDamageVoice(
-    _g: GameState,
+    _g: GameContext,
     details: { beforeHp: number; damage: number }
   ) {
     if (details.beforeHp > details.damage) {
@@ -695,14 +696,14 @@ class GodZeusBattler implements Battler {
 
 export const godZeusSpace: Space = {
   name: "神殿",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
-    const alreadyMet = g.zeusHp < 100;
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
+    const alreadyMet = g.state.zeusHp < 100;
     yield Log.description(
       `${alreadyMet ? "ゴッドゼウス" : "謎"}の神殿がある。`,
       alreadyMet ? "negative" : "neutral"
     );
-    if (g.zeusHp <= 0) {
+    if (g.state.zeusHp <= 0) {
       yield Log.description(`ゴッドゼウスは一時的に不在のようだ。`, "positive");
       return;
     }
@@ -731,7 +732,7 @@ export const godZeusSpace: Space = {
       return;
     }
 
-    if (g.zeusHp === 100) {
+    if (g.state.zeusHp === 100) {
       yield Log.dialog(
         {
           violent: "あ!?　何だてめえ！　姿を見せろ！",

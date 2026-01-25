@@ -1,7 +1,6 @@
 import { PlayerBattler } from "../../battle";
 import { GOAL_POSITION } from "../../config";
-import type { TurnResult } from "../../game";
-import { GameState } from "../../gameState";
+import type { GameContext, TurnResult } from "../../game";
 import {
   PlayerAttr,
   PlayerAttrChanger,
@@ -17,15 +16,15 @@ import { SPACE_MAP } from "./space/space";
 // 1ターンを経過させる。
 // ターンの切れ目に安全にセーブ&ロード（デバッグ用）できるように、
 // 1ターン分を関数に切ることでターン開始時にGameState以外の状態を参照しないことを保証している。
-export function* generateTurn(g: GameState): Generator<Log, TurnResult> {
-  const player = g.players[g.currentPlayerIndex];
+export function* generateTurn(g: GameContext): Generator<Log, TurnResult> {
+  const player = g.state.currentPlayer();
   if (player.goaled) {
     return { skipped: true };
   }
 
   player.turn += 1;
-  g.cameraStart = player.position;
-  g.cameraPlayerIndex = g.currentPlayerIndex;
+  g.state.cameraStart = player.position;
+  g.state.cameraPlayerIndex = g.state.currentPlayerIndex;
 
   // ターン開始
   yield Log.description(`${player.name}のターン${player.turn}。`);
@@ -142,17 +141,17 @@ export function* generateTurn(g: GameState): Generator<Log, TurnResult> {
   }
 
   // ゴールチェック
-  const justGoaledPlayers = g.players.filter(
+  const justGoaledPlayers = g.state.players.filter(
     (p) => p.position === GOAL_POSITION && !p.goaled
   );
   if (justGoaledPlayers.length > 0) {
     yield Log.newSection();
-    const you = g.players[0];
+    const you = g.state.players[0];
     const youGoaled = justGoaledPlayers.includes(you);
     if (youGoaled) {
       yield Log.description("おめでとう！", "positive");
     }
-    const alreadyGoaled = g.players.filter((p) => p.goaled).length;
+    const alreadyGoaled = g.state.players.filter((p) => p.goaled).length;
     const rank = alreadyGoaled + 1;
     const justGoaledNames = justGoaledPlayers.map((p) => p.name).join("と");
     yield Log.description(
@@ -193,10 +192,10 @@ export function* generateTurn(g: GameState): Generator<Log, TurnResult> {
           break;
       }
     }
-    if (youGoaled && g.trophies.length > 0) {
+    if (youGoaled && g.state.trophies.length > 0) {
       yield Log.newSection();
       yield Log.system("<今回のトロフィー>");
-      for (const trophy of g.trophies) {
+      for (const trophy of g.state.trophies) {
         const detail = Trophy.detail(trophy.name);
         const firstTimeText = trophy.firstTime ? " (new)" : "";
         yield Log.system(
@@ -205,7 +204,7 @@ export function* generateTurn(g: GameState): Generator<Log, TurnResult> {
       }
     }
     if (youGoaled) {
-      if (g.replayMode) {
+      if (g.state.replayMode) {
         yield Log.system(
           "これはリプレイです。トロフィーは保存されません。",
           "negative"
@@ -223,8 +222,8 @@ export function* generateTurn(g: GameState): Generator<Log, TurnResult> {
       const dialog = goaledDialog(you, rank);
       let gameOver = `${you.name}は${rank}位でゴールした。「${dialog}」`;
       gameOver += `\n[状態] ${attrsText}`;
-      if (g.trophies.length > 0) {
-        const trophiesText = g.trophies.map((t) => t.name).join(", ");
+      if (g.state.trophies.length > 0) {
+        const trophiesText = g.state.trophies.map((t) => t.name).join(", ");
         gameOver += `\n[トロフィー] ${trophiesText}`;
       }
       return { skipped: true, gameOver }; // ここのskippedは意味をなさない

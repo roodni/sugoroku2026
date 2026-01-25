@@ -1,15 +1,16 @@
 import { Battle, PlayerBattler } from "../../battle";
 import { GOAL_POSITION } from "../../config";
-import type { GameState, Player } from "../../gameState";
+import type { GameContext } from "../../game";
+import type { Player } from "../../gameState";
 import { PlayerAttrChanger } from "../../indicator";
 import { Log, LogUtil } from "../../log";
 
 // 相席イベント
 export function* generateSharingPositionEvent(
-  g: GameState,
+  g: GameContext,
   currentPlayer: Player
 ): Generator<Log, { playerDead: boolean }> {
-  const others = g.players.filter(
+  const others = g.state.players.filter(
     (p) => p !== currentPlayer && p.position === currentPlayer.position
   );
   if (others.length === 0) {
@@ -36,7 +37,7 @@ export function* generateSharingPositionEvent(
 
 // 来た人を嫌がって逃げる
 function* generatePhobicEscape(
-  g: GameState,
+  g: GameContext,
   phobic: Player,
   coming: Player
 ): Generator<Log, { escaped: boolean }> {
@@ -49,7 +50,7 @@ function* generatePhobicEscape(
     return { escaped: false };
   }
 
-  const peopleInNextSpace = g.players.filter(
+  const peopleInNextSpace = g.state.players.filter(
     (p) => p.position === phobic.position + 1
   );
   if (peopleInNextSpace.length > 0) {
@@ -75,7 +76,7 @@ function* generatePhobicEscape(
 }
 
 function* generateSharingPositionGentle(
-  g: GameState,
+  g: GameContext,
   player: Player,
   others: Player[]
 ) {
@@ -107,7 +108,7 @@ function* generateSharingPositionGentle(
 }
 
 function* generateSharingPositionViolent(
-  g: GameState,
+  g: GameContext,
   player: Player,
   others: Player[]
 ): Generator<Log, { playerDead: boolean }> {
@@ -156,13 +157,13 @@ function* generateSharingPositionViolent(
 }
 
 function* generateSharingPositionPhobic(
-  g: GameState,
+  g: GameContext,
   player: Player
 ): Generator<Log, { playerDead: boolean }> {
   yield Log.dialog("ひっ");
 
   let escaped = false;
-  const peopleInNextSpace = g.players.filter(
+  const peopleInNextSpace = g.state.players.filter(
     (p) => p.position === player.position + 1
   );
   if (player.position === GOAL_POSITION) {
@@ -205,7 +206,7 @@ function* generateSharingPositionPhobic(
 }
 
 function* generateSharingPositionSmart(
-  g: GameState,
+  g: GameContext,
   player: Player,
   others: Player[]
 ) {

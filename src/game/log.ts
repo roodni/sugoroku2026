@@ -1,5 +1,6 @@
 import { dice } from "../util";
-import type { GameState, Player } from "./gameState";
+import type { GameContext } from "./game";
+import type { Player } from "./gameState";
 import {
   attrSeparator,
   PlayerAttr,
@@ -61,7 +62,7 @@ export const LogUtil = {
   // ダイスロールは全てここを通す
   // (times)d(sides)+(cnst)
   *generateDiceRoll(
-    g: GameState,
+    g: GameContext,
     isBot: boolean,
     times: number,
     sides: number,
@@ -82,10 +83,10 @@ export const LogUtil = {
     let result = cnst;
     const details = [];
     for (let i = 0; i < times; i++) {
-      const x = g.futureDice.shift() ?? dice(sides); // 綺麗に書けるもんだな
+      const x = g.state.futureDice.shift() ?? dice(sides); // 綺麗に書けるもんだな
       result += x;
       details.push(x);
-      g.diceHistory.push(x);
+      g.state.diceHistory.push(x);
     }
 
     // after
@@ -119,21 +120,21 @@ export const LogUtil = {
     yield* this.generatePlayerAttrsChange(player, [attr], emotion);
   },
 
-  *generateEarnTrophy(g: GameState, trophyName: TrophyName): Generator<Log> {
-    if (g.trophies.map((t) => t.name).includes(trophyName)) {
+  *generateEarnTrophy(g: GameContext, trophyName: TrophyName): Generator<Log> {
+    if (g.state.trophies.map((t) => t.name).includes(trophyName)) {
       return; // 既に周回内で獲得していたらスルー
     }
 
     let firstTime = false; // リプレイではトロフィーを獲得できない
-    if (!g.replayMode) {
+    if (!g.state.replayMode) {
       firstTime = Trophy.earn(trophyName).firstTime;
     }
-    g.trophies.push({ name: trophyName, firstTime });
+    g.state.trophies.push({ name: trophyName, firstTime });
 
     let firstTimeText = "";
     if (firstTime) {
       firstTimeText = " (new)";
-    } else if (g.replayMode) {
+    } else if (g.state.replayMode) {
       firstTimeText = "（保存されません）";
     }
     yield Log.system(

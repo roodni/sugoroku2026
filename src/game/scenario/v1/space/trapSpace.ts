@@ -8,7 +8,7 @@ import type { Space } from "./space";
 export const spikyFloorSpace: Space = {
   name: "トゲ床",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("床がトゲトゲになっている。", "negative");
     yield Log.description(`${player.name}は踏んでしまった。`);
     const { knockedOut } = yield* PlayerBattler.generateHitPlayer(
@@ -40,7 +40,7 @@ export const LaboratorySpace: Space = {
   // クソイベ
   name: "研究所",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     if (player.dice !== "1d100") {
       // 初回
       yield Log.description("研究所がある。");

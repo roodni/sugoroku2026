@@ -8,19 +8,24 @@ export type TurnResult = {
   gameOver?: string; // 共有用のメッセージが入る。入ったらゲーム終了
 };
 
-export class Game {
+// ターン生成関数でバケツリレーする
+export interface GameContext {
+  get state(): GameState;
+}
+
+export class Game implements GameContext {
   // 描画に使うのでpublic
-  gameState: GameState;
+  state: GameState;
 
   private generator: Generator<Log> | undefined;
   history: Log[];
   loadable: boolean;
 
   constructor(options: { replay?: number[] }) {
-    this.gameState = GameState.initial();
+    this.state = GameState.initial();
     if (options.replay) {
-      this.gameState.replayMode = true;
-      this.gameState.futureDice = options.replay;
+      this.state.replayMode = true;
+      this.state.futureDice = options.replay;
     }
     this.history = [];
     this.loadable = true; // 最初はロード可能
@@ -30,33 +35,32 @@ export class Game {
   load(json: string) {
     if (this.loadable) {
       const obj = JSON.parse(json);
-      this.gameState = GameStateJson.load(obj);
+      this.state = GameStateJson.load(obj);
     } else {
       throw new Error("ターン途中ではロード禁止");
     }
   }
   save(): string {
-    const obj = GameStateJson.save(this.gameState);
+    const obj = GameStateJson.save(this.state);
     return JSON.stringify(obj, undefined, 2);
   }
 
   private *generate(): Generator<Log, string> {
     this.loadable = false;
-    if (this.gameState.replayMode) {
+    if (this.state.replayMode) {
       yield Log.description("リプレイの再生を開始した。");
     }
     while (true) {
-      const g = this.gameState;
-      const turnResult = yield* generateTurn(g);
+      const turnResult = yield* generateTurn(this);
       if (turnResult.gameOver !== undefined) {
         // ゲーム終了
         return turnResult.gameOver;
       }
-      g.currentPlayerIndex += 1;
-      g.currentPlayerIndex %= g.players.length;
+      this.state.currentPlayerIndex += 1;
+      this.state.currentPlayerIndex %= this.state.players.length;
       if (!turnResult.skipped) {
         this.loadable = true;
-        yield Log.turnEnd(); // <- このタイミングでgameStateがデバッグ機能により書き変わる可能性がある
+        yield Log.turnEnd(); // <- このタイミングでstateがデバッグ機能により書き変わる可能性がある
         this.loadable = false;
       }
     }

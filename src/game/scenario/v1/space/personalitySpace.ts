@@ -1,5 +1,5 @@
 import { GOAL_POSITION } from "../../../config";
-import type { GameState } from "../../../gameState";
+import type { GameContext } from "../../../game";
 import { PlayerAttrChanger } from "../../../indicator";
 import { Log, LogUtil } from "../../../log";
 import type { Space } from "./space";
@@ -8,8 +8,8 @@ import type { Space } from "./space";
 
 export const liveSpace: Space = {
   name: "ライブ会場",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description("ライブ会場がある。");
     yield Log.description("暗黒デスメタルバンドが演奏している。");
     yield Log.dialog("ゴォトゥヘル");
@@ -30,8 +30,8 @@ export const liveSpace: Space = {
 
 export const librarySpace: Space = {
   name: "図書館",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description("図書館がある。");
     if (player.personality === "violent") {
       yield Log.dialog("あ？　俺は本とか読まないぜ");
@@ -57,8 +57,8 @@ export const librarySpace: Space = {
 
 export const hauntedHouseSpace: Space = {
   name: "幽霊屋敷",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description("幽霊屋敷がある。");
     yield Log.description(`${player.name}は足を踏み入れた。`);
     yield Log.dialog("うらめしや……");
@@ -86,8 +86,8 @@ export const hauntedHouseSpace: Space = {
 
 export const newYearBellSpace: Space = {
   name: "除夜の鐘",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description("除夜の鐘が鳴り響く。");
     const dice = yield* LogUtil.generateDiceRoll(g, player.isBot, 1, 100, 8);
     yield Log.description(
@@ -131,8 +131,8 @@ export const newYearBellSpace: Space = {
 
 export const seminarSpace: Space = {
   name: "研修",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description(`${player.name}は研修を受講した。`);
     yield Log.dialog(
       `これからの市場を生き抜くにはグローバル人材としてソリューションにコミットすることです`
@@ -157,8 +157,8 @@ export const seminarSpace: Space = {
 
 export const onlineGameSpace: Space = {
   name: "ネトゲ",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description(`${player.name}はオンライン対戦ゲームで遊んだ。`);
     yield Log.dialog("oh shit! noob! lagger! asshole!");
     yield Log.description("かなりエキサイトした。");
@@ -177,8 +177,8 @@ export const onlineGameSpace: Space = {
 
 export const hygieneSpace: Space = {
   name: "衛生講習会",
-  *generate(g: GameState) {
-    const player = g.players[g.currentPlayerIndex];
+  *generate(g: GameContext) {
+    const player = g.state.currentPlayer();
     yield Log.description(`${player.name}は衛生講習会に参加した。`);
     yield Log.dialog(
       "未加熱の食材は寄生虫に汚染されている場合があります。このように！"

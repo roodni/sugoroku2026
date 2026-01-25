@@ -1,5 +1,5 @@
 import { GOAL_POSITION } from "../../../config";
-import { type GameState } from "../../../gameState";
+import type { GameContext } from "../../../game";
 import { Log } from "../../../log";
 import * as BossSpace from "./bossSpace";
 import * as HelpSpace from "./helpSpace";
@@ -10,7 +10,7 @@ import * as TrapSpace from "./trapSpace";
 // マス（で発生するイベント）の定義
 export interface Space {
   name?: string; // 省略したらマップに表示されない
-  generate?: (g: GameState) => Generator<Log>;
+  generate?: (g: GameContext) => Generator<Log>;
   isHospital?: boolean; // 復帰地点
 }
 

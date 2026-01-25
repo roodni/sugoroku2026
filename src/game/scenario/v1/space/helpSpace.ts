@@ -9,7 +9,7 @@ import type { Space } from "./space";
 export const konbiniSpace: Space = {
   name: "コンビニ",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("コンビニがある。");
     switch (player.personality) {
       case "gentle":
@@ -60,7 +60,7 @@ export const konbiniSpace: Space = {
 export const hospitalSpace: Space = {
   name: "病院",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("病院がある。");
 
     if (player.hp >= INITIAL_HP) {
@@ -118,7 +118,7 @@ export const hospitalSpace: Space = {
 export const shortCutSpace: Space = {
   name: "近道",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("近道がある。");
     switch (player.personality) {
       case "gentle":
@@ -181,7 +181,7 @@ export const shortCutSpace: Space = {
 export const weaponShopSpace: Space = {
   name: "武器屋",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("武器屋がある。");
     yield Log.dialog("らっしゃい！");
     switch (player.personality) {

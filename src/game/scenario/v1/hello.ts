@@ -1,11 +1,11 @@
 import { GOAL_POSITION } from "../../config";
-import type { GameState } from "../../gameState";
+import type { GameContext } from "../../game";
 import { Log } from "../../log";
 
 // ターン開始時の独り言
-export function* generateHello(g: GameState): Generator<Log> {
-  const player = g.players[g.currentPlayerIndex];
-  const index = g.currentPlayerIndex + player.position;
+export function* generateHello(g: GameContext): Generator<Log> {
+  const player = g.state.currentPlayer();
+  const index = g.state.currentPlayerIndex + player.position;
   const desiredDice = Math.min(6, GOAL_POSITION - player.position);
   const dialogs = (() => {
     switch (player.personality) {

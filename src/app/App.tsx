@@ -187,7 +187,7 @@ function App() {
     (options: { initializeJson: boolean; replayData?: number[] }) => {
       // ゲームオブジェクト
       const game = new Game({ replay: options.replayData });
-      setIsReplay(game.gameState.replayMode);
+      setIsReplay(game.state.replayMode);
       gameRef.current = game;
 
       if (options.replayData === undefined) {
@@ -274,7 +274,7 @@ function App() {
 
       // ゴール処理
       if (log.type === "gameOver") {
-        const replay = await encodeReplay(game.gameState.diceHistory);
+        const replay = await encodeReplay(game.state.diceHistory);
         setScene({ type: "gameOver", message: log.message, replay });
         // ゴールしたらURLにリプレイ情報を含める
         const url = createReplayUrl(location.href, replay);
@@ -451,7 +451,7 @@ function App() {
     }
   })();
 
-  const getGameState = useCallback(() => gameRef.current!.gameState, []);
+  const getGameState = useCallback(() => gameRef.current!.state, []);
 
   return (
     <div className="app">

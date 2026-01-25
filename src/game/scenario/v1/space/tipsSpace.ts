@@ -5,7 +5,7 @@ import type { Space } from "./space";
 export const destinyTipsSpace: Space = {
   name: "演説",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("演説が聞こえる。");
     yield Log.dialog("貴方は運命を信じますか？");
     yield Log.description("内容は胡散臭い。");
@@ -33,7 +33,7 @@ export const destinyTipsSpace: Space = {
 export const personalityTipsSpace: Space = {
   name: "本屋",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("本屋がある。");
     yield Log.description(`${player.name}は心理テストの本を手に取った。`);
     yield Log.dialog("人々の性格は4種類に分類されます");
@@ -76,7 +76,7 @@ class BoardBlocker implements Blocker {
 export const illegalWeaponTipsSpace: Space = {
   name: "立て看板",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("立て看板がある。");
     yield Log.dialog(
       "期待値10ダメージ以上の装備は法令により所持が禁止されています"
@@ -120,7 +120,7 @@ function rubyRemovingDate(s: string): string {
 export const releaseNoteV1Space: Space = {
   name: "石碑",
   *generate(g) {
-    const player = g.players[g.currentPlayerIndex];
+    const player = g.state.currentPlayer();
     yield Log.description("石碑に何かが刻まれている。");
     const notes = [
       "(2026-01-04) v1.0 初公開",
